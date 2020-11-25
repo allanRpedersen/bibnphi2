@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Traitement en cours ...{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 mx-5">
+        Traitement de l'ouvrage : {{ book.title }} ~ {{ book.author.lastName }}
+
+            {{ render( (controller( 'App\\Controller\\BookController:renderProgressBar', {prorata: prorata}  ))) }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}

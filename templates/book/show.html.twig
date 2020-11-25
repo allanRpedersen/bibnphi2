@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.slug }}{% endblock %}
+
+{% block body %}
+
+<div class="container mt-5">
+	<div class="row">
+		<div class="col-md-4">
+			<h1>{{ book.title }}</h1>
+			<br>
+			<p>xml parsing time : {{ book.parsingTime | round(2, 'floor')}} sec ({{ (book.parsingTime / 60)  | round(1, 'floor') }} min)</p>
+			<p>paragraphs       : {{ book.nbParagraphs }}</p>
+			<p>sentences        : {{ book.nbSentences }}</p>
+			<br>
+			<h3>écrit par {{ book.author.firstName ~' '~ book.author.lastName }}</h3>
+			<h4>publié en {{ book.publishedYear }}</h4>
+			<p>{{ book.summary }}</p>
+
+			<a href="{{ path('front') }}">retour à la bibliothèque</a>
+			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier</a>
+
+			{{ include('book/_delete_form.html.twig') }}
+		</div>
+		<div class="col-md-8">
+			{% for paragraph in book.bookParagraphs %}
+			<p>
+				{% for sentence in paragraph.sentences %}
+				{{ sentence.content }}
+				{% endfor %}
+			</p>
+			{% endfor %}
+		
+		</div>
+
+	</div>
+</div>
+{% endblock %}

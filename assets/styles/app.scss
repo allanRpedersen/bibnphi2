@@ -1,0 +1,22 @@
+//
+// using template https://bootswatch.com/lumen/
+// @import 'variables';
+@import 'bootstrap.min.css';
+// @import '~bootstrap/dist/css/bootstrap.min.css';
+// @import 'bootswatch';
+
+body {
+    background-color: lightgray;
+}
+
+.book-card {
+
+    background-color: rgb(216, 240, 241);
+    border: 1px solid black;
+    border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
+}
+
+.author-card {
+    background-color: rgb(207, 200, 92);
+    border: 1px solid black;
+}

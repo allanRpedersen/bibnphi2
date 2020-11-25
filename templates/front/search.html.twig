@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste de Recherche !!{% endblock %}
+
+{% block body %}
+	<div class="container mt1">
+	
+		<h3>Recherche de : {{ string }} dans la liste de livres suivante :</h3>
+		<p>
+		{% for book in bookList %}
+			{{book.title}} - {{book.author.lastName}} , 
+		{% endfor %}
+		</p>
+		<hr>
+		{# <h3>{{sentences|length}} occurences repérées !!</h3> #}
+		{% set book_slug = "" %}
+		{% for sentence in sentences %}
+
+		<div class="row">
+			<div class="col-md-4">
+			{% if sentence.book.slug != book_slug %}
+				{% set book_slug = sentence.book.slug %}
+				<h4>{{ sentence.book.title }} - {{ sentence.book.author.lastName}}</h4>
+			{% endif %}
+			</div>
+			<div class="col-md-8">
+				<p>{{sentence['sentence'][1].content|raw}}</p>
+			</div>
+		</div>
+
+		{% endfor %}
+	</div>
+{% endblock %}
