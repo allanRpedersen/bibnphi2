@@ -6,6 +6,7 @@
 <div class="row mx-2">
 	<div class="col-md-10 px-2">
 		<h1 class="text-center mt-3">Bibliothèque</h1>
+		<h5 class="text-center">({{ nbBooks }} ouvrages)</h5>
 		<div class="row">
 			{% for author in authors %}
 				{% for book in author.books %}

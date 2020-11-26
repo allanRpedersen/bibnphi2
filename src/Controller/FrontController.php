@@ -117,6 +117,8 @@ class FrontController extends AbstractController
 
 		}
 
+		$nbBooksInLibrary = count($bookRepository->findAll());
+
         return $this->render('front/index.html.twig', [
 			'authors' => $authorRepository->findByLastName(),
 			// 'authors' => $paginator->paginate(
@@ -124,6 +126,7 @@ class FrontController extends AbstractController
 			// 			$request->query->getInt('page', 1),
 			// 			3
 			// ),
+			'nbBooks' => $nbBooksInLibrary,
 			'form' => $form->createView(),
         ]);
     }
