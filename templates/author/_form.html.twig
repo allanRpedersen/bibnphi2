@@ -1,4 +1,6 @@
 {{ form_start(form) }}
-{{ form_widget(form) }}
+{# {{ form_widget(form) }} #}
+{{ form_row(form.lastName)}}
+{{ form_row(form.firstName)}}
     <button class="btn btn-info mb-2">{{ button_label|default('Ajout') }}</button>
 {{ form_end(form) }}

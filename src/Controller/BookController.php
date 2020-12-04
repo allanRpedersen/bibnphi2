@@ -176,8 +176,9 @@ class BookController extends AbstractController
 	/**
 	 * @Route("/{slug}/processing", name="book_processing")
 	 */
-	public function xmlParsingProcess(Book $book)
+	public function bookProcessing(Request $request, Book $book)
 	{
+		// check if odt file is well-founded and get xml file name from it
 		$xmlFileName = $this->isXmlFileValid($book);
 
 		if ($xmlFileName){
@@ -205,7 +206,10 @@ class BookController extends AbstractController
 			
 			$this->em->persist($book);
 			$this->em->flush();
-			
+
+			$this->addFlash(
+				'info',
+				'L\'analyse du document s\'est terminée avec succès !');
 			return $this->redirectToRoute('book_show', [
 				'slug' => $book->getSlug()
 				]);
@@ -235,11 +239,21 @@ class BookController extends AbstractController
 		//
 		$this->logger->info('>>> Entrée fonction BookController->new()' . microtime(true));
 		$this->logger->info('>>> $request->getMethod() : ' . $request->getMethod() );
-	
+
 		//
         $book = new Book();
 		$form = $this->createForm(BookType::class, $book);
-		
+
+		if ($request->getMethod()!='GET'){
+
+			// $data1 = $request->getContent();
+			// dd($request->getMethod(), $data1, $request, $book);
+			
+			// $data2 = $this->get('serializer')->deserialize($data1, 'App\Entity\Book', 'json');
+			// dd($data2);
+		}
+
+
 
 		$form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -287,8 +301,8 @@ class BookController extends AbstractController
      */
     public function edit(Request $request, Book $book, EntityManagerInterface $entityManager, UploaderHelper $uploaderHelper): Response
     {
-
-		$odtBookSize = $book->getOdtBookSize(); // set if exists <-- never used !-))
+	
+		// $odtBookSize = $book->getOdtBookSize(); // set if exists <-- never used !-))
 
 		// dump($book);
 
@@ -531,7 +545,8 @@ class BookController extends AbstractController
 
 		// get file size
 		$this->xmlFileSize = filesize($fileName);
-		$ratio = $this->xmlFileSize / self::READ_BUFFER_SIZE;
+		// nb of file buffers to be read
+		$ratio = ceil($this->xmlFileSize / self::READ_BUFFER_SIZE);
 
 		// unix cmd
 		// 

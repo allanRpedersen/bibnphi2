@@ -18,14 +18,14 @@ class XmlParser {
 	 * 
 	 */
 	private $book; // the book being parsed
-	private $xmlfh;   // xml file handler
 	
     private $nbWords;
     private $nbSentences;
 	private $nbParagraphs;
 	
+	private $xmlfh;   // xml file handler
     private $xmlFileSize;
-	private $xmlFileName;
+	// private $xmlFileName;
 	
 	private $parsingTime;
 	private $parsingCompleted;
@@ -54,12 +54,12 @@ class XmlParser {
 	{
 		$this->book = $book;
 		
-		$this->xmlFileName = $xmlFileName;
+		// $this->xmlFileName = $xmlFileName;
 		$this->em = $em;
 		$this->logger = $logger;
 
 		$this->xmlFileSize = filesize($xmlFileName);
-		$this->ratio = $this->xmlFileSize / self::READ_BUFFER_SIZE;
+		$this->ratio = ceil($this->xmlFileSize / self::READ_BUFFER_SIZE);
 
 		// ??
 		// $fh = @fopen() 
@@ -186,7 +186,7 @@ class XmlParser {
 				$this->numBuffer ++;
 	
 				xml_parse($this->parser, $buffer);
-				$this->logger->info('n° read buffer : ' . $this->numBuffer );
+				$this->logger->info('n° read buffer : ' . $this->numBuffer . ' / ' . $this->ratio );
 
 			}
 

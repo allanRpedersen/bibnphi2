@@ -22,18 +22,24 @@ class FrontController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator, BookRepository $bookRepository, AuthorRepository $authorRepository)
     {
+		// init
+		//
 		$authors = [];
 		$bookList = [];
 		
-		// $matchingSentences =[];
+		//
 		$matchingSentences = [];
-
 		$matchingSentence = [
 			'book' => NULL,
 			'sentence' => NULL,
 			'iNeedle' => 0,
 		];
 
+		//
+		$nbBooksInLibrary = count($bookRepository->findAll());
+
+		//
+		// the search form
 		$search = new SentenceSearch();
 		$form = $this->createForm(SentenceSearchType::class, $search);
 		$form->handleRequest($request);
@@ -82,7 +88,7 @@ class FrontController extends AbstractController
 				
 			}
 			
-			// watabout a spinner ?
+			// watabout a spinner (processing state) ??
 
 
 			foreach($bookList as $book){
@@ -116,8 +122,6 @@ class FrontController extends AbstractController
 			]);
 
 		}
-
-		$nbBooksInLibrary = count($bookRepository->findAll());
 
         return $this->render('front/index.html.twig', [
 			'authors' => $authorRepository->findByLastName(),

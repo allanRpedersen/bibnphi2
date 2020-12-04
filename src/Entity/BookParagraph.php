@@ -41,8 +41,7 @@ class BookParagraph
     public function __construct()
     {
         $this->sentences = new ArrayCollection();
-		$this->matchingSentences = new ArrayCollection();
-		// dd('$$ BookParagraph __construct $$');
+		// $this->matchingSentences = new ArrayCollection();
     }
 
     public function getId(): ?int

@@ -1,0 +1,86 @@
+		<nav class="navbar navbar-expand-lg navbar-light bg-primary fixed-top">
+			<span class="navbar-brand">Bib'n'Phi</span>
+			{# <a class="navbar-brand" href="{{ path('front') }}"></a> #}
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarColor02">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link btn btn-primary mx-1" href="#">
+							<i class="fas fa-chart-line"></i>Dashboard<span class="sr-only">(current)</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary mx-1" href="{{ path('admin_book_index') }}">
+							<i class="fas fa-book"></i>	
+							Les ouvrages
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary mx-1" href="#">
+							<i class="fas fa-users"></i>
+							Utilisateurs
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary mx-1" href="#">
+							Les auteur.e.s
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary mx-1" href="#">
+							A propos
+						</a>
+					</li>
+				</ul>
+
+				{# <form class="form-inline my-2 my-lg-0">
+					<input class="form-control mr-sm-2" type="text" placeholder="Search">
+					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+				</form> #}
+
+				<ul class="navbar-nav ml-auto">
+				<li>
+					<a href="{{ path('front') }}" class="nav-link" target="_blank" rel="noopener noreferrer">
+						<i class="fas fa-eye"></i>
+						Voir le site
+					</a>
+				</li>
+
+				{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+				<li class="nav-item dropdown active" {# style="float:right;"  #}>
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						{{ app.user.email }}
+						{# <img src="{{ vich_uploader_asset(app.user, 'imageFile')}}" alt="avatar" style="width: 30px; height:auto;"> #}
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+						{# <a class="dropdown-item" href="{{ path('user_show', { slug: app.user.slug, id: app.user.id }) }}"><i class="fas fa-user"></i> Mes informations</a>
+						<a class="dropdown-item" href="{{ path('admin_account_dashboard') }}"><i class="fas fa-chess" aria-hidden="true"></i> Admin dashboard</a> #}
+						<a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+						<a class="dropdown-item" href="{{ path('user_updatepwd') }}"><i class="fas fa-user-lock"></i> Modif mot de passe</a>
+					</div>
+				</li>
+
+				{% else %}
+				{# <li class="nav-item">
+					<a href="{{ path('app_register') }}" class="{{ encore_entry_link_tags('app') }}nav-link" role="button" aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-user-edit"></i>
+						Inscription
+					</a>
+				</li> #}
+				{# <li class="nav-item">
+					<a href="{{ path('app_login') }}" class="nav-link" role="button" aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-sign-in-alt"></i>
+						Connexion
+					</a>
+				</li> #}
+				{% endif %}
+
+				</ul>
+
+			</div>
+		</nav>
+
+		<div class="container mt-1" style="padding-top: 55px">{{ include('partials/_flash_messages.html.twig') }}</div>
