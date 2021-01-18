@@ -2,6 +2,9 @@
 /public/books/
 /bibnphi.log
 
+###>
+/.vscode
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
