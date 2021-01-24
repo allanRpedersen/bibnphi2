@@ -14,10 +14,10 @@
                     <th>Résumé</th>
                     <th>Publié en</th>
                     <th>odtBookName</th>
+                    <th class="text-center">parsingTime(sec) </th>
                     <th class="text-center">nbParagraphs</th>
                     <th class="text-center">nbSentences</th>
-                    <th class="text-center">nbWords</th>
-                    <th class="text-center">parsingTime(min) </th>
+                    {# <th class="text-center">nbWords</th> #}
                     <th>Action</th>
                 </tr>
             </thead>
@@ -30,10 +30,18 @@
                     <td>{{book.summary}}</td>
                     <td>{{book.publishedYear}}</td>
                     <td>{{book.odtBookName}}</td>
+                    <td class="text-center">
+                        {% if (book.parsingTime == 0) %}
+                        <span class="badge badge-danger">
+                        {% else %}
+                        <span class="badge badge-info">
+                        {% endif %}    
+                        {{(book.parsingTime)  | round(1, 'floor')}}</span>
+                    </td>
+                    {# <td class="text-center"><span class="badge badge-info">{{(book.parsingTime / 60)  | round(1, 'floor')}}</span></td> #}
                     <td class="text-center"><span class="badge badge-primary rounded">{{book.nbParagraphs}}</span></td>
                     <td class="text-center"><span class="badge badge-primary rounded">{{book.nbSentences}}</span></td>
-                    <td class="text-center"><span class="badge badge-primary rounded">{{book.nbWords}}</span></td>
-                    <td class="text-center"><span class="badge badge-info">{{(book.parsingTime / 60)  | round(1, 'floor')}}</span></td>
+                    {# <td class="text-center"><span class="badge badge-primary rounded">{{book.nbWords}}</span></td> #}
                     <td>
                         <a href="#" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                         <a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a>

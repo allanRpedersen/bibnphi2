@@ -123,7 +123,7 @@ class XmlParser {
 	}
 
 	/**
-	 * Parse the xml file which contains the odt document.
+	 * Parse the xml file which describes the document.
 	 * Store the sentences in $this->book set by __construct()
 	 *
 	 */

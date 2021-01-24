@@ -6,7 +6,7 @@
 /.vscode
 
 ###>
-###> /src/DataFixtures/
+/src/DataFixtures/
 
 ###> symfony/framework-bundle ###
 /.env.local

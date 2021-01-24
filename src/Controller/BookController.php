@@ -184,6 +184,7 @@ class BookController extends AbstractController
 		if ($xmlFileName){
 
 			$xmlParser = new XmlParser($book, $xmlFileName, $this->em, $this->logger);
+			$this->xmlParser = $xmlParser;
 
 			// setting no execution time out .. bbrrrr !! 
 			// if ($xmlParser->getRatio() > 1) ini_set('max_execution_time', '0');
@@ -210,6 +211,7 @@ class BookController extends AbstractController
 			$this->addFlash(
 				'info',
 				'L\'analyse du document s\'est terminée avec succès !');
+
 			return $this->redirectToRoute('book_show', [
 				'slug' => $book->getSlug()
 				]);
@@ -409,8 +411,9 @@ class BookController extends AbstractController
 			// remove odt file
 			$dirName = $book->getOdtBookName();
 			passthru('rm -v books/'. $dirName . ' >>books/sorties_console 2>&1', $errCode );
-			
-			
+
+			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
+
 			// remove .whatever to get directory name << buggy !-(
 			$dirName = substr($dirName, 0, strpos($dirName, '.'));
 			// then delete associated directory recursive
