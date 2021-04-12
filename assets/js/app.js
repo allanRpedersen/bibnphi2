@@ -45,7 +45,7 @@ function showSpinner(){
 
 function setProgressBar(){
 	console.log('setProgressBar()');
-	$('#progress-bar-container').css({ "display": "block" });
+	$('#progress-bar-container').css({ "display": "flex" });
 }
 
 function unsetProgressBar(){
@@ -53,7 +53,40 @@ function unsetProgressBar(){
 	$('#progress-bar-container').css({ "display": "none" });
 }
 
-function renderProgressBar(ratio){
+function renderProgressBar(){
+
+	// $_HTTP_HOST ??
+
+	console.log($(location).attr('href'));
+	console.log($(location).attr('host')); // 127.0.0.1:8000
+	console.log($(location).attr('protocol')); // http
+
+	$.ajax({
+
+		url: 'http://127.0.0.1:8000/api/book/getParsingProgress',
+		// url: 'http://127.0.0.1:8000/api/book/getParsingProgress',
+		method: 'GET',
+		async: true,
+		cache: false,
+		dataType: 'json',
+		success: function(data)
+		{
+			console.log(data);
+			$('#progress-bar').css({ "width": data.parsingProgress });
+		},
+		error: function(object, error, errorThrown)
+		{
+			console.log('### error ** ' + error + ' (' + errorThrown + ')');
+		},
+		complete: function(object, status)
+		{
+			console.log('>> complete :-)' + status);
+		}
+	});
+	
+
+	
+
 
 }
 
@@ -76,7 +109,10 @@ $(function () {
 
 		console.log('click on button-new-update');
 		setProgressBar();
+		renderProgressBar();
 	});
+
+
 
 	console.log('Document Ready !!');
 	// alert();

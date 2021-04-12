@@ -11,7 +11,7 @@
 			<br>
 			<p>xml parsing time : {{ book.parsingTime | round(2, 'floor')}} sec ({{ (book.parsingTime / 60)  | round(1, 'floor') }} min)</p>
 			<p>paragraphs       : {{ book.nbParagraphs }}</p>
-			<p>sentences        : {{ book.nbSentences }}</p>
+			{# <p>sentences        : {{ book.nbSentences }}</p> #}
 			<br>
 			<h3>écrit par {{ book.author.firstName ~' '~ book.author.lastName }}</h3>
 			<h4>publié en {{ book.publishedYear }}</h4>
@@ -24,13 +24,12 @@
 		</div>
 		<div class="col-md-8">
 			{% for paragraph in book.bookParagraphs %}
-			<p>
-				{% for sentence in paragraph.sentences %}
-				{{ sentence.content }}
-				{% endfor %}
-			</p>
+				<p id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 			{% endfor %}
 		
+			{% for note in book.bookNotes %}
+				<p id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content }}</p>
+			{% endfor%}
 		</div>
 
 	</div>

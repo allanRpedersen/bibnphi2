@@ -3,8 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Book;
+use App\Entity\BookNote;
 use App\Entity\BookSentence;
 use App\Entity\BookParagraph;
+use App\Repository\BookRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 
 class XmlParser {
@@ -32,6 +35,7 @@ class XmlParser {
 	
 	private $ratio; // $xmlFileSize / READ_BUFFER_SIZE
 	private $numBuffer;
+	// private $percentProgress;
 	
 	private $timeStart;
 	private $noteCollection;
@@ -43,6 +47,7 @@ class XmlParser {
 			$isNoteBody,
 			$isNoteCitation,
 			$noteBody,
+			$indexNoteCitation,
 			$noteCitation,
 			// $paragraphCounter,
 			$text;
@@ -50,8 +55,9 @@ class XmlParser {
 	private $logger;
 	private $em;
 		
-	public function __construct( Book $book, $xmlFileName, $em, $logger = NULL )
+	public function __construct( Book $book, $xmlFileName, EntityManagerInterface $em, $logger = NULL )
 	{
+		
 		$this->book = $book;
 		
 		// $this->xmlFileName = $xmlFileName;
@@ -69,6 +75,11 @@ class XmlParser {
 		$this->timeStart = 0;
 		$this->parsingCompleted = FALSE;
 		$this->parsingTime = -1;
+
+		$this->nbWords = 0;
+		$this->nbSentences = 0;
+		$this->nbParagraphs = 0;
+		$this->numBuffer= 0;
 
 	}
 
@@ -135,12 +146,8 @@ class XmlParser {
 			// various initialization settings
 			$this->noteCollection = [];
 			$this->text = '';
-			$this->nbWords = 0;
-			$this->nbSentences = 0;
-			$this->nbParagraphs = 0;
-			$this->numBuffer= 0;
 
-			// init
+			// init parsing time 
 			$this->timeStart = microtime(true);
 			if ($this->ratio > 3) ini_set('max_execution_time', '0'); // no execution time out !
 
@@ -184,9 +191,14 @@ class XmlParser {
 			while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
 
 				$this->numBuffer ++;
+				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
 	
 				xml_parse($this->parser, $buffer);
+
 				$this->logger->info('n° read buffer : ' . $this->numBuffer . ' / ' . $this->ratio );
+				$this->logger->info('percentProgress : ' . $percentProgress );
+
+				file_put_contents('percentProgress', $percentProgress);
 
 			}
 
@@ -217,6 +229,94 @@ class XmlParser {
 	 * 
 	 */
 
+	public function parse_async()
+	{
+
+
+		//
+		if ($this->timeStart == 0){
+
+			// various initialization settings
+			$this->noteCollection = [];
+			$this->text = '';
+			$this->nbWords = 0;
+			$this->nbSentences = 0;
+			$this->nbParagraphs = 0;
+			$this->numBuffer= 0;
+
+			// init parsing time 
+			$this->timeStart = microtime(true);
+			if ($this->ratio > 3) ini_set('max_execution_time', '0'); // no execution time out !
+
+			$this->parser = xml_parser_create();
+
+			//
+			// set up the handlers
+			xml_set_element_handler($this->parser, [$this, "start_element_handler"], [$this, "end_element_handler"]);
+			xml_set_character_data_handler($this->parser, [$this, "character_data_handler"]);
+
+		}
+
+		//
+		if ( $this->xmlfh ){
+
+			// if( ($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE ){
+			// 	$this->numBuffer ++;
+	
+			// 	xml_parse($this->parser, $buffer);
+			// 	$this->logger->info('n° read buffer : ' . $this->numBuffer );
+
+			// }
+			// else {
+			// 	xml_parse($this->parser, '', true); // to finalize parsing
+			// 	xml_parser_free($this->parser);
+			// 	unset($this->parser);
+	
+			// 	if (feof($this->xmlfh)){
+			// 		$this->parsingCompleted = true;
+			// 		$this->parsingTime = \microtime(true) - $this->timeStart;
+			// 		$this->logger->info("ParsingCompleted : " . $this->parsingTime);
+			// 	}
+			// 	else {
+			// 		$this->parsingTime = -1;
+			// 		$this->logger->info("ERREUR: feof(xmlFile) retourne FALSE !! ???");
+			// 	}
+			// 	fclose($this->xmlfh);
+			// }
+
+
+			while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
+
+				$this->numBuffer ++;
+				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
+	
+				xml_parse($this->parser, $buffer);
+
+				$this->logger->info('n° read buffer : ' . $this->numBuffer . ' / ' . $this->ratio );
+				$this->logger->info('percentProgress : ' . $percentProgress );
+
+				file_put_contents('percentProgress', $percentProgress);
+
+			}
+
+			xml_parse($this->parser, '', true); // to finalize parsing
+			xml_parser_free($this->parser);
+			unset($this->parser);
+
+			if (feof($this->xmlfh)) {
+				$this->parsingCompleted = true;
+				$this->parsingTime = \microtime(true) - $this->timeStart;
+				$this->logger->info("ParsingCompleted : " . $this->parsingTime);
+			}
+			else {
+				$this->logger->info("ERREUR: feof(xmlFile) retourne FALSE !! ???");
+			}
+			fclose($this->xmlfh);
+
+		}
+
+	}
+
 
 
 	/**
@@ -244,7 +344,14 @@ class XmlParser {
 				break;
 
 			case "TEXT:NOTE" ;
-				$this->text .= '(#';
+				//
+				// strlen, number of bytes, some characters may be multi-bytes ...
+				// iconv_strlen, number of characters
+				//
+				// index from the beginning of the paragraph !!
+				$this->indexNoteCitation = iconv_strlen($this->text);
+
+				// $this->text .= '(#';
 				$this->insideNote = true;
 				break;
 				
@@ -281,9 +388,13 @@ class XmlParser {
 			
 			case "TEXT:NOTE" ;
 				//
-				$this->noteCollection[] = '[note#' . $this->noteCitation . ') ' . $this->noteBody . '#]';
+				$this->noteCollection[] = ['index' => $this->indexNoteCitation,
+											'citation' => $this->noteCitation,
+											'content' => $this->noteBody];
+											
+				// $this->noteCollection[] = '[note#' . $this->noteCitation . ') ' . $this->noteBody . '#]';
 				//
-				$this->text .= ')'; // to end the note citation in the text
+				// $this->text .= ')'; // to end the note citation in the text
 				$this->insideNote = false;
 				$this->noteBody = '';
 				break;
@@ -313,8 +424,8 @@ class XmlParser {
 	{
 		if ($this->isNoteBody) $this->noteBody .= $data;
 		else if (!$this->insideAnnotation){
-			$this->text .= $data;
 			if ($this->isNoteCitation) $this->noteCitation = $data; 
+			else $this->text .= $data;
 		}
 	}
 
@@ -337,54 +448,79 @@ class XmlParser {
 			//			- ordered list ( 1. aaa 2. bbb 3. ccc etc)
 			//			- S. as St, Saint
 			//
-			$sentences = preg_split('/(?<![IVXLCM1234567890S].)(?<=[.?!])\s+/', $rawParagraph, -1, PREG_SPLIT_DELIM_CAPTURE);
-			if ($sentences){
-				foreach ($sentences as $sentence ){
+			// $sentences = preg_split('/(?<![IVXLCM1234567890S].)(?<=[.?!])\s+/', $rawParagraph, -1, PREG_SPLIT_DELIM_CAPTURE);
+			// if ($sentences){
+			// 	foreach ($sentences as $sentence ){
 					
-					// remove all non-breaking space !!
-					// regex / /u << unicode support
-					$sentence = preg_replace("/[\x{00a0}\s]+/u", " ", $sentence);
-					$sentence = ltrim($sentence);
+			// 		// remove all non-breaking space !!
+			// 		// regex / /u << unicode support
+			// 		$sentence = preg_replace("/[\x{00a0}\s]+/u", " ", $sentence);
+			// 		$sentence = ltrim($sentence);
 					
-					if ($sentence != ''){
+			// 		if ($sentence != ''){
 						
-						if ( NULL === $bookParagraph ){
-							$bookParagraph = new BookParagraph();
-							$bookParagraph->setBook($this->book);
-						}
+			// 			if ( NULL === $bookParagraph ){
+			// 				$bookParagraph = new BookParagraph();
+			// 				$bookParagraph->setBook($this->book);
+			// 			}
 
-						$bookSentence = new BookSentence();
-						$bookSentence->setBookParagraph($bookParagraph);
-						$bookSentence->setContent($sentence);
+			// 			$bookSentence = new BookSentence();
+			// 			$bookSentence->setBookParagraph($bookParagraph);
+			// 			$bookSentence->setContent($sentence);
 
-						$this->nbSentences++;
-						$this->em->persist($bookSentence);
+			// 			$this->nbSentences++;
+			// 			$this->em->persist($bookSentence);
+			// 		}
+
+			// 	}
+			// }
+
+			$rawParagraph = preg_replace("/[\x{00a0}\s]+/u", " ", $rawParagraph);
+			$rawParagraph = ltrim($rawParagraph);
+
+			if ($rawParagraph != ''){
+				$bookParagraph = new BookParagraph();
+				$bookParagraph->setBook($this->book);
+
+				//
+				// handle notes if any for the paragraph
+				if (!empty($noteCollection)){
+
+					foreach($this->noteCollection as $note){
+
+						$bookNote = new BookNote();
+						$bookNote->setBook($this->book);
+						$bookNote->setBookParagraph($bookParagraph);
+
+						$bookNote->setContent($note['content']);
+						$bookNote->setCitation($note['citation']);
+						$bookNote->setCitationIndex($note['index']);
+
+						$this->em->persist($bookNote);
+
+						$citation = $note['citation'];
+						$index = $note['index'];
+						// inject html to set superscript note tags
+						$rawParagraph = mb_substr($rawParagraph, 0, $index)
+										. '<sup id="citation_' . $citation
+										. '"><a class="" href="#note_' . $citation .'">'
+										. $citation
+										. '</a></sup>'
+										. mb_substr($rawParagraph, $index);
+
 					}
-
 				}
+
+				$bookParagraph->setContent($rawParagraph);
 			}
+
+
 
 			//
 			if ( NULL !== $bookParagraph ){
 
 				$this->nbParagraphs++;				
 				$this->em->persist($bookParagraph);
-
-				//
-				// then get notes if any for the paragraph
-				if (!empty($noteCollection)){
-					foreach($this->noteCollection as $note){
-						$pNote = new BookParagraph();
-						$pNote->SetBook($this->book);
-						$this->em->persist($pNote);
-
-						$sNote = new BookSentence();
-						$sNote->setBookParagraph($pNote);
-						$sNote->setContent($note);
-						$this->em->persist($sNote);
-
-					}
-				}
 
 				$this->em->flush();
 			}

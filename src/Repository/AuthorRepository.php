@@ -44,6 +44,26 @@ class AuthorRepository extends ServiceEntityRepository
 	/**
 	 * 
 	 * 
+	 * findByFirstName
+	 * 
+	 * @param string $orderBy
+     * @return Author[] Returns an array of Author objects
+     */
+    public function findByFirstName($orderBy='ASC')
+    {
+        return $this->createQueryBuilder('t')
+            //->andWhere('t.firstName = :val')
+            //->setParameter('val', $value)
+            ->orderBy('t.firstName', $orderBy)
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+	/**
+	 * 
+	 * 
 	 * findByLastNameQuery
 	 * 
 	 * @param string $orderBy

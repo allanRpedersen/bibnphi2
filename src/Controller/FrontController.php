@@ -96,19 +96,9 @@ class FrontController extends AbstractController
 				$paragraphs = $book->getBookParagraphs();
 
 				foreach($paragraphs as $paragraph){
-					$sentences = $paragraph->getMatchingSentences($stringToSearch);
-
-					if ($sentences)
-						foreach($sentences as $sentence){
-
-							$matchingSentence['book'] = $book;
-							$matchingSentence['sentence'] = $sentence;
-							// $matchingSentence['iNeedle'] = $sentence[0];
-
-							$matchingSentences[] = $matchingSentence;
-
-							// $matchingSentences[] = $sentence;
-						}
+					if ($paragraph->isMatchingParagraph($stringToSearch)){
+						$matchingParagraphs[] = $paragraph;
+					}
 				}
 			}
 
@@ -117,7 +107,7 @@ class FrontController extends AbstractController
 			return $this->render('front/search.html.twig', [
 				'string' => $stringToSearch,
 				'bookList' => $bookList,
-				'sentences' => $matchingSentences,
+				'paragraphs' => $matchingParagraphs,
 
 			]);
 

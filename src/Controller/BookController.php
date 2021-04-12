@@ -24,6 +24,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 //
 // $bool=pcntl_async_signals(true);
@@ -94,10 +95,6 @@ class BookController extends AbstractController
 		]);
 	}
 	
-	/**
-	 * 
-	 */
-
 
 	/**
 	 * 
@@ -176,7 +173,7 @@ class BookController extends AbstractController
 	/**
 	 * @Route("/{slug}/processing", name="book_processing")
 	 */
-	public function bookProcessing(Request $request, Book $book)
+	public function bookProcessing(Request $request, Book $book, ContainerInterface $container)
 	{
 		// check if odt file is well-founded and get xml file name from it
 		$xmlFileName = $this->isXmlFileValid($book);
@@ -195,15 +192,26 @@ class BookController extends AbstractController
 			// 		$xmlParser->parse();
 			// }
 
-			$xmlParser->parse();
+			// try async ..
+			// $this->get('krlove.async.factory')
+			// 		->call('app.service.parse', 'parse');
+
+			
+			// $container->get('krlove.service')->call('app.service.parse', 'parse');
+
+			// could be a long time process ..
+			$xmlParser->parse(); // can be very, very long for some books !-/ 
 			
 			if ($xmlParser->isParsingCompleted()){
-				$book->setParsingTime($xmlParser->getParsingTime())
-					->setNbParagraphs($xmlParser->getNbParagraphs())
-					->setNbSentences($xmlParser->getNbSentences())
-					->setNbWords($xmlParser->getNbWords())
-				;
+				//
+				//
 			}
+
+			$book->setParsingTime($xmlParser->getParsingTime())
+				->setNbParagraphs($xmlParser->getNbParagraphs())
+				->setNbSentences($xmlParser->getNbSentences())
+				->setNbWords($xmlParser->getNbWords())
+			;
 			
 			$this->em->persist($book);
 			$this->em->flush();
@@ -220,7 +228,7 @@ class BookController extends AbstractController
 			// flash message
 			$this->addFlash(
 				'warning',
-				'Le fichier xml est invalide ou absent (cf bibnphi.log) !-\\'
+				'Le fichier xml : ' . $xmlFileName . ' est invalide ou absent (cf bibnphi.log) !-\\'
 			);
 		}
 		

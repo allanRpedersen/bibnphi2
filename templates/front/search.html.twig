@@ -14,17 +14,17 @@
 		<hr>
 		{# <h3>{{sentences|length}} occurences repérées !!</h3> #}
 		{% set book_slug = "" %}
-		{% for sentence in sentences %}
+		{% for paragraph in paragraphs %}
 
 		<div class="row">
 			<div class="col-md-4">
-			{% if sentence.book.slug != book_slug %}
-				{% set book_slug = sentence.book.slug %}
-				<h4>{{ sentence.book.title }} - {{ sentence.book.author.lastName}}</h4>
+			{% if paragraph.book.slug != book_slug %}
+				{% set book_slug = paragraph.book.slug %}
+				<h4>{{ paragraph.book.title }} - {{ paragraph.book.author.lastName}}</h4>
 			{% endif %}
 			</div>
 			<div class="col-md-8">
-				<p>{{sentence['sentence'][1].content|raw}}</p>
+				<p>{{paragraph.highlightedContent|raw}}</p>
 			</div>
 		</div>
 

@@ -6,6 +6,7 @@
 parameters:
 
 services:
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -29,3 +30,16 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    app.service.parser:
+        class: 'App\Service\XmlParser'
+        ##autowire: false
+        # manually wire all arguments
+        arguments:
+            - '\App\Entity\Book'
+            - string
+            - 'Doctrine\ORM\EntityManagerInterface'
+            # - '@mailer'
+            # - 'superadmin@example.com'    
+        public: true
+

@@ -128,9 +128,16 @@ class Book
      */
     private $parsingTime;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="book", orphanRemoval=true)
+     */
+    private $bookNotes;
+    
+
     public function __construct()
     {
         $this->bookParagraphs = new ArrayCollection();
+        $this->bookNotes = new ArrayCollection();
     }
 	//
 	//
@@ -146,13 +153,13 @@ class Book
 	 * @return void
 	 */
 	public function InitializeSlug()
-	{
-		// if ( empty($this->slug) ){}
-
-		// le slug est systèmatiquement recalculé ..
-		$slugify = new Slugify();
-		$this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
-	}
+               	{
+               		// if ( empty($this->slug) ){}
+               
+               		// le slug est systèmatiquement recalculé ..
+               		$slugify = new Slugify();
+               		$this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
+               	}
 
 
     public function getId(): ?int
@@ -257,12 +264,6 @@ class Book
         return $this->odtBookName;
     }
     
-    public function getXmlFilePath(): ?string
-    {
-        return 'bzzz';
-
-    }
-
     public function setOdtBookSize(?int $odtBookSize): void
     {
         $this->odtBookSize = $odtBookSize;
@@ -274,9 +275,9 @@ class Book
     }
 
 	public function setBookMimeType(?string $bookMimeType): void
-	{
-		$this->bookMimeType = $bookMimeType;
-	}
+               	{
+               		$this->bookMimeType = $bookMimeType;
+               	}
 
     public function getBookMimeType(): ?string
     {
@@ -284,9 +285,9 @@ class Book
     }
 
 	public function setOdtOriginalName(?string $odtOriginalName): void
-	{
-		$this->odtOriginalName = $odtOriginalName;
-	}
+               	{
+               		$this->odtOriginalName = $odtOriginalName;
+               	}
 
     public function getOdtOriginalName(): ?string
     {
@@ -313,9 +314,16 @@ class Book
 
     public function removeBookParagraph(BookParagraph $bookParagraph): self
     {
-		foreach( $bookParagraph->getSentences() as $sentence ){
-			$bookParagraph->removeSentence($sentence);
+		// foreach( $bookParagraph->getSentences() as $sentence ){
+		// 	$bookParagraph->removeSentence($sentence);
+		// }
+        //
+        // to be replaced by getNotes & remove Notes
+		foreach( $bookParagraph->getNotes() as $note ){
+			$bookParagraph->removeNote($note);
 		}
+
+
 
         if ($this->bookParagraphs->contains($bookParagraph)) {
             $this->bookParagraphs->removeElement($bookParagraph);
@@ -372,6 +380,36 @@ class Book
     public function setParsingTime(float $parsingTime): self
     {
         $this->parsingTime = $parsingTime;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BookNote[]
+     */
+    public function getBookNotes(): Collection
+    {
+        return $this->bookNotes;
+    }
+
+    public function addBookNote(BookNote $bookNote): self
+    {
+        if (!$this->bookNotes->contains($bookNote)) {
+            $this->bookNotes[] = $bookNote;
+            $bookNote->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookNote(BookNote $bookNote): self
+    {
+        if ($this->bookNotes->removeElement($bookNote)) {
+            // set the owning side to null (unless already changed)
+            if ($bookNote->getBook() === $this) {
+                $bookNote->setBook(null);
+            }
+        }
 
         return $this;
     }

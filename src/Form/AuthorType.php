@@ -18,19 +18,20 @@ class AuthorType extends GenericType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-			->add('lastName', TextType::class, $this->mkBasics("nom", "le nom de l'auteur(e)"))
-            ->add('firstName', TextType::class, $this->mkBasics("prénom", "son prénom", false))
-            ->add('birthYear', TextType::class, $this->mkBasics("naissance","l'année de sa naissance", false))
-            ->add('deathYear', TextType::class, $this->mkBasics("mort","celle de sa mort", false))
-            ->add('summary', TextType::class, $this->mkBasics("présentation", "Une phrase de présentation", false))
+			->add('lastName', TextType::class, $this->mkBasics("nom/nom d'usage", "le nom de l'auteur(e)"))
+            ->add('firstName', TextType::class, $this->mkBasics("prénom", "son prénom (facultatif)", false))
+            ->add('birthYear', TextType::class, $this->mkBasics("naissance","l'année de sa naissance (facultatif)", false))
+            ->add('deathYear', TextType::class, $this->mkBasics("mort","celle de sa mort (facultatif)", false))
+            ->add('summary', TextType::class, $this->mkBasics("présentation", "Une phrase de présentation (facultatif)", false))
             ->add('content',CKEditorType::class, $this->mkBasics( "description", 
-                                                                  "Une description détaillée de l'auteur",
+                                                                  "(facultatif)",
                                                                   false,
                                                                   //
                                                                   // CKEditor config
                                                                   [
                                                                     'config' => [
-                                                                        'uiColor' => '#0000FF' // blue !!
+                                                                        'uiColor' => '#0000FF', // blue !!
+                                                                        'editorplaceholder' => "Une description détaillée de l'auteur (facultatif)"
                                                                         ]
                                                                   ]))
         ;
