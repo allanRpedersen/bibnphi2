@@ -35,6 +35,9 @@ class FrontController extends AbstractController
 			'iNeedle' => 0,
 		];
 
+		$matchingParagraphs = [];
+		
+
 		//
 		$nbBooksInLibrary = count($bookRepository->findAll());
 

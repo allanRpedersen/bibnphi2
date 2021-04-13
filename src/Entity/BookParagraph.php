@@ -111,13 +111,14 @@ class BookParagraph
     {
         $encoding = mb_detect_encoding($this->content);
         
-        $fromIndex = 0; $indexFound = 0;
+        $fromIndex = 0;
+        $indexFound = 0;
         $length = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
 
         //
         //
-        while (($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
+        while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
 
             $this->foundStringsIndexes[] = $indexFound;
 
