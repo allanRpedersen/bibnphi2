@@ -486,7 +486,7 @@ class XmlParser {
 				// handle notes if any for the paragraph
 				if (!empty($noteCollection)){
 
-					foreach($this->noteCollection as $note){
+					foreach($this->noteCollection as $key => $note){
 
 						$bookNote = new BookNote();
 						$bookNote->setBook($this->book);
@@ -500,12 +500,18 @@ class XmlParser {
 
 						$citation = $note['citation'];
 						$index = $note['index'];
+
+						$htmlToAdd = '<sup id="citation_' . $citation . '">
+										<a class="" href="#note_' . $citation .'">'	. $citation .
+										'</a></sup>';
+
+						$indexShift = strlen($htmlToAdd);
+						$index = $index + ($indexShift * $key); // occurrence-1
+
+
 						// inject html to set superscript note tags
 						$rawParagraph = mb_substr($rawParagraph, 0, $index)
-										. '<sup id="citation_' . $citation
-										. '"><a class="" href="#note_' . $citation .'">'
-										. $citation
-										. '</a></sup>'
+										. $htmlToAdd
 										. mb_substr($rawParagraph, $index);
 
 					}
