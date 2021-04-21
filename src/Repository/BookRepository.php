@@ -55,6 +55,60 @@ class BookRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+	 * findByNbParagraphs
+	 * 
+	 * @param string $orderBy
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByNbParagraphs($orderBy='DESC') : array
+    {
+        return $this->createQueryBuilder('t')
+            //->andWhere('t.title = :val')
+            //->setParameter('val', $value)
+            ->orderBy('t.nbParagraphs', $orderBy)
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+	 * findByParsingTime
+	 * 
+	 * @param string $orderBy
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByParsingTime($orderBy='DESC') : array
+    {
+        return $this->createQueryBuilder('t')
+            //->andWhere('t.title = :val')
+            //->setParameter('val', $value)
+            ->orderBy('t.parsingTime', $orderBy)
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+	 * findByAuthor
+	 * 
+	 * @param string $orderBy
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByAuthor($orderBy='ASC') : array
+    {
+        return $this->createQueryBuilder('t')
+            //->andWhere('t.title = :val')
+            //->setParameter('val', $value)
+            ->orderBy('t.author', $orderBy)
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 
     // /**
     //  * @return Book[] Returns an array of Book objects

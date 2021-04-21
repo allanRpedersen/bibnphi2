@@ -8,15 +8,15 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Titre</th>
-                    <th>Auteur.e</th>
+                    <th><a href="{{path('admin_book_index')}}">Id</a></th>
+                    <th><a href="{{path('admin_book_index',{sortBy: 'Title'})}}">Titre</a></th>
+                    <th><a href="{{path('admin_book_index',{sortBy: 'Author'})}}">Auteur.e</a></th>
                     <th>Résumé</th>
                     <th>Publié en</th>
                     <th>odtBookName</th>
-                    <th class="text-center">parsingTime(sec) </th>
-                    <th class="text-center">nbParagraphs</th>
-                    <th class="text-center">nbSentences</th>
+                    <th class="text-center"><a href="{{path('admin_book_index',{sortBy: 'ParsingTime'})}}">parsingTime(sec)</a></th>
+                    <th class="text-center"><a href="{{path('admin_book_index',{sortBy: 'NbParagraphs'})}}">nbParagraphs</a></th>
+                    {# <th class="text-center">nbSentences</th> #}
                     {# <th class="text-center">nbWords</th> #}
                     <th>Action</th>
                 </tr>

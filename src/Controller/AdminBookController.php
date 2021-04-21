@@ -16,12 +16,35 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AdminBookController extends AbstractController
 {
     /**
-     * @Route("/book", name="admin_book_index")
+     * @Route("/book/{sortBy}", name="admin_book_index")
      */
-    public function index(BookRepository $repo): Response
+    public function index($sortBy = 'Id', BookRepository $repo): Response
     {
+        switch($sortBy){
+            case 'Title':
+                $books = $repo->findByTitle();
+                break;
+                
+            case 'NbParagraphs':
+                $books = $repo->findByNbParagraphs();
+                break;
+                
+            case 'ParsingTime':
+                $books = $repo->findByParsingTime();
+                break;
+                
+            case 'Author':
+                $books = $repo->findByAuthor();
+                break;
+                
+            default:
+                $books = $repo->findAll();
+                break;
+    
+        }
+
         return $this->render('admin/book/index.html.twig', [
-            'books' => $repo->findAll(),
+            'books' => $books,
         ]);
     }
 

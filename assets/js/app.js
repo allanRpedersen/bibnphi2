@@ -46,6 +46,8 @@ function showSpinner(){
 function setProgressBar(){
 	console.log('setProgressBar()');
 	$('#progress-bar-container').css({ "display": "flex" });
+
+	
 }
 
 function unsetProgressBar(){
