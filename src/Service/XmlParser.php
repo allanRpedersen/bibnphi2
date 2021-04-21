@@ -451,30 +451,12 @@ class XmlParser {
 			// $sentences = preg_split('/(?<![IVXLCM1234567890S].)(?<=[.?!])\s+/', $rawParagraph, -1, PREG_SPLIT_DELIM_CAPTURE);
 			// if ($sentences){
 			// 	foreach ($sentences as $sentence ){
-					
-			// 		// remove all non-breaking space !!
-			// 		// regex / /u << unicode support
-			// 		$sentence = preg_replace("/[\x{00a0}\s]+/u", " ", $sentence);
-			// 		$sentence = ltrim($sentence);
-					
-			// 		if ($sentence != ''){
-						
-			// 			if ( NULL === $bookParagraph ){
-			// 				$bookParagraph = new BookParagraph();
-			// 				$bookParagraph->setBook($this->book);
-			// 			}
-
-			// 			$bookSentence = new BookSentence();
-			// 			$bookSentence->setBookParagraph($bookParagraph);
-			// 			$bookSentence->setContent($sentence);
-
-			// 			$this->nbSentences++;
-			// 			$this->em->persist($bookSentence);
-			// 		}
-
 			// 	}
 			// }
 
+
+			// remove all non-breaking space !! ( regex / /u means unicode support )
+			// 
 			$rawParagraph = preg_replace("/[\x{00a0}\s]+/u", " ", $rawParagraph);
 			$rawParagraph = ltrim($rawParagraph);
 
@@ -506,7 +488,7 @@ class XmlParser {
 										'</a></sup>';
 
 						$indexShift = strlen($htmlToAdd);
-						$index = $index + ($indexShift * $key); // occurrence-1
+						$index = $index + ($indexShift * $key); // in case of several notes in the paragraph
 
 
 						// inject html to set superscript note tags

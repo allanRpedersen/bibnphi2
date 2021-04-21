@@ -22,8 +22,20 @@ body {
 }
 
 .found-content {
-    color: crimson;
+    // color: crimson;
     // border: 1px solid black;
-    background-color: rgb(123, 189, 123);
-    font-size: 1.2rem;
+    // background-color: rgb(145, 253, 160);
+    font-size: 1.1rem;
+    font-style: italic;
+    font-weight: bold;
+    text-decoration: underline;
 }
+
+:target {
+    scroll-margin-top: 70px; /* height of sticky header */
+}
+
+// html {
+//     scroll-padding-top: 70px; /* height of sticky header */
+//   }
+  

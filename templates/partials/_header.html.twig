@@ -16,7 +16,11 @@
 						<a class="nav-link btn btn-primary mx-1" href="{{ path('book_index') }}">Les oeuvres</a>
 					</li>
 					<li class="nav-item">
+						{% if book is defined %}
+						<h2 style="color:rgb(190, 218, 165); margin-left:30px;">{{ book.title }}</h2>
+						{% else %}
 						<a class="nav-link btn btn-primary mx-1" href="#">A propos</a>
+						{% endif %}
 					</li>
 				</ul>
 

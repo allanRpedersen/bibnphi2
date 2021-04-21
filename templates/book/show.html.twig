@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ book.slug }}{% endblock %}
+{% block title %}{{ book.title }}{% endblock %}
 
 {% block body %}
 
@@ -9,12 +9,11 @@
 		<div class="col-md-4">
 			<h1>{{ book.title }}</h1>
 			<br>
-			<p>xml parsing time : {{ book.parsingTime | round(2, 'floor')}} sec ({{ (book.parsingTime / 60)  | round(1, 'floor') }} min)</p>
-			<p>paragraphs       : {{ book.nbParagraphs }}</p>
-			{# <p>sentences        : {{ book.nbSentences }}</p> #}
+			<p>{{ book.nbParagraphs }} paragraphes</p>
+			<p>Temps d'analyse Xml : {{ book.parsingTime | round(2, 'floor')}} sec ({{ (book.parsingTime / 60)  | round(1, 'floor') }} min)</p>
 			<br>
-			<h3>écrit par {{ book.author.firstName ~' '~ book.author.lastName }}</h3>
-			<h4>publié en {{ book.publishedYear }}</h4>
+			<h5>écrit par {{ book.author.firstName ~' '~ book.author.lastName }}</h5>
+			<p>publié en {{ book.publishedYear }}</p>
 			<p>{{ book.summary }}</p>
 
 			<a href="{{ path('front') }}">retour à la bibliothèque</a>

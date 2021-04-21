@@ -116,6 +116,8 @@ class BookParagraph
         $length = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
 
+        // dd($stringToSearch, $length, $encoding);
+
         //
         //
         while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){

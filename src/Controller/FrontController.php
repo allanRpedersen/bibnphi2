@@ -53,6 +53,8 @@ class FrontController extends AbstractController
 
 			$stringToSearch = $search->getStringToSearch();
 
+			// dd($stringToSearch);
+
 
 			if ($search->getBooks()->isEmpty()){
 
