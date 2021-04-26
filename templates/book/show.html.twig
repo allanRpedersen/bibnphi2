@@ -23,11 +23,11 @@
 		</div>
 		<div class="col-md-8">
 			{% for paragraph in book.bookParagraphs %}
-				<p id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
+				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
-				<p id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content }}</p>
+				<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content }}</p>
 			{% endfor%}
 		</div>
 

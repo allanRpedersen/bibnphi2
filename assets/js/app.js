@@ -55,18 +55,41 @@ function unsetProgressBar(){
 	$('#progress-bar-container').css({ "display": "none" });
 }
 
-function renderProgressBar(){
+ function renderProgressBar(){
 
-	// $_HTTP_HOST ??
+	let href = $(location).attr('href');
+	let host = $(location).attr('host');
+	let protocol = $(location).attr('protocol');
+	
+	let protocol_host = protocol + '//' + host;
 
-	console.log($(location).attr('href'));
-	console.log($(location).attr('host')); // 127.0.0.1:8000
-	console.log($(location).attr('protocol')); // http
+	console.log('href: ' + href);
+	console.log('protocol_host: ' + protocol_host);
+
+
+	let fileName = protocol_host + '/percentProgress';
+	console.log(fileName);
+
+	let response =  fetch(fileName);
+
+	if (response.ok) { // if HTTP-status is 200-299
+	// get the response body (the method explained below)
+	let text =  response.text();
+	console.log('text: ' + text);
+	} else {
+	alert("HTTP-Error: " + response.status);
+	}
+ 
+ 	fetch(fileName)
+		// .then(response => response.json())
+		.then((response) => response.text())
+		.then((data) => console.log(data));
+
+
 
 	$.ajax({
 
-		url: 'http://127.0.0.1:8000/api/book/getParsingProgress',
-		// url: 'http://127.0.0.1:8000/api/book/getParsingProgress',
+		url: protocol_host+'/api/book/getParsingProgress',
 		method: 'GET',
 		async: true,
 		cache: false,
@@ -85,10 +108,6 @@ function renderProgressBar(){
 			console.log('>> complete :-)' + status);
 		}
 	});
-	
-
-	
-
 
 }
 
@@ -111,6 +130,7 @@ $(function () {
 
 		console.log('click on button-new-update');
 		setProgressBar();
+
 		renderProgressBar();
 	});
 
