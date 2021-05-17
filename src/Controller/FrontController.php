@@ -27,6 +27,9 @@ class FrontController extends AbstractController
 		$authors = [];
 		$bookList = [];
 		
+
+		// dd($this->getParameter('kernel.environment'));
+
 		//
 		$matchingSentences = [];
 		$matchingSentence = [

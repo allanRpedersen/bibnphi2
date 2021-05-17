@@ -68,6 +68,9 @@ class BookController extends AbstractController
 
 	private $em;
 
+	// 
+	private $fDev; 
+
 
 	public function __construct(KernelInterface $kernel, EntityManagerInterface $em, UploaderHelper $uploaderHelper)
 	{
@@ -79,6 +82,8 @@ class BookController extends AbstractController
 
 		$this->logger = new Logger('bibnphi');
 		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/bibnphi.log', Logger::DEBUG) );
+
+
 	}
 
     /**
@@ -95,29 +100,6 @@ class BookController extends AbstractController
 		]);
 	}
 	
-
-	/**
-	 * 
-	 */
-	// public function renderProgressBar($prorata=0){
-
-	// 	echo "<script>";
-	// 	echo "document.getElementById('progress-value').innerHTML=’".$prorata."%’;";
-	// 	echo "document.getElementById('progress-bar').style.width=’".$prorata."%’;";
-	// 	echo "</script>";
-		
-	// 	ob_flush();
-	// 	flush();
-		
-	// 	ob_flush();
-	// 	flush();
-		
-	// 	return $this->render('partials/_progress_bar.html.twig', [
-	// 		'prorata' => $prorata,
-	// 	]);
-
-	// }
-
 	/**
 	 * 
 	 */

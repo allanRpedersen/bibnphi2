@@ -47,3 +47,7 @@ body {
 .p-justify {
     text-align: justify;
 }
+
+#progress-bar {
+    transition: width 3s linear;
+}

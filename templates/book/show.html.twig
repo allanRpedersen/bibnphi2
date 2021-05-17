@@ -6,22 +6,16 @@
 
 <div class="container mt-5">
 	<div class="row">
-		<div class="col-md-4">
-			<h1>{{ book.title }}</h1>
-			<br>
-			<p>{{ book.nbParagraphs }} paragraphes</p>
-			<p>Temps d'analyse Xml : {{ book.parsingTime | round(2, 'floor')}} sec ({{ (book.parsingTime / 60)  | round(1, 'floor') }} min)</p>
-			<br>
-			<h5>écrit par {{ book.author.firstName ~' '~ book.author.lastName }}</h5>
-			<p>publié en {{ book.publishedYear }}</p>
-			<p>{{ book.summary }}</p>
+		<div class="col-md-2">
 
-			<a href="{{ path('front') }}">retour à la bibliothèque</a>
-			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier</a>
+			{# <a href="{{ path('front') }}">retour à la bibliothèque</a> #}
 
+			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
 			{{ include('book/_delete_form.html.twig') }}
+			{% endif %}
 		</div>
-		<div class="col-md-8">
+		<div class="col-md-10">
 			{% for paragraph in book.bookParagraphs %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 			{% endfor %}

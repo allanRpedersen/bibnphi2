@@ -15,7 +15,8 @@ class XmlParser {
 	/**
 	 * 
 	 */
-	const READ_BUFFER_SIZE = 65536; // 64kb
+	// const READ_BUFFER_SIZE = 65536; // 64kb ... 32768 32 Kb ??
+	const READ_BUFFER_SIZE = 32768; // 32 Kb
 
 	/**
 	 * 
@@ -144,6 +145,8 @@ class XmlParser {
 		if ($this->timeStart == 0){
 
 			// various initialization settings
+			if (!file_put_contents('percentProgress', '0%')) dd('BOH'); // <<<<<<<<< :-/
+
 			$this->noteCollection = [];
 			$this->text = '';
 
@@ -163,42 +166,15 @@ class XmlParser {
 		//
 		if ( $this->xmlfh ){
 
-			// if( ($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE ){
-			// 	$this->numBuffer ++;
-	
-			// 	xml_parse($this->parser, $buffer);
-			// 	$this->logger->info('n° read buffer : ' . $this->numBuffer );
-
-			// }
-			// else {
-			// 	xml_parse($this->parser, '', true); // to finalize parsing
-			// 	xml_parser_free($this->parser);
-			// 	unset($this->parser);
-	
-			// 	if (feof($this->xmlfh)){
-			// 		$this->parsingCompleted = true;
-			// 		$this->parsingTime = \microtime(true) - $this->timeStart;
-			// 		$this->logger->info("ParsingCompleted : " . $this->parsingTime);
-			// 	}
-			// 	else {
-			// 		$this->parsingTime = -1;
-			// 		$this->logger->info("ERREUR: feof(xmlFile) retourne FALSE !! ???");
-			// 	}
-			// 	fclose($this->xmlfh);
-			// }
-
-
 			while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
 
 				$this->numBuffer ++;
 				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
-	
-				xml_parse($this->parser, $buffer);
-
-				$this->logger->info('n° read buffer : ' . $this->numBuffer . ' / ' . $this->ratio );
-				$this->logger->info('percentProgress : ' . $percentProgress );
-
+				
 				file_put_contents('percentProgress', $percentProgress);
+				$this->logger->info('percentProgress : ' . $percentProgress );
+				
+				xml_parse($this->parser, $buffer);
 
 			}
 
@@ -330,13 +306,23 @@ class XmlParser {
 			case "TEXT:P" ;
 			case "TEXT:H" ;
 				// $this->paragraphCounter++;
-				// dump([$element, $attribs]);
 				break;
-			
+				
 			case "TEXT:SPAN":
+				break;
+				
 			case "DRAW:FRAME" ;
+				$this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+				break;
+				// dump([$element, $attribs]);
+					
 			case "DRAW:IMAGE" ;
-			// dump([$element, $attribs]);
+				$this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+				// $this->logger->info("BaliseXML : $element avec les attributs > " . serialize($attribs) );
+				// $this->logger->info("BaliseXML : $element avec les attributs > " . implode('#', $attribs) );
+				
+				// store Illustration
+				$this->logger->info($attribs['XLINK:HREF']);
 				break;
 			
 			case "OFFICE:ANNOTATION" ;
@@ -365,6 +351,8 @@ class XmlParser {
 				// dump([$element, $attribs]);
 				break;
 			
+			default ;
+				// $this->logger->info("élément XML $element non géré"); // <<<<<<<<<<<<<<<<<<<<
 		} 
 	}
 

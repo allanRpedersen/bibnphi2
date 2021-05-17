@@ -38,6 +38,8 @@ console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
 function showSpinner(){
 
 	console.log('showSpinner !waouh');
+	// $('body').css({ 'cursor': 'url("/public/surfer.gif"), wait, progress' });
+	$('body').css({ 'cursor': 'wait' });
 
 	// $('#search_button').append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">Rechercher...</span>');
 	// alert('showSpinner');
@@ -47,67 +49,108 @@ function setProgressBar(){
 	console.log('setProgressBar()');
 	$('#progress-bar-container').css({ "display": "flex" });
 
-	
+	setInterval(renderProgressBar, 2000);
+
 }
 
 function unsetProgressBar(){
 	console.log('unsetProgressBar()');
 	$('#progress-bar-container').css({ "display": "none" });
+
+
 }
 
  function renderProgressBar(){
 
-	let href = $(location).attr('href');
+	// let href = $(location).attr('href'); // http://127.0.0.1:8000/book/new
 	let host = $(location).attr('host');
-	let protocol = $(location).attr('protocol');
+	let protocol = $(location).attr('protocol'); // http:	
 	
-	let protocol_host = protocol + '//' + host;
+	let protocol_host = protocol + '//' + host;  // http://127.0.0.1:8000
 
-	console.log('href: ' + href);
-	console.log('protocol_host: ' + protocol_host);
+	// console.log('href: ' + href);
+	// console.log('protocol_host: ' + protocol_host);
 
+	let fileName = '/percentProgress';
 
-	let fileName = protocol_host + '/percentProgress';
-	console.log(fileName);
+	// console.log('1er fetch: ' + fileName);
 
-	let response =  fetch(fileName);
-
-	if (response.ok) { // if HTTP-status is 200-299
-	// get the response body (the method explained below)
-	let text =  response.text();
-	console.log('text: ' + text);
-	} else {
-	alert("HTTP-Error: " + response.status);
-	}
- 
- 	fetch(fileName)
-		// .then(response => response.json())
-		.then((response) => response.text())
-		.then((data) => console.log(data));
+	// fetch(fileName)
+	// // .then(response => response.json())
+	// .then((response) => response.text())
+	// .then((data) => console.log('data 1er fetch: ' + data));
 
 
+	
+	var myRequest = new Request(fileName);
+	// console.log('fetch: ' + fileName);
+    fetch(myRequest)
+    .then(function(response) {
+    //   console.log('type: ' + response.type);
+    //   console.log('url: ' + response.url);
+    //   console.log('useFinalURL: ' + response.useFinalURL);
+    //   console.log('status: ' + response.status);
+    //   console.log('ok: ' + response.ok);
+    //   console.log('statusText: ' + response.statusText);
+    //   console.log('headers: ' + response.headers);
+      if (!response.ok) {
+        throw new Error("HTTP error, status = " + response.status);
+      }
+      return response.text();
+    })
+    .then(function(text) {
 
-	$.ajax({
+		console.log(text);
+		$('#progress-bar').css('width', text);
+		$('#progress-bar').text( text );
 
-		url: protocol_host+'/api/book/getParsingProgress',
-		method: 'GET',
-		async: true,
-		cache: false,
-		dataType: 'json',
-		success: function(data)
-		{
-			console.log(data);
-			$('#progress-bar').css({ "width": data.parsingProgress });
-		},
-		error: function(object, error, errorThrown)
-		{
-			console.log('### error ** ' + error + ' (' + errorThrown + ')');
-		},
-		complete: function(object, status)
-		{
-			console.log('>> complete :-)' + status);
-		}
+    	// console.log('text: ' +  text);
+    })
+    .catch(function(error) {
+		console.log('Error: ' + error.message);
+		alert('blik' + error.message);
 	});
+
+
+
+
+	// let response =  fetch(fileName);
+	// console.log('response.ok: ' + response.ok);
+
+	// if (response.ok) { // if HTTP-status is 200-299
+	// 	// get the response body (the method explained below)
+	// 	let text =  response.text();
+	// 	console.log('text: ' + text);
+	// } else {
+		
+		
+	// 	console.log(response);
+	// alert("HTTP-Error: " + response.status);
+	// }
+ 
+
+
+	// $.ajax({
+
+	// 	url: protocol_host+'/api/book/getParsingProgress',
+	// 	method: 'GET',
+	// 	async: true,
+	// 	cache: false,
+	// 	dataType: 'json',
+	// 	success: function(data)
+	// 	{
+	// 		console.log(data);
+	// 		$('#progress-bar').css({ "width": data.parsingProgress });
+	// 	},
+	// 	error: function(object, error, errorThrown)
+	// 	{
+	// 		console.log('### error ** ' + error + ' (' + errorThrown + ')');
+	// 	},
+	// 	complete: function(object, status)
+	// 	{
+	// 		console.log('>> complete :-)' + status);
+	// 	}
+	// });
 
 }
 
@@ -129,9 +172,9 @@ $(function () {
 		event.stopImmediatePropagation();
 
 		console.log('click on button-new-update');
-		setProgressBar();
+		showSpinner();
+		setTimeout(setProgressBar, 1000);
 
-		renderProgressBar();
 	});
 
 
