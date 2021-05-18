@@ -27,6 +27,10 @@ class FrontController extends AbstractController
 		$authors = [];
 		$bookList = [];
 		
+		//
+		// cleaning ..
+		passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
+
 
 		// dd($this->getParameter('kernel.environment'));
 

@@ -200,7 +200,11 @@ class BookController extends AbstractController
 
 			$this->addFlash(
 				'info',
-				'L\'analyse du document s\'est terminée avec succès ! ( ' . $xmlParser->getNbParagraphs() . ' paragraphes en '. $xmlParser->getParsingTime() . ' secondes)');
+				'L\'analyse du document s\'est terminée avec succès ! ( ' . $xmlParser->getNbParagraphs() . ' paragraphes en '. round($xmlParser->getParsingTime(), 2) . ' secondes)');
+
+				//
+				// 
+				passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
 
 			return $this->redirectToRoute('book_show', [
 				'slug' => $book->getSlug()
@@ -249,10 +253,6 @@ class BookController extends AbstractController
 
 		$form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
-			//
-			//
-			passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
 
 			$book->setNbParagraphs(0)
 				->setNbSentences(0)

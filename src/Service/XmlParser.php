@@ -80,7 +80,7 @@ class XmlParser {
 		$this->nbWords = 0;
 		$this->nbSentences = 0;
 		$this->nbParagraphs = 0;
-		$this->numBuffer= 0;
+		$this->numBuffer = 0;
 
 	}
 
