@@ -22,6 +22,9 @@ import 'bootstrap';
 
 import 'select2';
 
+var protocol_host;
+var progressFileName;
+
 console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
 //
 
@@ -41,13 +44,14 @@ function showSpinner(){
 	// $('body').css({ 'cursor': 'url("/public/surfer.gif"), wait, progress' });
 	$('body').css({ 'cursor': 'wait' });
 
-	// $('#search_button').append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">Rechercher...</span>');
-	// alert('showSpinner');
 }
 
 function setProgressBar(){
 	console.log('setProgressBar()');
 	$('#progress-bar-container').css({ "display": "flex" });
+
+	progressFileName = protocol_host + '/percentProgress';
+	console.log('nom du fichier de progress : ' + progressFileName );
 
 	setInterval(renderProgressBar, 2000);
 
@@ -62,17 +66,6 @@ function unsetProgressBar(){
 
  function renderProgressBar(){
 
-	// let href = $(location).attr('href'); // http://127.0.0.1:8000/book/new
-	let host = $(location).attr('host');
-	let protocol = $(location).attr('protocol'); // http:	
-	
-	let protocol_host = protocol + '//' + host;  // http://127.0.0.1:8000
-
-	// console.log('href: ' + href);
-	// console.log('protocol_host: ' + protocol_host);
-
-	let fileName = '/percentProgress';
-
 	// console.log('1er fetch: ' + fileName);
 
 	// fetch(fileName)
@@ -80,9 +73,7 @@ function unsetProgressBar(){
 	// .then((response) => response.text())
 	// .then((data) => console.log('data 1er fetch: ' + data));
 
-
-	
-	var myRequest = new Request(fileName);
+	var myRequest = new Request(progressFileName);
 	// console.log('fetch: ' + fileName);
     fetch(myRequest)
     .then(function(response) {
@@ -94,7 +85,8 @@ function unsetProgressBar(){
     //   console.log('statusText: ' + response.statusText);
     //   console.log('headers: ' + response.headers);
       if (!response.ok) {
-        throw new Error("HTTP error, status = " + response.status);
+		console.log("fetch error, status = " + response.status);
+    	throw new Error("HTTP error, status = " + response.status);
       }
       return response.text();
     })
@@ -172,12 +164,21 @@ $(function () {
 		event.stopImmediatePropagation();
 
 		console.log('click on button-new-update');
+
 		showSpinner();
+		console.log('click on ajout, protocol_host: ' + protocol_host);
 		setTimeout(setProgressBar, 1000);
 
 	});
 
+	let href = $(location).attr('href');           // http://127.0.0.1:8000/book/new
+	let host = $(location).attr('host');           // 127.0.0.1:8000
+	let protocol = $(location).attr('protocol');   // http:	
+	
+	protocol_host = protocol + '//' + host;        // http://127.0.0.1:8000
 
+	console.log('href: ' + href);
+	console.log('protocol_host: ' + protocol_host);
 
 	console.log('Document Ready !!');
 	// alert();

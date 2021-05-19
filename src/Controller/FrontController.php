@@ -29,7 +29,8 @@ class FrontController extends AbstractController
 		
 		//
 		// cleaning ..
-		passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
+		// passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
+		file_put_contents('percentProgress', '0%');
 
 
 		// dd($this->getParameter('kernel.environment'));

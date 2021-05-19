@@ -204,7 +204,8 @@ class BookController extends AbstractController
 
 				//
 				// 
-				passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
+				// passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
+				file_put_contents('percentProgress', '0%');
 
 			return $this->redirectToRoute('book_show', [
 				'slug' => $book->getSlug()
