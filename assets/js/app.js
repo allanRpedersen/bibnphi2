@@ -29,15 +29,6 @@ console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
 //
 
 
-// $('button#main_search').on('click', function(e)
-// $('button#main_search').addEventListener('click', function(e)
-// $('button#main_search').on('click', function(e)
-// {
-// 	console.log('===== showSpinner ====', e.target );
-// 	return true;
-	
-// });
-
 function showSpinner(){
 
 	console.log('showSpinner !waouh');
@@ -53,7 +44,7 @@ function setProgressBar(){
 	progressFileName = protocol_host + '/percentProgress';
 	console.log('nom du fichier de progress : ' + progressFileName );
 
-	setInterval(renderProgressBar, 2000);
+	setInterval(renderProgressBar, 1000);
 
 }
 
@@ -96,7 +87,6 @@ function unsetProgressBar(){
 		$('#progress-bar').css('width', text);
 		$('#progress-bar').text( text );
 
-    	// console.log('text: ' +  text);
     })
     .catch(function(error) {
 		console.log('Error: ' + error.message);
