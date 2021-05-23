@@ -63,8 +63,15 @@ function unsetProgressBar(){
 	// // .then(response => response.json())
 	// .then((response) => response.text())
 	// .then((data) => console.log('data 1er fetch: ' + data));
+	const myInit = {
+					method: 'GET',
+					mode: 'cors',
+					cache: 'no-store',
+				};
 
-	var myRequest = new Request(progressFileName);
+
+	var myRequest = new Request(progressFileName, myInit);
+	console.log(myRequest);
 	// console.log('fetch: ' + fileName);
     fetch(myRequest)
     .then(function(response) {
@@ -139,7 +146,20 @@ function unsetProgressBar(){
 // $(document).ready(function(){
 $(function () {
 
-	// Form/SentenceSearchType
+	//
+	// init 
+	//
+	let href = $(location).attr('href');           // http://127.0.0.1:8000/book/new
+	let host = $(location).attr('host');           // 127.0.0.1:8000
+	let protocol = $(location).attr('protocol');   // http:	
+	
+	protocol_host = protocol + '//' + host;        // http://127.0.0.1:8000
+
+	console.log('href: ' + href);
+	console.log('protocol_host: ' + protocol_host);
+
+
+	// Form/SentenceSearchType init
 	$('#sentence_search_books').select2({
 		width: '100%',
 		placeholder: 'parmi les oeuvres ...',
@@ -160,15 +180,6 @@ $(function () {
 		setTimeout(setProgressBar, 1000);
 
 	});
-
-	let href = $(location).attr('href');           // http://127.0.0.1:8000/book/new
-	let host = $(location).attr('host');           // 127.0.0.1:8000
-	let protocol = $(location).attr('protocol');   // http:	
-	
-	protocol_host = protocol + '//' + host;        // http://127.0.0.1:8000
-
-	console.log('href: ' + href);
-	console.log('protocol_host: ' + protocol_host);
 
 	console.log('Document Ready !!');
 	// alert();
