@@ -145,7 +145,7 @@ class XmlParser {
 		if ($this->timeStart == 0){
 
 			// various initialization settings
-			if (!file_put_contents('percentProgress', '0%')) dd('BOH'); // <<<<<<<<< :-/
+			if (!file_put_contents('percentProgress', '0%')) dd('BOH !!!!'); // <<<<<<<<< :-/
 
 			$this->noteCollection = [];
 			$this->text = '';
@@ -171,7 +171,7 @@ class XmlParser {
 				$this->numBuffer ++;
 				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
 				
-				file_put_contents('percentProgress', $percentProgress);
+				if (!file_put_contents('percentProgress', $percentProgress)) $this->logger->error('>> erreur file_put_contents');
 				$this->logger->info('percentProgress : ' . $percentProgress );
 				
 				xml_parse($this->parser, $buffer);

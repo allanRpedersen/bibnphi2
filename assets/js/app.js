@@ -42,7 +42,7 @@ function setProgressBar(){
 	$('#progress-bar-container').css({ "display": "flex" });
 
 	progressFileName = protocol_host + '/percentProgress';
-	console.log('nom du fichier de progress : ' + progressFileName );
+	console.log('fichier de progress : ' + progressFileName );
 
 	setInterval(renderProgressBar, 1000);
 
@@ -97,7 +97,7 @@ function unsetProgressBar(){
     })
     .catch(function(error) {
 		console.log('Error: ' + error.message);
-		alert('blik' + error.message);
+		alert('blik blik :-<> ' + error.message);
 	});
 
 
