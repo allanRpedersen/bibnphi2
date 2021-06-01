@@ -205,7 +205,6 @@ class BookController extends AbstractController
 				//
 				// 
 				// passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
-				file_put_contents('percentProgress', '0%');
 
 			return $this->redirectToRoute('book_show', [
 				'slug' => $book->getSlug()
@@ -241,16 +240,17 @@ class BookController extends AbstractController
         $book = new Book();
 		$form = $this->createForm(BookType::class, $book);
 
-		if ($request->getMethod()!='GET'){
+		// if ($request->getMethod()!='GET'){
 
-			// $data1 = $request->getContent();
-			// dd($request->getMethod(), $data1, $request, $book);
+		// 	// $data1 = $request->getContent();
+		// 	// dd($request->getMethod(), $data1, $request, $book);
 			
-			// $data2 = $this->get('serializer')->deserialize($data1, 'App\Entity\Book', 'json');
-			// dd($data2);
-		}
+		// 	// $data2 = $this->get('serializer')->deserialize($data1, 'App\Entity\Book', 'json');
+		// 	// dd($data2);
+		// }
 
-
+		//
+		if (!file_put_contents('percentProgress', '0%')) $this->logger->error('>>> on file_put_contents');
 
 		$form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

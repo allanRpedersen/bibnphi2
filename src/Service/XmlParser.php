@@ -171,10 +171,10 @@ class XmlParser {
 				$this->numBuffer ++;
 				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
 				
+				xml_parse($this->parser, $buffer);
+				
 				if (!file_put_contents('percentProgress', $percentProgress)) $this->logger->error('>> erreur file_put_contents');
 				$this->logger->info('percentProgress : ' . $percentProgress );
-				
-				xml_parse($this->parser, $buffer);
 
 			}
 

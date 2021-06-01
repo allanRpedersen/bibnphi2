@@ -7,6 +7,9 @@
     },
     "license": "UNLICENSED",
     "private": true,
+    "browser": {
+        "fs": false
+    },
     "scripts": {
         "dev-server": "encore dev-server",
         "dev": "encore dev",
@@ -15,6 +18,7 @@
     },
     "dependencies": {
         "bootstrap": "^4.5.3",
+        "dotenv": "^10.0.0",
         "jquery": "^3.5.1",
         "lodash": "^4.17.20",
         "popper.js": "^1.16.1",

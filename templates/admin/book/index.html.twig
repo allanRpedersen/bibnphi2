@@ -5,14 +5,13 @@
 {% block body %}
     <div class="container-fluid">
         <h1 class="mt-5">Administration des ouvrages</h1>
+        <a type ="button" class="btn btn-info mb-3" href="{{ path('book_new') }}">Ajouter une oeuvre</a>
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th><a class="anchor-no-decoration" href="{{path('admin_book_index')}}">Id</a></th>
+                    <th><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'Id'})}}">Id</a></th>
                     <th><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'Title'})}}">Titre</a></th>
                     <th><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'Author'})}}">Auteur.e</a></th>
-                    <th>Résumé</th>
-                    <th>Publié en</th>
                     <th>odtBookName</th>
                     <th class="text-center"><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'ParsingTime'})}}">parsingTime(sec)</a></th>
                     <th class="text-center"><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'NbParagraphs'})}}">nbParagraphs</a></th>
@@ -27,8 +26,6 @@
                     <td>{{book.id}}</td>
                     <td>{{book.title}}</td>
                     <td>{{book.author.lastName}}</td>
-                    <td>{{book.summary}}</td>
-                    <td>{{book.publishedYear}}</td>
                     <td>{{book.odtBookName}}</td>
                     <td class="text-center">
                         {% if (book.parsingTime == 0) %}
@@ -43,7 +40,7 @@
                     {# <td class="text-center"><span class="badge badge-primary rounded">{{book.nbSentences}}</span></td> #}
                     {# <td class="text-center"><span class="badge badge-primary rounded">{{book.nbWords}}</span></td> #}
                     <td>
-                        <a href="#" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                        <a type="button" href="#" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                         <form method="post" action="{{ path('admin_book_delete', {'slug': book.slug}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
                             <input type="hidden" name="_method" value="DELETE">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ book.id) }}">

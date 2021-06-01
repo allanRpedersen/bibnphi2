@@ -1,13 +1,14 @@
 /*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
+* Welcome to your app's main JavaScript file!
+*
+* We recommend including the built version of this JavaScript file
+* (and its CSS file) in your base layout (base.html.twig).
+*/
 
 // any CSS you import will output into a single css file (app.css in this case)
 import '../styles/app.scss';
 // require('../css/app.scss');
+
 
 // Need jQuery? Install it with "yarn add jquery", then uncomment to import it.
 // var $ = require('jquery');
@@ -22,14 +23,31 @@ import 'bootstrap';
 
 import 'select2';
 
-var protocol_host;
-var progressFileName;
-
-console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
 //
+//
+// const fs = require('fs')
 
+// import { readFile } from 'fs/promises';
 
-function showSpinner(){
+import fs from 'fs';
+
+  
+  // require('dotenv').config();
+  
+  // import dotenv from 'dotenv';
+  // dotenv.config();
+  
+  var protocol_host;
+  var progressFileName;
+  
+  console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
+  console.log( process );
+  console.log( process.env );
+  // console.log( process.env.DATABASE_URL );  undefined !!-/
+  //
+  
+  
+  function showSpinner(){
 
 	console.log('showSpinner !waouh');
 	// $('body').css({ 'cursor': 'url("/public/surfer.gif"), wait, progress' });
@@ -38,13 +56,13 @@ function showSpinner(){
 }
 
 function setProgressBar(){
-	console.log('setProgressBar()');
+
 	$('#progress-bar-container').css({ "display": "flex" });
 
 	progressFileName = protocol_host + '/percentProgress';
-	console.log('fichier de progress : ' + progressFileName );
+	console.log('setProgressBar, avec le fichier de progress : ' + progressFileName );
 
-	setInterval(renderProgressBar, 1000);
+	setInterval(renderProgressBar, 200);
 
 }
 
@@ -63,9 +81,15 @@ function unsetProgressBar(){
 	// // .then(response => response.json())
 	// .then((response) => response.text())
 	// .then((data) => console.log('data 1er fetch: ' + data));
-	const myInit = {
+	var myHeaders = new Headers({
+		"Content-Type": "text/plain",
+		// "Content-Length": 4,
+	  });
+	
+	var myInit = {
 					method: 'GET',
-					mode: 'cors',
+					headers: myHeaders,
+					mode: 'same-origin',
 					cache: 'no-store',
 				};
 
@@ -177,7 +201,8 @@ $(function () {
 
 		showSpinner();
 		console.log('click on ajout, protocol_host: ' + protocol_host);
-		setTimeout(setProgressBar, 1000);
+		// setTimeout(setProgressBar, 1000);
+		setProgressBar();
 
 	});
 

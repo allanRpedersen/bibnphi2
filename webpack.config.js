@@ -48,10 +48,10 @@ Encore
     .enableVersioning(Encore.isProduction())
 
     // enables @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = 3;
-    })
+    // .configureBabelPresetEnv((config) => {
+    //     config.useBuiltIns = 'usage';
+    //     config.corejs = 3;
+    // })
 
     // enables Sass/SCSS support
     .enableSassLoader()
@@ -72,3 +72,12 @@ Encore
 ;
 
 module.exports = Encore.getWebpackConfig();
+
+// webpack.config.js
+// const Dotenv = require('dotenv-webpack');
+
+// module.exports = {
+//   plugins: [
+//     new Dotenv()
+//   ]
+// };
