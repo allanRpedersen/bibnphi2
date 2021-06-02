@@ -145,7 +145,7 @@ class XmlParser {
 		if ($this->timeStart == 0){
 
 			// various initialization settings
-			if (!file_put_contents('percentProgress', '0%')) dd('BOH !!!!'); // <<<<<<<<< :-/
+			if (!file_put_contents('percentProgress.log', '0%')) dd('BOH !!!!'); // <<<<<<<<< :-/
 
 			$this->noteCollection = [];
 			$this->text = '';
@@ -171,9 +171,13 @@ class XmlParser {
 				$this->numBuffer ++;
 				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
 				
+				$am = microtime(true);
 				xml_parse($this->parser, $buffer);
+				$bufferParsingTime = microtime(true) - $am;
+
+				$this->logger->info('buffer n°' . $this->numBuffer . ' - parsing time: ' . $bufferParsingTime );
 				
-				if (!file_put_contents('percentProgress', $percentProgress)) $this->logger->error('>> erreur file_put_contents');
+				if (!file_put_contents('percentProgress.log', $percentProgress)) $this->logger->error('>> erreur file_put_contents');
 				$this->logger->info('percentProgress : ' . $percentProgress );
 
 			}
@@ -271,7 +275,7 @@ class XmlParser {
 				$this->logger->info('n° read buffer : ' . $this->numBuffer . ' / ' . $this->ratio );
 				$this->logger->info('percentProgress : ' . $percentProgress );
 
-				file_put_contents('percentProgress', $percentProgress);
+				file_put_contents('percentProgress.log', $percentProgress);
 
 			}
 

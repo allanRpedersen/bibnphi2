@@ -59,10 +59,10 @@ function setProgressBar(){
 
 	$('#progress-bar-container').css({ "display": "flex" });
 
-	progressFileName = protocol_host + '/percentProgress';
+	progressFileName = protocol_host + '/percentProgress.log';
 	console.log('setProgressBar, avec le fichier de progress : ' + progressFileName );
 
-	setInterval(renderProgressBar, 200);
+	setInterval(renderProgressBar, 300);
 
 }
 

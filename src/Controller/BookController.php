@@ -202,10 +202,6 @@ class BookController extends AbstractController
 				'info',
 				'L\'analyse du document s\'est terminée avec succès ! ( ' . $xmlParser->getNbParagraphs() . ' paragraphes en '. round($xmlParser->getParsingTime(), 2) . ' secondes)');
 
-				//
-				// 
-				// passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
-
 			return $this->redirectToRoute('book_show', [
 				'slug' => $book->getSlug()
 				]);
@@ -250,7 +246,7 @@ class BookController extends AbstractController
 		// }
 
 		//
-		if (!file_put_contents('percentProgress', '0%')) $this->logger->error('>>> on file_put_contents');
+		if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
 
 		$form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -364,17 +360,24 @@ class BookController extends AbstractController
 				// if (!$errCode){}
 
 				//
+				if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
+
+				//
 				// xml parsing !!
 				$this->book = $book;
-				$book->setParsingTime($this->parseXmlContent($dirName . '/content.xml'))
-					->setNbParagraphs($this->nbBookParagraphs)
-					->setNbSentences($this->nbBookSentences)
-					->setNbWords($this->nbBookWords)
+				$book->setNbParagraphs(0)
+					->setNbSentences(0)
+					->setNbWords(0)
+					->setParsingTime(0)
 					;
-				
+
 				$entityManager->persist($book);
 				$entityManager->flush();
 				
+				return $this->redirectToRoute('book_processing', [
+					'slug' => $book->getSlug()
+				]);
+	
 			}
 						
             return $this->redirectToRoute('book_show', [
@@ -421,265 +424,6 @@ class BookController extends AbstractController
         }
 
         return $this->redirectToRoute('book_index');
-	}
-
-
-	/**
-	 *      O D T   X M L   p a r s i n g
-	 */
-	private function start_element_handler($parser, $element, $attribs)
-	{
-
-		switch($element){
-
-			case "TEXT:P" ;
-			case "TEXT:H" ;
-				$this->counter++;
-				// dump([$element, $attribs]);
-				break;
-			
-			case "TEXT:SPAN":
-			case "DRAW:FRAME" ;
-			case "DRAW:IMAGE" ;
-			// dump([$element, $attribs]);
-				break;
-			
-			case "OFFICE:ANNOTATION" ;
-				$this->insideAnnotation = true;
-				break;
-
-			case "TEXT:NOTE" ;
-				$this->text .= '(#';
-				$this->insideNote = true;
-				break;
-				
-			case "TEXT:NOTE-CITATION" ;
-				$this->isNoteCitation = TRUE;
-				// dump([$element, $attribs]);
-				break;
-				
-			case "TEXT:NOTE-BODY" ;
-				$this->isNoteBody = true;
-				// dump([$element, $attribs]);
-				break;
-			
-		} 
-	}
-
-	private function end_element_handler($parser, $element)
-	{
-		switch($element){
-			case "TEXT:P" ;
-			case "TEXT:H" ;
-				if (!$this->insideNote){
-
-					$this->handleBookParagraph($this->text, $this->noteCollection);
-					$this->text = '';
-					$this->noteCollection = [];
-
-				}
-				break;
-
-			case "OFFICE:ANNOTATION" ;
-				$this->insideAnnotation = false;
-				break;
-			
-			case "TEXT:NOTE" ;
-				//
-				$this->noteCollection[] = '[note#' . $this->noteCitation . ') ' . $this->noteBody . '#]';
-				//
-				$this->text .= ')'; // to end the note citation in the text
-				$this->insideNote = false;
-				$this->noteBody = '';
-				break;
-
-			case "TEXT:NOTE-CITATION" ;
-				$this->isNoteCitation = FALSE;
-				break;
-
-			case "TEXT:NOTE-BODY" ;
-				// 
-				$this->isNoteBody = false;
-				break;
-			
-			case "TEXT:LINE-BREAK" ;
-				//
-				$this->text .= ' ';
-				break;
-			
-			case "TEXT:SPAN" ;
-				break;
-
-		}	
-
-	}
-
-	private function character_data_handler($parser, $data)
-	{
-		if ($this->isNoteBody) $this->noteBody .= $data;
-		else if (!$this->insideAnnotation){
-			$this->text .= $data;
-			if ($this->isNoteCitation) $this->noteCitation = $data; 
-		}
-	}
-
-	/**
-	 * Parse the xml file which contains the odt document.
-	 *
-	 * @param string $fileName
-	 * @return void
-	 */
-	private function parseXmlContent( string $fileName ) : ?float
-	{
-		//
-		$timeStart = microtime(true);
-
-		// various initialization settings
-		$this->noteCollection = [];
-		$this->text = '';
-		$this->nbBookWords = 0;
-		$this->nbBookSentences = 0;
-		$this->nbBookParagraphs = 0;
-
-		// get file size
-		$this->xmlFileSize = filesize($fileName);
-		// nb of file buffers to be read
-		$ratio = ceil($this->xmlFileSize / self::READ_BUFFER_SIZE);
-
-		// unix cmd
-		// 
-		passthru('echo \'$fileName:' . $fileName . ' ~ $fileSize:' . $this->xmlFileSize . '\' >>books/sorties_console 2>&1', $errCode );
-		$this->logger->info('$fileName : ' . $fileName . ' ~ $fileSize:' . $this->xmlFileSize);
-		passthru('echo \'ratio:' . $ratio . '\' >>books/sorties_console 2>&1', $errCode );
-		$this->logger->info('$ratio : ' . $ratio );
-
-
-		// setting no execution time out .. bbrrrr !! 
-		if ($ratio > 1) ini_set('max_execution_time', '0');
-
-		//
-		// $fh = @fopen() 
-		// ( @ symbol supresses any php driven error message !? )
-		//
-		$fh = fopen($fileName, 'rb');
-		if ( $fh ){
-
-			$nbBuffer = 0;
-
-			$this->parser = xml_parser_create();
-			$this->counter = 0; // nb de paragraphes !!?
-
-			//
-			// set up the handlers
-			xml_set_element_handler($this->parser, [$this, "start_element_handler"], [$this, "end_element_handler"]);
-			xml_set_character_data_handler($this->parser, [$this, "character_data_handler"]);
-
-			// fread vs fgets !! ??
-			while (($buffer = fread($fh, self::READ_BUFFER_SIZE)) != false){
-				//
-				// 
-				$nbBuffer++;
-				xml_parse($this->parser, $buffer);
-
-				sleep(1); // ?? cf err 503 !-(
-				$this->logger->info('n° read buffer : ' . $nbBuffer );
-			}
-
-			xml_parse($this->parser, '', true); // finalize parsing
-			xml_parser_free($this->parser);
-			unset($this->parser);
-
-
-			if (!feof($fh)) {
-				passthru('echo "Erreur: fread() a échoué ..." >>books/sorties_console 2>&1', $errCode);
-				return 0;
-			}
-
-			fclose($fh);
-
-		}
-		else {
-			passthru('echo "Erreur: fopen a retourné FALSE !!" >>books/sorties_console 2>&1', $errCode);
-			return 0 ; // no parsing !!
-		}
-
-		// stop timer !
-		//$timeEnd = \microtime(true);
-
-		$duration = \microtime(true) - $timeStart;
-		$this->logger->info('Parsing duration : ' . $duration );
-		// passthru('echo \'Parsing duration:' . $duration . '\' >>books/sorties_console 2>&1', $errCode );
-
-		// dd($timeStart, $timeEnd, $timeEnd - $timeStart);
-		return($duration);
-	}
-
-	private function handleBookParagraph($rawParagraph, $noteCollection)
-	{
-		if ($rawParagraph != ''){
-
-			$entityManager = $this->getDoctrine()->getManager();
-			$bookParagraph = NULL;
-			
-			// split the paragraph using the punctuation signs [.?!]
-			// with a negative look-behind feature to exclude :
-			// 			- roman numbers (example CXI.)
-			//			- ordered list ( 1. aaa 2. bbb 3. ccc etc)
-			//			- S. as St, Saint
-			//
-			$sentences = preg_split('/(?<![IVXLCM1234567890S].)(?<=[.?!])\s+/', $rawParagraph, -1, PREG_SPLIT_DELIM_CAPTURE);
-			if ($sentences){
-				foreach ($sentences as $sentence ){
-					
-					// remove all non-breaking space !!
-					// regex / /u << unicode support
-					$sentence = preg_replace("/[\x{00a0}\s]+/u", " ", $sentence);
-					$sentence = ltrim($sentence);
-					
-					if ($sentence != ''){
-						
-						if ( NULL === $bookParagraph ){
-							$bookParagraph = new BookParagraph();
-							$bookParagraph->setBook($this->book);
-						}
-
-						$bookSentence = new BookSentence();
-						$bookSentence->setBookParagraph($bookParagraph);
-						$bookSentence->setContent($sentence);
-
-						$this->nbBookSentences++;
-						$entityManager->persist($bookSentence);
-					}
-
-				}
-			}
-
-			//
-			if ( NULL !== $bookParagraph ){
-
-				$this->nbBookParagraphs++;				
-				$entityManager->persist($bookParagraph);
-
-				//
-				// then get notes if any for the paragraph
-				if (!empty($noteCollection)){
-					foreach($this->noteCollection as $note){
-						$pNote = new BookParagraph();
-						$pNote->SetBook($this->book);
-						$entityManager->persist($pNote);
-
-						$sNote = new BookSentence();
-						$sNote->setBookParagraph($pNote);
-						$sNote->setContent($note);
-						$entityManager->persist($sNote);
-
-					}
-				}
-
-				$entityManager->flush();
-			}
-			
-		}
 	}
 
 }

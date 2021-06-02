@@ -18,7 +18,7 @@ class AdminBookController extends AbstractController
     /**
      * @Route("/book/{sortBy}", name="admin_book_index")
      */
-    public function index($sortBy = 'Id', BookRepository $repo): Response
+    public function index($sortBy = 'Title', BookRepository $repo): Response
     {
         switch($sortBy){
             case 'Id':
@@ -41,9 +41,9 @@ class AdminBookController extends AbstractController
                 $books = $repo->findByAuthor();
                 break;
                 
-            default:
-                $books = $repo->findByTitle();
-                break;
+            // default:
+            //     $books = $repo->findByTitle();
+            //     break;
     
         }
 
