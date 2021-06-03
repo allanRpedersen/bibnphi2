@@ -73,6 +73,8 @@ class XmlParser {
 
 		$this->xmlFileSize = filesize($xmlFileName);
 		$this->ratio = ceil($this->xmlFileSize / $bufferSize);
+		
+		$this->logger->info('ratio ('. $this->xmlFileSize . '/' . $bufferSize . ') : ' . $this->ratio );
 
 		// ??
 		// $fh = @fopen() 
