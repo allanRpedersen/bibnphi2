@@ -27,14 +27,7 @@ class FrontController extends AbstractController
 		$authors = [];
 		$bookList = [];
 		
-		//
-		// cleaning ..
-		// passthru('rm -v percentProgress >>books/sorties_console 2>&1', $errCode );
-		file_put_contents('percentProgress', '0%');
-
-
 		// dd($this->getParameter('kernel.environment'));
-
 		//
 		$matchingSentences = [];
 		$matchingSentence = [
@@ -45,7 +38,6 @@ class FrontController extends AbstractController
 
 		$matchingParagraphs = [];
 		
-
 		//
 		$nbBooksInLibrary = count($bookRepository->findAll());
 

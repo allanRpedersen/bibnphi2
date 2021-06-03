@@ -2,11 +2,13 @@
 
 namespace App\Service;
 
+use Monolog\Logger;
 use App\Entity\Book;
 use App\Entity\BookNote;
 use App\Entity\BookSentence;
 use App\Entity\BookParagraph;
 use App\Repository\BookRepository;
+use Monolog\Handler\StreamHandler;
 use Doctrine\ORM\EntityManagerInterface;
 
 
@@ -16,8 +18,7 @@ class XmlParser {
 	 * 
 	 */
 	// const READ_BUFFER_SIZE = 65536; // 64kb ... 32768 32 Kb ??
-	const READ_BUFFER_SIZE = 32768; // 32 Kb
-
+	private  $READ_BUFFER_SIZE;
 	/**
 	 * 
 	 */
@@ -34,7 +35,7 @@ class XmlParser {
 	private $parsingTime;
 	private $parsingCompleted;
 	
-	private $ratio; // $xmlFileSize / READ_BUFFER_SIZE
+	private $ratio; // $xmlFileSize / READ_BUFFER_SIZE  i.e. total of buffers read
 	private $numBuffer;
 	// private $percentProgress;
 	
@@ -56,17 +57,22 @@ class XmlParser {
 	private $logger;
 	private $em;
 		
-	public function __construct( Book $book, $xmlFileName, EntityManagerInterface $em, $logger = NULL )
+	public function __construct( Book $book, $xmlFileName, $projectDir, $bufferSize, EntityManagerInterface $em )
 	{
 		
 		$this->book = $book;
+		$this->READ_BUFFER_SIZE = $bufferSize;
 		
 		// $this->xmlFileName = $xmlFileName;
 		$this->em = $em;
-		$this->logger = $logger;
+		
+		// $this->logger = $logger;
+		$this->logger = new Logger('_xmlParser');
+		$this->logger->pushHandler( new StreamHandler($projectDir . '/bibnphi.log', Logger::DEBUG) );
+
 
 		$this->xmlFileSize = filesize($xmlFileName);
-		$this->ratio = ceil($this->xmlFileSize / self::READ_BUFFER_SIZE);
+		$this->ratio = ceil($this->xmlFileSize / $bufferSize);
 
 		// ??
 		// $fh = @fopen() 
@@ -136,7 +142,7 @@ class XmlParser {
 
 	/**
 	 * Parse the xml file which describes the document.
-	 * Store the sentences in $this->book set by __construct()
+	 * Store the paragraphs in $this->book set by __construct()
 	 *
 	 */
 	public function parse()
@@ -166,7 +172,7 @@ class XmlParser {
 		//
 		if ( $this->xmlfh ){
 
-			while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
+			while (($buffer = fread($this->xmlfh, $this->READ_BUFFER_SIZE)) != FALSE){
 
 				$this->numBuffer ++;
 				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
@@ -175,7 +181,7 @@ class XmlParser {
 				xml_parse($this->parser, $buffer);
 				$bufferParsingTime = microtime(true) - $am;
 
-				$this->logger->info('buffer n°' . $this->numBuffer . ' - parsing time: ' . $bufferParsingTime );
+				$this->logger->info('buffer n°' . $this->numBuffer . '/' . $this->ratio . ' - parsing time: ' . $bufferParsingTime );
 				
 				if (!file_put_contents('percentProgress.log', $percentProgress)) $this->logger->error('>> erreur file_put_contents');
 				$this->logger->info('percentProgress : ' . $percentProgress );
@@ -265,7 +271,8 @@ class XmlParser {
 			// }
 
 
-			while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
+			// while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
+			while (($buffer = fread($this->xmlfh, $this->READ_BUFFER_SIZE)) != FALSE){
 
 				$this->numBuffer ++;
 				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
@@ -316,12 +323,13 @@ class XmlParser {
 				break;
 				
 			case "DRAW:FRAME" ;
-				$this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+				// $this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
 				break;
 				// dump([$element, $attribs]);
 					
 			case "DRAW:IMAGE" ;
-				$this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+				// $this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+
 				// $this->logger->info("BaliseXML : $element avec les attributs > " . serialize($attribs) );
 				// $this->logger->info("BaliseXML : $element avec les attributs > " . implode('#', $attribs) );
 				
