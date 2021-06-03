@@ -162,7 +162,14 @@ class BookController extends AbstractController
 
 		if ($xmlFileName){
 
-			$xmlParser = new XmlParser($book, $xmlFileName, $this->em, $this->logger);
+			$xmlParser = new XmlParser(
+										$book, 
+										$xmlFileName, 
+										$this->projectDir, 
+										$this->getParameter('app.parsing_buffer_size'), 
+										$this->em
+									);
+
 			$this->xmlParser = $xmlParser;
 
 			// setting no execution time out .. bbrrrr !! 
@@ -423,7 +430,8 @@ class BookController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('book_index');
+        // return $this->redirectToRoute('book_index');
+        return $this->redirectToRoute('front');
 	}
 
 }
