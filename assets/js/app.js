@@ -29,7 +29,7 @@ import 'select2';
 
 // import { readFile } from 'fs/promises';
 
-import fs from 'fs';
+// import fs from 'fs';
 
   
   // require('dotenv').config();
@@ -62,7 +62,7 @@ function setProgressBar(){
 	progressFileName = protocol_host + '/percentProgress.log';
 	console.log('setProgressBar, avec le fichier de progress : ' + progressFileName );
 
-	setInterval(renderProgressBar, 300);
+	setInterval(renderProgressBar, 300); // 700 ~ 900 ??
 
 }
 
@@ -81,14 +81,18 @@ function unsetProgressBar(){
 	// // .then(response => response.json())
 	// .then((response) => response.text())
 	// .then((data) => console.log('data 1er fetch: ' + data));
-	var myHeaders = new Headers({
-		"Content-Type": "text/plain",
-		// "Content-Length": 4,
-	  });
+
+
+	// var myHeaders = new Headers({
+	// 	"Content-Type": "text/plain",
+	// 	// "Content-Length": 4,
+	//   });
 	
 	var myInit = {
 					method: 'GET',
-					headers: myHeaders,
+					headers: {
+						"Content-Type": "text/plain",
+					},
 					mode: 'same-origin',
 					cache: 'no-store',
 				};
