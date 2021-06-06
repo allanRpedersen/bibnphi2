@@ -4,9 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    #
-    # 64Kb = 65536
-    # 32Kb = 32768
+    # 256Kb = 262144
+    # 128Kb = 131072
+    # 64Kb  =  65536
+    # 32Kb  =  32768
     app.parsing_buffer_size: 32768
 
 services:
