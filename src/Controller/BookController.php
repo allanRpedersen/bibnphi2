@@ -15,16 +15,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\Annotation\Route;
 use Vich\UploaderBundle\Form\Type\VichFileType;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
-
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 //
 // $bool=pcntl_async_signals(true);
@@ -57,15 +61,12 @@ class BookController extends AbstractController
 			$nbBookParagraphs,
 			$xmlFileSize,
 			$iCurrentBuffer;
-
-	const READ_BUFFER_SIZE = 65536; // 64kb
+	
 	private $book;
-
 
 	private $uploaderHelper;
 	private $logger;
 	private $projectDir;
-
 	private $em;
 
 	// 
@@ -128,14 +129,14 @@ class BookController extends AbstractController
 		}
 		//
 		// unix cmd
-		passthru('mkdir -v ' . $dirName . ' >>books/sorties_console 2>&1', $errCode );
+		passthru('mkdir -v ' . $dirName . ' > /dev/null 2>&1', $errCode );
 		if ($errCode){
 			$this->logger->debug('Erreur de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
 			return null;
 		}
 		//
 		//
-		passthru('unzip '. $odtFilePath . ' -d ' . $dirName . ' >>books/sorties_console 2>&1', $errCode);
+		passthru('unzip '. $odtFilePath . ' -d ' . $dirName . ' > /dev/null 2>&1', $errCode);
 		if ($errCode){
 			$this->logger->debug('Erreur de décompression : ' . $odtFilePath . ', errCode : ' . $errCode );
 			return null;
@@ -155,19 +156,49 @@ class BookController extends AbstractController
 	/**
 	 * @Route("/{slug}/processing", name="book_processing")
 	 */
-	public function bookProcessing(Request $request, Book $book, ContainerInterface $container)
+	public function bookProcessing(Request $request, Book $book, KernelInterface $kernel)
 	{
+
+
 		// check if odt file is well-founded and get xml file name from it
 		$xmlFileName = $this->isXmlFileValid($book);
 
 		if ($xmlFileName){
 
+
+			$application = new Application($kernel);
+
+			$application->setAutoExit(false);
+
+			$input = new ArrayInput([
+				'command' => 'app.:xml-parser',
+				// (optional) define the value of command arguments
+				'xmlFileName' => $xmlFileName,
+				'bookId' => $book->getId(),
+				// (optional) pass options to the command
+				// '--message-limit' => $messages,
+			]);
+
+			// You can use NullOutput() if you don't need the output
+			$output = new BufferedOutput();
+
+			$output = new NullOutput();
+			$application->run($input, $output);
+
+			// return the output, don't use if you used NullOutput()
+			// $content = $output->fetch();
+
+			// return new Response(""), if you used NullOutput()
+			// return new Response($content);
+			return new Response("");
+
+
 			$xmlParser = new XmlParser(
 										$book, 
 										$xmlFileName, 
-										$this->projectDir, 
+										$this->getParameter('kernel.project_dir'), 
 										$this->getParameter('app.parsing_buffer_size'), 
-										$this->em
+										$this->em,
 									);
 
 			$this->xmlParser = $xmlParser;
@@ -185,22 +216,22 @@ class BookController extends AbstractController
 			// $this->get('krlove.async.factory')
 			// 		->call('app.service.parse', 'parse');
 
-			
-			// $container->get('krlove.service')->call('app.service.parse', 'parse');
+			//  $container
+			// ContainerInterface $container->get('krlove.service')->call('app.service.parse', 'parse');
 
 			// could be a long time process ..
-			$xmlParser->parse(); // can be very, very long for some books !-/ 
+			$xmlParser->parse(); // can be very, very long for some books !-/ get a command for it !!!!!
 			
 			if ($xmlParser->isParsingCompleted()){
 				//
 				//
-			}
-
 			$book->setParsingTime($xmlParser->getParsingTime())
 				->setNbParagraphs($xmlParser->getNbParagraphs())
 				->setNbSentences($xmlParser->getNbSentences())
 				->setNbWords($xmlParser->getNbWords())
 			;
+			}
+
 			
 			$this->em->persist($book);
 			$this->em->flush();
@@ -268,7 +299,6 @@ class BookController extends AbstractController
 			$entityManager->flush();
 
 			$this->logger->info('>>> $book->getOdtOriginalName() : ' . $book->getOdtOriginalName() );
-
 			//
 			//
 			return $this->redirectToRoute('book_processing',[
@@ -345,9 +375,9 @@ class BookController extends AbstractController
 				
 				// unix cmd
 				// delete previous directory recursive
-				passthru('rm -v -r ' . $dirName . ' >books/sorties_console 2>&1', $errCode );
+				passthru('rm -v -r ' . $dirName . ' > /dev/null 2>&1', $errCode );
 				// and odt file
-				passthru('rm -v '. $dirName . '.odt >>books/sorties_console 2>&1', $errCode );
+				passthru('rm -v '. $dirName . '.odt > /dev/null 2>&1', $errCode );
 
 				// then create new document directory
 				$localPath = $uploaderHelper->asset($book, 'odtBookFile');
@@ -359,32 +389,42 @@ class BookController extends AbstractController
 		
 				// unix cmd
 				// create new directory
-				passthru('mkdir -v ' . $dirName . ' >>books/sorties_console 2>&1', $errCode );
-				
-				// and unzip in it !
-				passthru('unzip -q ' . $fileName . ' -d ' . $dirName . ' >>books/sorties_console 2>&1', $errCode);
+				passthru('mkdir -v ' . $dirName . ' > /dev/null 2>&1', $errCode );
+				if ($errCode){
+					$this->logger->debug('ERREUR de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
+					// flash message !!
+				}
+				else{
+					// then unzip in it !
+					passthru('unzip -q ' . $fileName . ' -d ' . $dirName . ' > /dev/null 2>&1', $errCode);
+					if ($errCode){
+						$this->logger->debug('ERREUR de décompression : ' . $fileName . ', errCode : ' . $errCode );
+						// flash message !!
+					}
+					else{
 
-				// if (!$errCode){}
-
-				//
-				if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
-
-				//
-				// xml parsing !!
-				$this->book = $book;
-				$book->setNbParagraphs(0)
-					->setNbSentences(0)
-					->setNbWords(0)
-					->setParsingTime(0)
-					;
-
-				$entityManager->persist($book);
-				$entityManager->flush();
-				
-				return $this->redirectToRoute('book_processing', [
-					'slug' => $book->getSlug()
-				]);
-	
+						//
+						if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
+		
+						//
+						// xml parsing !!
+						$this->book = $book;
+						$book->setNbParagraphs(0)
+							->setNbSentences(0)
+							->setNbWords(0)
+							->setParsingTime(0)
+							;
+		
+						$entityManager->persist($book);
+						$entityManager->flush();
+						
+						return $this->redirectToRoute('book_processing', [
+							'slug' => $book->getSlug()
+						]);
+					}
+					
+				}
+			
 			}
 						
             return $this->redirectToRoute('book_show', [
@@ -415,14 +455,14 @@ class BookController extends AbstractController
 			// unix cmd
 			// remove odt file
 			$dirName = $book->getOdtBookName();
-			passthru('rm -v books/'. $dirName . ' >>books/sorties_console 2>&1', $errCode );
+			passthru('rm -v books/'. $dirName . ' > /dev/null 2>&1', $errCode );
 
 			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
 
 			// remove .whatever to get directory name << buggy !-(
 			$dirName = substr($dirName, 0, strpos($dirName, '.'));
 			// then delete associated directory recursive
-			passthru('rm -v -r books/' . $dirName . ' >>books/sorties_console 2>&1', $errCode );
+			passthru('rm -v -r books/' . $dirName . ' > /dev/null 2>&1', $errCode );
 
 			//
 			//

@@ -5,9 +5,7 @@ namespace App\Service;
 use Monolog\Logger;
 use App\Entity\Book;
 use App\Entity\BookNote;
-use App\Entity\BookSentence;
 use App\Entity\BookParagraph;
-use App\Repository\BookRepository;
 use Monolog\Handler\StreamHandler;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -57,9 +55,8 @@ class XmlParser {
 	private $logger;
 	private $em;
 		
-	public function __construct( Book $book, $xmlFileName, $projectDir, $bufferSize, EntityManagerInterface $em )
+	public function __construct( $book, $xmlFileName, $projectDir, $bufferSize, EntityManagerInterface $em )
 	{
-		
 		$this->book = $book;
 		$this->READ_BUFFER_SIZE = $bufferSize;
 		
@@ -73,7 +70,6 @@ class XmlParser {
 
 		$this->xmlFileSize = filesize($xmlFileName);
 		$this->ratio = ceil($this->xmlFileSize / $bufferSize);
-		
 		$this->logger->info('ratio ('. $this->xmlFileSize . '/' . $bufferSize . ') : ' . $this->ratio );
 
 		// ??
@@ -81,6 +77,9 @@ class XmlParser {
 		// ( @ symbol supresses any php driven error message !? )
 		//
 		$this->xmlfh = fopen($xmlFileName, 'rb');
+
+
+		
 		$this->timeStart = 0;
 		$this->parsingCompleted = FALSE;
 		$this->parsingTime = -1;

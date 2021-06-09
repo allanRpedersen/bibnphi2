@@ -62,7 +62,7 @@ function setProgressBar(){
 	progressFileName = protocol_host + '/percentProgress.log';
 	console.log('setProgressBar, avec le fichier de progress : ' + progressFileName );
 
-	setInterval(renderProgressBar, 300); // 700 ~ 900 ??
+	setInterval(renderProgressBar, 700); // 700 ~ 900 ??
 
 }
 

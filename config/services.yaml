@@ -8,7 +8,7 @@ parameters:
     # 128Kb = 131072
     # 64Kb  =  65536
     # 32Kb  =  32768
-    app.parsing_buffer_size: 32768
+    app.parsing_buffer_size: 65536
 
 services:
 
@@ -43,7 +43,7 @@ services:
         arguments:
             - '\App\Entity\Book'
             - string
-            - string
+            - '%kernel.project_dir%'
             - '%app.parsing_buffer_size%'
             - 'Doctrine\ORM\EntityManagerInterface'
             # - '@mailer'
