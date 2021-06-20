@@ -65,7 +65,7 @@ class XmlParser {
 		
 		// $this->logger = $logger;
 		$this->logger = new Logger('_xmlParser');
-		$this->logger->pushHandler( new StreamHandler($projectDir . '/bibnphi.log', Logger::DEBUG) );
+		$this->logger->pushHandler( new StreamHandler($projectDir . '/public/bibnphi.log', Logger::DEBUG) );
 
 
 		$this->xmlFileSize = filesize($xmlFileName);

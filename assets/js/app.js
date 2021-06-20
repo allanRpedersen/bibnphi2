@@ -210,6 +210,48 @@ $(function () {
 
 	});
 
+
+	$('#log-button').on('click', function(event) {
+
+		console.log('click on #log-button');
+
+		let logFileName = protocol_host + '/bibnphi.log';
+		let params = `scrollbars=no,
+						resizable=no,
+						status=no,
+						location=no,
+						toolbar=no,
+						menubar=no,
+						width=900,
+						height=500,
+						left=100,
+						top=100`;
+
+		
+		window.open(logFileName, logFileName, params);
+
+// 		fetch(logFileName)
+// 			.then(
+// 				function(response) {
+// 				if (response.status !== 200) {
+// 					console.log('Looks like there was a problem. Status Code: ' +
+// 					response.status);
+// 					return;
+// 				}
+
+// 				// Examine the text in the response
+// 				response.text().then(function(data) {
+// 					console.log(data);
+// 				});
+// 				}
+// 			)
+// 			.catch(function(err) {
+// 				console.log('Fetch Error :-S', err);
+//   });
+
+
+	});
+
 	console.log('Document Ready !!');
 	// alert();
 });

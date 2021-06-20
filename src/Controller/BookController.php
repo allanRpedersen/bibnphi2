@@ -82,7 +82,7 @@ class BookController extends AbstractController
 		$this->uploaderHelper = $uploaderHelper;
 
 		$this->logger = new Logger('bibnphi');
-		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/bibnphi.log', Logger::DEBUG) );
+		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/public/bibnphi.log', Logger::DEBUG) );
 
 
 	}
@@ -166,31 +166,31 @@ class BookController extends AbstractController
 		if ($xmlFileName){
 
 
-			$application = new Application($kernel);
+			// $application = new Application($kernel);
 
-			$application->setAutoExit(false);
+			// $application->setAutoExit(false);
 
-			$input = new ArrayInput([
-				'command' => 'app.:xml-parser',
-				// (optional) define the value of command arguments
-				'xmlFileName' => $xmlFileName,
-				'bookId' => $book->getId(),
-				// (optional) pass options to the command
-				// '--message-limit' => $messages,
-			]);
+			// $input = new ArrayInput([
+			// 	'command' => 'app.:xml-parser',
+			// 	// (optional) define the value of command arguments
+			// 	'xmlFileName' => $xmlFileName,
+			// 	'bookId' => $book->getId(),
+			// 	// (optional) pass options to the command
+			// 	// '--message-limit' => $messages,
+			// ]);
 
-			// You can use NullOutput() if you don't need the output
-			$output = new BufferedOutput();
+			// // You can use NullOutput() if you don't need the output
+			// $output = new BufferedOutput();
 
-			$output = new NullOutput();
-			$application->run($input, $output);
+			// $output = new NullOutput();
+			// $application->run($input, $output);
 
-			// return the output, don't use if you used NullOutput()
-			// $content = $output->fetch();
+			// // return the output, don't use if you used NullOutput()
+			// // $content = $output->fetch();
 
-			// return new Response(""), if you used NullOutput()
-			// return new Response($content);
-			return new Response("");
+			// // return new Response(""), if you used NullOutput()
+			// // return new Response($content);
+			// return new Response("");
 
 
 			$xmlParser = new XmlParser(

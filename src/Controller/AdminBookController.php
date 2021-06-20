@@ -88,4 +88,20 @@ class AdminBookController extends AbstractController
 	}
 
 
+    /**
+     * @Route("/erase-log", name="admin_erase_log")
+     */
+    public function eraseLog(Request $request): Response
+    {
+
+			//
+			// unix cmd
+			// remove log file bibnphi.log
+			passthru('rm -v bibnphi.log >>books/sorties_console 2>&1', $errCode );
+            passthru('touch bibnphi.log');
+
+        return $this->redirectToRoute('admin_book_index');
+	}
+
+
 }
