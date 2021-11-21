@@ -71,30 +71,50 @@ class XmlParserCommand extends Command
         $book = $this->br->find($bookId);
 
 
-        // dd($book);
+        $parser = new XmlParser(
+                        $book,
+                        $xmlFileName,
+                        $this->params->get('kernel.project_dir'),
+                        $this->params->get('app.parsing_buffer_size_xl'),
+                        $this->em,
+        );
 
-        $nbParagraphs = $book->getNbParagraphs();
-
-        // $this->parser = new XmlParser(
-        //                 $book,
-        //                 $xmlFileName,
-        //                 $this->params->get('kernel.project_dir'),
-        //                 $this->params->get('app.parsing_buffer_size'),
-        //                 $this->em,
-        // );
+        $parser->parse();
 
 
+        if ( $parser->isParsingCompleted() ){
+
+            //
+            //
+            $book->setParsingTime($parser->getParsingTime())
+                ->setNbParagraphs($parser->getNbParagraphs())
+                ->setNbSentences($parser->getNbSentences())
+                ->setNbWords($parser->getNbWords())
+                ;
+
+        
+            $this->em->persist($book);
+            $this->em->flush();
+
+            // $nbParagraphs = $book->getNbParagraphs();
+
+            // $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+
+            // $io->success('Parsing is completed !-) ' . $book->getTitle() . ' got ' . $nbParagraphs . ' paragraphs' );
+            // $io->note($nbParagraphs);
+            // $io->note($book->getTitle());
+
+        }
+        else {
+            $io->note('Parsing of ' . $xmlFileName . ' is NOT completed !!');
+        }
 
         // foreach($paragraphs as $paragraph)
         // {
         //     $io->text($paragraph->getContent());
         // }
         
-        $io->note($nbParagraphs);
-        $io->note($book->getTitle());
-
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
-
+        //
         return Command::SUCCESS;
     }
 }

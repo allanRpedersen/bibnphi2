@@ -191,67 +191,86 @@ class BookController extends AbstractController
 			// // return new Response(""), if you used NullOutput()
 			// // return new Response($content);
 			// return new Response("");
+ 
+			$xmlFileSize = filesize($xmlFileName);
 
-
-			$xmlParser = new XmlParser(
-										$book, 
-										$xmlFileName, 
-										$this->getParameter('kernel.project_dir'), 
-										$this->getParameter('app.parsing_buffer_size'), 
-										$this->em,
-									);
-
-			$this->xmlParser = $xmlParser;
-
-			// setting no execution time out .. bbrrrr !! 
-			// if ($xmlParser->getRatio() > 1) ini_set('max_execution_time', '0');
-
-			//
-			// xml parsing !
-			// while( !$xmlParser->isParsingCompleted() ){
-			// 		$xmlParser->parse();
-			// }
-
-			// try async ..
-			// $this->get('krlove.async.factory')
-			// 		->call('app.service.parse', 'parse');
-
-			//  $container
-			// ContainerInterface $container->get('krlove.service')->call('app.service.parse', 'parse');
-
-			// could be a long time process ..
-			$xmlParser->parse(); // can be very, very long for some books !-/ get a command for it !!!!!
-			
-			if ($xmlParser->isParsingCompleted()){
+			// for the big xml files, use an external command
+			if ( $xmlFileSize > $this->getParameter('app.xmlfile_size_external_process')){
 				//
+				$cmd = $this->getParameter('kernel.project_dir')
+						. '/bin/console app:xml-parser --env=prod --quiet '
+						. $xmlFileName . ' '
+						. $book->getId() . ' > /dev/null 2>&1';
+				
+				passthru( $cmd );  /////////////////
+			}
+			else {
+
+				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_m');
+				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_s');
+				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_xs');
+
+				$xmlParser = new XmlParser(
+											$book, 
+											$xmlFileName, 
+											$this->getParameter('kernel.project_dir'), 
+											$fileBufferSize, 
+											$this->em,
+										);
+
+				$this->xmlParser = $xmlParser;
+
+				// setting no execution time out .. bbrrrr !! 
+				// if ($xmlParser->getRatio() > 1) ini_set('max_execution_time', '0');
+
 				//
-			$book->setParsingTime($xmlParser->getParsingTime())
-				->setNbParagraphs($xmlParser->getNbParagraphs())
-				->setNbSentences($xmlParser->getNbSentences())
-				->setNbWords($xmlParser->getNbWords())
-			;
+				// xml parsing !
+				// while( !$xmlParser->isParsingCompleted() ){
+				// 		$xmlParser->parse();
+				// }
+
+				// try async ..
+				// $this->get('krlove.async.factory')
+				// 		->call('app.service.parse', 'parse');
+
+				//  $container
+				// ContainerInterface $container->get('krlove.service')->call('app.service.parse', 'parse');
+
+				// could be a long time process ..
+				$xmlParser->parse(); // can be very, very long for some books !-/ get a command for it !!!!!
+				
+				if ($xmlParser->isParsingCompleted()){
+					//
+					//
+					$book->setParsingTime($xmlParser->getParsingTime())
+						->setNbParagraphs($xmlParser->getNbParagraphs())
+						->setNbSentences($xmlParser->getNbSentences())
+						->setNbWords($xmlParser->getNbWords())
+					;
+
+				
+					$this->em->persist($book);
+					$this->em->flush();
+
+					$this->addFlash(
+						'info',
+						'L\'analyse du document s\'est terminée avec succès ! ( ' . $xmlParser->getNbParagraphs() . ' paragraphes en '. round($xmlParser->getParsingTime(), 2) . ' secondes)');
+
+					return $this->redirectToRoute('book_show', [
+						'slug' => $book->getSlug()
+						]);
+				}
+					
+				else {
+					// flash message
+					$this->addFlash(
+						'warning',
+						'Le fichier xml : ' . $xmlFileName . ' est invalide ou absent (cf bibnphi.log) !-\\'
+					);
+				}
 			}
 
-			
-			$this->em->persist($book);
-			$this->em->flush();
-
-			$this->addFlash(
-				'info',
-				'L\'analyse du document s\'est terminée avec succès ! ( ' . $xmlParser->getNbParagraphs() . ' paragraphes en '. round($xmlParser->getParsingTime(), 2) . ' secondes)');
-
-			return $this->redirectToRoute('book_show', [
-				'slug' => $book->getSlug()
-				]);
-		}
-		else {
-			// flash message
-			$this->addFlash(
-				'warning',
-				'Le fichier xml : ' . $xmlFileName . ' est invalide ou absent (cf bibnphi.log) !-\\'
-			);
-		}
-		
+	}
 		//
 		//
         return $this->redirectToRoute('book_index');
@@ -267,7 +286,7 @@ class BookController extends AbstractController
     {
 
 		//
-		$this->logger->info('>>> Entrée fonction BookController->new()' . microtime(true));
+		$this->logger->info('>>> Entrée BookController->new()' . microtime(true));
 		$this->logger->info('>>> $request->getMethod() : ' . $request->getMethod() );
 
 		//

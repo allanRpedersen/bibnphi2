@@ -4,11 +4,20 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    # 256Kb = 262144
-    # 128Kb = 131072
-    # 64Kb  =  65536
-    # 32Kb  =  32768
-    app.parsing_buffer_size: 65536
+    # 512kb = 524288 xl
+    # 256Kb = 262144 l
+    # 128Kb = 131072 m <<<<
+    # 64Kb  =  65536 s
+    # 32Kb  =  32768 xs
+
+    app.parsing_buffer_size_xl: 524288
+    app.parsing_buffer_size_l: 262144
+    app.parsing_buffer_size_m: 131072
+    app.parsing_buffer_size_s: 65536
+    app.parsing_buffer_size_xs: 32768
+    
+    # 4Mb = 4194304 - i.e. 4*1024*1024
+    app.xmlfile_size_external_process: 4194304
 
 services:
 
@@ -44,7 +53,7 @@ services:
             - '\App\Entity\Book'
             - string
             - '%kernel.project_dir%'
-            - '%app.parsing_buffer_size%'
+            - '%app.parsing_buffer_size_m%'
             - 'Doctrine\ORM\EntityManagerInterface'
             # - '@mailer'
             # - 'superadmin@example.com'    

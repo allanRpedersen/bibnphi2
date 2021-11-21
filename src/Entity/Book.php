@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use App\Entity\Author;
 use Cocur\Slugify\Slugify;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -14,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
+ * @ApiResource()
  * @ORM\Entity(repositoryClass=BookRepository::class)
  * @ORM\HasLifecycleCallbacks
  * @Vich\Uploadable

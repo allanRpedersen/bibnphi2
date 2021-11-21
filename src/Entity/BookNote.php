@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\BookNoteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BookNoteRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
- * @ORM\Entity(repositoryClass=BookNoteRepository::class)
+ *  @ApiResource()
+ *  @ORM\Entity(repositoryClass=BookNoteRepository::class)
  */
 class BookNote
 {
