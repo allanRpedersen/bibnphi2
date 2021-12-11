@@ -206,7 +206,9 @@ class BookController extends AbstractController
 			}
 			else {
 
-				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_m');
+				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_xl');
+				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_l');
+				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_m');
 				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_s');
 				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_xs');
 
