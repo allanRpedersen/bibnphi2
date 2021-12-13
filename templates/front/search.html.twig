@@ -3,31 +3,31 @@
 {% block title %}Liste de Recherche !!{% endblock %}
 
 {% block body %}
-	<div class="container mt1">
+	<div class="container">
 	
-		<h3>Recherche de : {{ string }} dans la liste de livres suivante :</h3>
-		<p>
-		{% for book in bookList %}
-			{{book.title}} - {{book.author.lastName}} , 
-		{% endfor %}
-		</p>
-		<hr>
-		{# <h3>{{sentences|length}} occurences repérées !!</h3> #}
-		{% set book_slug = "" %}
-		{% for paragraph in paragraphs %}
 
-		<div class="row">
-			<div class="col-md-4">
-			{% if paragraph.book.slug != book_slug %}
-				{% set book_slug = paragraph.book.slug %}
-				<h4>{{ paragraph.book.title }} - {{ paragraph.book.author.lastName}}</h4>
-			{% endif %}
+		<div id="searching-result-content">
+			<div id="searching-result-leftside">
+				<h5 class="mb-3">{{ matchingBookList|length }} occurrences de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+				{% for book in bookList %}
+					{% if book in matchingBookList %}
+						<p><a href="#{{book.id}}">{{book.title}} - {{book.author.lastName}}</a></p>
+					{% else %}
+						<p class="p-non-matching-book">{{book.title}} - {{book.author.lastName}}</p>
+					{% endif %}
+				{% endfor %}
 			</div>
-			<div class="col-md-8">
-				<p class="p-justify">{{paragraph.highlightedContent|raw}}</p>
+			<div id="searching-result-rightside">
+				{% set book_slug = "" %}
+				{% for paragraph in paragraphs %}
+					{% if paragraph.book.slug != book_slug %}
+					{% set book_slug = paragraph.book.slug %}
+					<h3 id="{{ paragraph.book.id }}">{{ paragraph.book.title }}</h3><h4>{{ paragraph.book.author.lastName}}</h4>
+					{% endif %}
+					<p class="p-justify">{{paragraph.highlightedContent|raw}}</p>
+				{% endfor %}
 			</div>
 		</div>
 
-		{% endfor %}
 	</div>
 {% endblock %}

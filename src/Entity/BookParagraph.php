@@ -117,6 +117,7 @@ class BookParagraph
         $indexFound = 0;
         $length = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
+        $this->foundStringsIndexes = [];
 
         // dd($stringToSearch, $length, $encoding);
 
@@ -144,7 +145,10 @@ class BookParagraph
 
         }
 
+        //
+        //
         // et les notes éventuellements associés ???
+        //
         //
 
         // false if empty !! ?-/
@@ -208,5 +212,13 @@ class BookParagraph
         $this->highlightedContent = $highlightedContent;
 
         return $this;
+    }
+
+    /**
+     * Get the value of foundStringsIndexes
+     */ 
+    public function getFoundStringsIndexes()
+    {
+        return $this->foundStringsIndexes;
     }
 }

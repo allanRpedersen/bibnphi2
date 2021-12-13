@@ -95,6 +95,7 @@ class FrontController extends AbstractController
 			
 			// watabout a spinner (processing state) ??
 
+			$matchingBookList = [];
 
 			foreach($bookList as $book){
 
@@ -102,6 +103,7 @@ class FrontController extends AbstractController
 
 				foreach($paragraphs as $paragraph){
 					if ($paragraph->isMatchingParagraph($stringToSearch)){
+						$matchingBookList[] = $paragraph->getBook();
 						$matchingParagraphs[] = $paragraph;
 					}
 				}
@@ -112,6 +114,7 @@ class FrontController extends AbstractController
 			return $this->render('front/search.html.twig', [
 				'string' => $stringToSearch,
 				'bookList' => $bookList,
+				'matchingBookList' => $matchingBookList,
 				'paragraphs' => $matchingParagraphs,
 
 			]);
