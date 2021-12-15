@@ -35,8 +35,13 @@ body {
     // border: 1px solid black;
 }
 
+// les cibles des hyperliens vers les notes de fin ..
 :target {
-    scroll-margin-top: 70px; /* height of sticky header */
+    scroll-margin-top: 70px; /* height of sticky header (where does it come from ??-) */
+}
+
+:target, #searching-result-content {
+    scroll-margin-top: 7px; /* height of sticky header (where does it come from ??-) */
 }
 
 // html {
@@ -67,24 +72,27 @@ body {
 // }
 
 #searching-result-content {
-    height: 100%;
-    // height: calc(100% - 70px);
+    height: calc(100vh - 91px);
+    padding: 0 33px;
 
 }
 
 #searching-result-leftside {
     float: left;
     width: 25%;
-    height: 100vh;
+    // height: 100vh;
+    height: calc(100vh - 91px);
     overflow-y: scroll;
     padding: 0px 3px;
+    // border:rgb(233, 185, 27) solid 1px;
 }
 
 #searching-result-rightside {
     width: 75%;
-    height: 100vh;
+    height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 3px;
+    border:rgb(11, 131, 31) solid 1px;
 
 }
 

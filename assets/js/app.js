@@ -213,8 +213,7 @@ $(function () {
 
 	$('#log-button').on('click', function(event) {
 
-		console.log('click on #log-button');
-
+		
 		let logFileName = protocol_host + '/bibnphi.log';
 		let params = `scrollbars=no,
 						resizable=no,
@@ -226,7 +225,8 @@ $(function () {
 						height=500,
 						left=100,
 						top=100`;
-
+						
+		console.log('#log-button - opening ' + logFileName);
 		
 		window.open(logFileName, logFileName, params);
 
