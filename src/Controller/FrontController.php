@@ -96,26 +96,33 @@ class FrontController extends AbstractController
 			// watabout a spinner (processing state) ??
 
 			$matchingBookList = [];
+			$lastId = 0;
+			$nbFoundStrings = 0;
 
 			foreach($bookList as $book){
 
+				$bookId = $book->getId();
 				$paragraphs = $book->getBookParagraphs();
 
 				foreach($paragraphs as $paragraph){
 					if ($paragraph->isMatchingParagraph($stringToSearch)){
-						$matchingBookList[] = $paragraph->getBook();
 						$matchingParagraphs[] = $paragraph;
+						$nbFoundStrings++;
+
+						if ($bookId != $lastId){
+							$lastId = $bookId;
+							$matchingBookList[] = $book; // $paragraph->getBook();
+						} 
 					}
 				}
 			}
-
-
 
 			return $this->render('front/search.html.twig', [
 				'string' => $stringToSearch,
 				'bookList' => $bookList,
 				'matchingBookList' => $matchingBookList,
 				'paragraphs' => $matchingParagraphs,
+				'nbFoundStrings' => $nbFoundStrings
 
 			]);
 

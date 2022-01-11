@@ -8,14 +8,14 @@
 
 		<div id="searching-result-content">
 			<div id="searching-result-leftside">
-				<h5 class="mb-3">{{ matchingBookList|length }} occurrences de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
-				{% for book in bookList %}
-					{% if book in matchingBookList %}
-						<p><a href="#{{book.id}}">{{book.title}} - {{book.author.lastName}}</a></p>
-					{% else %}
-						<p class="p-non-matching-book">{{book.title}} - {{book.author.lastName}}</p>
-					{% endif %}
+				<h5 class="mb-3">{{ nbFoundStrings }} occurrences de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+				{% for book in matchingBookList %}
+					<p><a href="#{{book.id}}">{{book.title}} - {{book.author.lastName}}</a></p>
 				{% endfor %}
+					{# {% if book in matchingBookList %}
+					{% endif %} #}
+					{# {% else %}
+						<p class="p-non-matching-book">{{book.title}} - {{book.author.lastName}}</p> #}
 			</div>
 			<div id="searching-result-rightside">
 				{% set book_slug = "" %}

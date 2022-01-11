@@ -52,8 +52,6 @@ class BookParagraph
 
     public function __construct()
     {
-        // $this->sentences = new ArrayCollection();
-		// $this->matchingSentences = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->foundStringsIndexes = new ArrayCollection();
     }
@@ -132,9 +130,10 @@ class BookParagraph
             else
                 $this->highlightedContent = mb_substr($this->content, $fromIndex, $indexFound, $encoding);
 
+            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/hl/' . $this->id . '"';
             $this->highlightedContent .= '<span class="found-content">';
             $this->highlightedContent .= mb_substr($this->content, $indexFound, $length, $encoding);
-            $this->highlightedContent .= '</span>';
+            $this->highlightedContent .= '</span></a>';
 
             $fromIndex = $indexFound + $length;
             
@@ -147,7 +146,7 @@ class BookParagraph
 
         //
         //
-        // et les notes éventuellements associés ???
+        // et les notes éventuellement associés ???
         //
         //
 

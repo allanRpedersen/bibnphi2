@@ -347,6 +347,17 @@ class BookController extends AbstractController
     }
 
     /**
+     * @Route("/{slug}/hl/{paragraph_id}", name="book_show_highlighted", methods={"GET"})
+     */
+    public function showHighlighted(Book $book, $paragraph_id): Response
+    {
+        return $this->render('book/show.html.twig', [
+            'book' => $book,
+			'jump_to' => $paragraph_id
+        ]);
+    }
+
+    /**
      * @Route("/{slug}/edit", name="book_edit", methods={"GET","POST"})
 	 * @IsGranted("ROLE_USER")
      */

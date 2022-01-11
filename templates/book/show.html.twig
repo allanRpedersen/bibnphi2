@@ -17,7 +17,12 @@
 		</div>
 		<div class="col-md-10">
 			{% for paragraph in book.bookParagraphs %}
+				{% if is_granted('ROLE_ADMIN') %}
+				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.id }} - {{ paragraph.content | raw }}</p>
+
+				{% else %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
+				{% endif %}
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
@@ -27,4 +32,15 @@
 
 	</div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+	{% if jump_to is defined %}
+	<script type="text/javascript">
+		paragraph = document.getElementById("_{{ jump_to }}");
+		paragraph.scrollIntoView();
+		//var offsetToScroll = document.getElementById("_{{ jump_to }}").offsetTop;
+		//window.scroll( {top:offsetToScroll, behavior:'smooth'});
+	</script>
+	{% endif %}
 {% endblock %}

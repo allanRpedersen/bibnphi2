@@ -40,9 +40,12 @@ body {
     scroll-margin-top: 70px; /* height of sticky header (where does it come from ??-) */
 }
 
-:target, #searching-result-content {
-    scroll-margin-top: 7px; /* height of sticky header (where does it come from ??-) */
+//
+// 
+h3:target {
+    scroll-margin-top: 0;
 }
+
 
 // html {
 //     scroll-padding-top: 70px; /* height of sticky header */
