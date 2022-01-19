@@ -6,9 +6,19 @@ use App\Entity\Book;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class SentenceSearch
 {
 	/**
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min = 3,
+     *      max = 150,
+     *      minMessage = "au minimum {{ limit }} caractères",
+     *      maxMessage = "au plus {{ limit }} caractères" )
+     *
+     * 
 	 * La chaîne à rechercher, forcément non nulle
 	 * 
 	 * 		un mot

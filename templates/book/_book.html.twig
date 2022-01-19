@@ -1,17 +1,17 @@
 <div class="card book-card mb-3">
     <div class="card-body">
+        <p class="card-text">
+            {% if author.firstName is empty %}
+            {% set fullName = author.lastName %}
+            {% else %}
+            {% set fullName = author.lastName ~ ', ' ~ author.firstName %}
+            {% endif %}
+            <a href="{{ path('author_show', { 'slug' : author.slug }) }}">{{ fullName }}</a>
+        </p>
         <p class="card-title">
             <a href="{{ path('book_show', { 'slug' : book.slug }) }}">
             {{ book.title }}
             </a>
-        </p>
-        <p class="card-text">
-            {% if author.firstName is empty %}
-                {% set fullName = author.lastName %}
-            {% else %}
-                {% set fullName = author.lastName ~ ', ' ~ author.firstName %}
-            {% endif %}
-            <a href="{{ path('author_show', { 'slug' : author.slug }) }}">{{ fullName }}</a>
         </p>
     </div>
 </div>

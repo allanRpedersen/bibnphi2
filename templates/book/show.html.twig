@@ -3,35 +3,32 @@
 {% block title %}{{ book.title }}{% endblock %}
 
 {% block body %}
-
-<div class="container mt-5">
-	<div class="row">
-		<div class="col-md-2">
-
-			{# <a href="{{ path('front') }}">retour à la bibliothèque</a> #}
-
+<div class="container">
+	<div id="book-display-content">
+		<div id="book-display-leftside">
+			<h3>{{ book.author.lastName }}</h3>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
 			{{ include('book/_delete_form.html.twig') }}
 			{% endif %}
+
 		</div>
-		<div class="col-md-10">
+		<div id="book-display-rightside">
 			{% for paragraph in book.bookParagraphs %}
 				{% if is_granted('ROLE_ADMIN') %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.id }} - {{ paragraph.content | raw }}</p>
-
-				{% else %}
-				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 				{% endif %}
+				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
 				<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content }}</p>
-			{% endfor%}
-		</div>
+			{% endfor %}
 
+		</div>
 	</div>
 </div>
+
 {% endblock %}
 
 {% block javascripts %}
@@ -39,8 +36,6 @@
 	<script type="text/javascript">
 		paragraph = document.getElementById("_{{ jump_to }}");
 		paragraph.scrollIntoView();
-		//var offsetToScroll = document.getElementById("_{{ jump_to }}").offsetTop;
-		//window.scroll( {top:offsetToScroll, behavior:'smooth'});
 	</script>
 	{% endif %}
 {% endblock %}

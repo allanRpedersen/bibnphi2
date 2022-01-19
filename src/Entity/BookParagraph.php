@@ -36,9 +36,18 @@ class BookParagraph
 
     /**
      * @ORM\Column(type="text")
+     * 
+     * Le contenu du paragraphe
      */
     private $content;
 
+    /**
+     * 
+     * 
+     * Le contenu qui correspond à une recherche et enrichi 
+     * avec les extraits du texte qui correspondent à la chaîne recherchée
+     * qui sont affectées par la classe .found-content
+     */
     private $highlightedContent;
     
     // private $matchingSentence = [
@@ -146,7 +155,7 @@ class BookParagraph
 
         //
         //
-        // et les notes éventuellement associés ???
+        // et les notes éventuellement associées ???
         //
         //
 

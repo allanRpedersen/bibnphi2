@@ -12,7 +12,8 @@ body {
 }
 
 .book-card {
-    background-color: rgb(216, 240, 241);
+    background-color: rgb(223, 158, 37);
+    // background-color: rgb(216, 240, 241);
     border: 1px solid black;
     border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
 }
@@ -36,9 +37,9 @@ body {
 }
 
 // les cibles des hyperliens vers les notes de fin ..
-:target {
-    scroll-margin-top: 70px; /* height of sticky header (where does it come from ??-) */
-}
+// :target {
+//     scroll-margin-top: 70px; /* height of sticky header (where does it come from ??-) */
+// }
 
 //
 // 
@@ -71,18 +72,18 @@ h3:target {
 // html, body {
 //     height: 100%;
 //     overflow: hidden;
-//     margin: 0;
+//     margin: 0;qq
 // }
 
-#searching-result-content {
+#searching-result-content, #book-display-content {
     height: calc(100vh - 91px);
-    padding: 0 33px;
+    padding: 3px 33px;
 
 }
 
-#searching-result-leftside {
+#searching-result-leftside, #book-display-leftside {
     float: left;
-    width: 25%;
+    width: 23%;
     // height: 100vh;
     height: calc(100vh - 91px);
     overflow-y: scroll;
@@ -90,8 +91,8 @@ h3:target {
     // border:rgb(233, 185, 27) solid 1px;
 }
 
-#searching-result-rightside {
-    width: 75%;
+#searching-result-rightside, #book-display-rightside {
+    width: 77%;
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 3px;

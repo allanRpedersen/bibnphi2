@@ -105,9 +105,10 @@ class FrontController extends AbstractController
 				$paragraphs = $book->getBookParagraphs();
 
 				foreach($paragraphs as $paragraph){
-					if ($paragraph->isMatchingParagraph($stringToSearch)){
+					if ( $paragraph->isMatchingParagraph($stringToSearch)){
 						$matchingParagraphs[] = $paragraph;
-						$nbFoundStrings++;
+
+						$nbFoundStrings += sizeof($paragraph->getFoundStringsIndexes());
 
 						if ($bookId != $lastId){
 							$lastId = $bookId;

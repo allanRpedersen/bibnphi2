@@ -4,11 +4,13 @@
 
 {% block body %}
 	<div class="container">
-	
-
 		<div id="searching-result-content">
 			<div id="searching-result-leftside">
-				<h5 class="mb-3">{{ nbFoundStrings }} occurrences de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+				{% if nbFoundStrings > 0 %}
+					<h5 class="mb-3">{{ nbFoundStrings }} occurrences de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+				{% else %}
+					<h5 class="mb-3">Désolé, aucune occurrence de <span class="found-content">{{ string }}</span> n'a été trouvée dans la liste demandée !-/</h5>
+				{% endif %}
 				{% for book in matchingBookList %}
 					<p><a href="#{{book.id}}">{{book.title}} - {{book.author.lastName}}</a></p>
 				{% endfor %}
