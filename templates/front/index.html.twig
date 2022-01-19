@@ -7,15 +7,15 @@
 	<div class="col-md-10 px-2">
 		<h1 class="text-center mt-3">Bibliothèque</h1>
 		<p class="text-center">({{ nbBooks }} ouvrages)</p>
-		{% for author in authors %}
-			<div class="row">
+		<div class="row">
+			{% for author in authors %}
 				{% for book in author.books %}
 					<div class="col-md-2">
 					{% include 'book/_book.html.twig' %}
 					</div>
 				{% endfor %}
-			</div>
-		{% endfor %}
+			{% endfor %}
+		</div>
 
 		{# <div class="pagination">
 			{{ knp_pagination_render(authors)}}
