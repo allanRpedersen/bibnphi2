@@ -6,7 +6,7 @@
 <div class="container">
 	<div id="book-display-content">
 		<div id="book-display-leftside">
-			<h3>{{ book.author.lastName }}</h3>
+			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}">{{ book.author.lastName }}</a></h3>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
 			{{ include('book/_delete_form.html.twig') }}
