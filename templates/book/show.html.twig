@@ -17,8 +17,9 @@
 			{% for paragraph in book.bookParagraphs %}
 				{% if is_granted('ROLE_ADMIN') %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.id }} - {{ paragraph.content | raw }}</p>
-				{% endif %}
+				{% else %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
+				{% endif %}
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}

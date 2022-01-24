@@ -49,6 +49,7 @@ class XmlParser {
 			$noteBody,
 			$indexNoteCitation,
 			$noteCitation,
+			$drawFrameWithObject,
 			// $paragraphCounter,
 			$text;
 
@@ -156,6 +157,7 @@ class XmlParser {
 
 			$this->noteCollection = [];
 			$this->text = '';
+			$this->drawFrameWithObject = false;
 
 			// init parsing time 
 			$this->timeStart = microtime(true);
@@ -324,18 +326,24 @@ class XmlParser {
 				break;
 				
 			case "DRAW:FRAME" ;
-				// $this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+				$this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 				// dump([$element, $attribs]);
+
+			case "DRAW:OBJECT" ;
+				$this->logger->info("<$element> " . json_encode($attribs) );
+
+				$this->drawFrameWithObject = true;
+				break;
 					
 			case "DRAW:IMAGE" ;
-				// $this->logger->info("BaliseXML <$element> " . json_encode($attribs) );
+				$this->logger->info("<$element> " . json_encode($attribs) );
 
 				// $this->logger->info("BaliseXML : $element avec les attributs > " . serialize($attribs) );
 				// $this->logger->info("BaliseXML : $element avec les attributs > " . implode('#', $attribs) );
 				
 				// store Illustration
-				$this->logger->info($attribs['XLINK:HREF']);
+				// $this->logger->info($attribs['XLINK:HREF']);
 				break;
 			
 			case "OFFICE:ANNOTATION" ;
@@ -349,8 +357,6 @@ class XmlParser {
 				//
 				// index from the beginning of the paragraph !!
 				$this->indexNoteCitation = iconv_strlen($this->text);
-
-				// $this->text .= '(#';
 				$this->insideNote = true;
 				break;
 				
@@ -389,13 +395,10 @@ class XmlParser {
 			
 			case "TEXT:NOTE" ;
 				//
-				$this->noteCollection[] = ['index' => $this->indexNoteCitation,
-											'citation' => $this->noteCitation,
-											'content' => $this->noteBody];
+				$this->noteCollection[] = [ 'index'		=> $this->indexNoteCitation,
+											'citation'	=> $this->noteCitation,
+											'content'	=> $this->noteBody ];
 											
-				// $this->noteCollection[] = '[note#' . $this->noteCitation . ') ' . $this->noteBody . '#]';
-				//
-				// $this->text .= ')'; // to end the note citation in the text
 				$this->insideNote = false;
 				$this->noteBody = '';
 				break;
@@ -416,6 +419,13 @@ class XmlParser {
 			
 			case "TEXT:SPAN" ;
 				break;
+			
+			case "DRAW:FRAME" ;
+				$this->drawFrameWithObject = false;
+				// $this->logger->info("<$element> " );
+				break;
+				// dump([$element, $attribs]);
+					
 
 		}	
 
@@ -423,6 +433,12 @@ class XmlParser {
 
 	private function character_data_handler($parser, $data)
 	{
+		//
+		// Les données récupérées peuvent être :
+		//		- un contenu de paragraphe à ajouter au texte déjà existant
+		//		- un contenu de note à ajouter au texte de la note en cours
+		//		- le texte de la citation qui fait référence à la note en cours 
+		//
 		if ($this->isNoteBody) $this->noteBody .= $data;
 		else if (!$this->insideAnnotation){
 			if ($this->isNoteCitation) $this->noteCitation = $data; 
@@ -456,7 +472,7 @@ class XmlParser {
 			// }
 
 
-			// remove all non-breaking space !! ( regex / /u means unicode support )
+			// remove all non-breaking spaces !! ( regex / /u means unicode support )
 			// 
 			$rawParagraph = preg_replace("/[\x{00a0}\s]+/u", " ", $rawParagraph);
 			$rawParagraph = ltrim($rawParagraph);

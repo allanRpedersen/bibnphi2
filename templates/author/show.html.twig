@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Author{% endblock %}
+{% block title %}{{ author.lastName }}{% endblock %}
 
 {% block body %}
-    <h1>Author</h1>
+    <h1>{{ author.firstName }} {{ author.lastName }}</h1>
 
     <table class="table">
         <tbody>
@@ -11,28 +11,28 @@
                 <th>Id</th>
                 <td>{{ author.id }}</td>
             </tr> #}
-            <tr>
+            {# <tr>
                 <th>FirstName</th>
                 <td>{{ author.firstName }}</td>
             </tr>
             <tr>
                 <th>LastName</th>
                 <td>{{ author.lastName }}</td>
-            </tr>
+            </tr> #}
             <tr>
-                <th>BirthYear</th>
+                <th>Né en</th>
                 <td>{{ author.birthYear }}</td>
             </tr>
             <tr>
-                <th>DeathYear</th>
+                <th>Mort en </th>
                 <td>{{ author.deathYear }}</td>
             </tr>
             <tr>
-                <th>Summary</th>
+                <th>Résumé</th>
                 <td>{{ author.summary }}</td>
             </tr>
             <tr>
-                <th>Content</th>
+                <th>Description</th>
                 <td>{{ author.content | raw }}</td>
             </tr>
         </tbody>
