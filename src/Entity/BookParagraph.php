@@ -139,7 +139,7 @@ class BookParagraph
             else
                 $this->highlightedContent = mb_substr($this->content, $fromIndex, $indexFound, $encoding);
 
-            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/hl/' . $this->id . '"';
+            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/hl/' . $this->id . '">';
             $this->highlightedContent .= '<span class="found-content">';
             $this->highlightedContent .= mb_substr($this->content, $indexFound, $length, $encoding);
             $this->highlightedContent .= '</span></a>';

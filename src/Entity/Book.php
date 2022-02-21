@@ -134,12 +134,14 @@ class Book
      * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="book", orphanRemoval=true)
      */
     private $bookNotes;
-    
+
 
     public function __construct()
     {
         $this->bookParagraphs = new ArrayCollection();
         $this->bookNotes = new ArrayCollection();
+
+
     }
 	//
 	//

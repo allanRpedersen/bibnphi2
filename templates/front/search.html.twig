@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste de Recherche !!{% endblock %}
+{% block title %}Résultat d'une recherche{% endblock %}
 
 {% block body %}
 	<div class="container">
@@ -14,10 +14,6 @@
 				{% for book in matchingBookList %}
 					<p><a href="#{{book.id}}">{{book.title}} - {{book.author.lastName}}</a></p>
 				{% endfor %}
-					{# {% if book in matchingBookList %}
-					{% endif %} #}
-					{# {% else %}
-						<p class="p-non-matching-book">{{book.title}} - {{book.author.lastName}}</p> #}
 			</div>
 			<div id="searching-result-rightside">
 				{% set book_slug = "" %}

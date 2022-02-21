@@ -36,7 +36,6 @@ class FrontController extends AbstractController
 			'iNeedle' => 0,
 		];
 
-		$matchingParagraphs = [];
 		
 		//
 		$nbBooksInLibrary = count($bookRepository->findAll());
@@ -93,8 +92,9 @@ class FrontController extends AbstractController
 				
 			}
 			
-			// watabout a spinner (processing state) ??
-
+			//
+			//
+			$matchingParagraphs = [];
 			$matchingBookList = [];
 			$lastId = 0;
 			$nbFoundStrings = 0;
@@ -115,7 +115,10 @@ class FrontController extends AbstractController
 							$matchingBookList[] = $book; // $paragraph->getBook();
 						} 
 					}
+
 				}
+
+
 			}
 
 			return $this->render('front/search.html.twig', [

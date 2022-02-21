@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Book;
 use App\Repository\BookRepository;
+use App\Repository\AuthorRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,27 +19,32 @@ class AdminBookController extends AbstractController
     /**
      * @Route("/book/{sortBy}", name="admin_book_index")
      */
-    public function index($sortBy = 'Title', BookRepository $repo): Response
+    public function index($sortBy = 'Title', AuthorRepository $authorRepo, BookRepository $bookRepo): Response
     {
         switch($sortBy){
             case 'Id':
-                $books = $repo->findAll();
+                $books = $bookRepo->findAll();
                 break;
 
             case 'Title':
-                $books = $repo->findByTitle();
+                $books = $bookRepo->findByTitle();
                 break;
                 
             case 'NbParagraphs':
-                $books = $repo->findByNbParagraphs();
+                $books = $bookRepo->findByNbParagraphs();
                 break;
                 
             case 'ParsingTime':
-                $books = $repo->findByParsingTime();
+                $books = $bookRepo->findByParsingTime();
                 break;
                 
             case 'Author':
-                $books = $repo->findByAuthor();
+                $authors = $authorRepo->findAll();
+                $books = [];
+                foreach( $authors as $author){
+                    $books[] = $author->getBooks();
+                }
+
                 break;
                 
             // default:

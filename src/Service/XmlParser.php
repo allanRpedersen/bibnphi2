@@ -453,13 +453,14 @@ class XmlParser {
 	 */
 	private function handleBookParagraph($rawParagraph, $noteCollection)
 	{
+		$bookParagraph = NULL;
+
 		if ($rawParagraph != ''){
 
 			// $entityManager = $this->getDoctrine()->getManager(); <<<<<<<< !!!!!
 
-			$bookParagraph = NULL;
 			
-			// split the paragraph using the punctuation signs [.?!]
+			// split the paragraph using the punctuation signs [.?!], into sentences
 			// with a negative look-behind feature to exclude :
 			// 			- roman numbers (example CXI.)
 			//			- ordered list ( 1. aaa 2. bbb 3. ccc etc)
@@ -526,7 +527,7 @@ class XmlParser {
 
 				$this->nbParagraphs++;				
 				$this->em->persist($bookParagraph);
-
+				
 				$this->em->flush();
 			}
 			

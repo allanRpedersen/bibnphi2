@@ -194,7 +194,7 @@ class BookController extends AbstractController
  
 			$xmlFileSize = filesize($xmlFileName);
 
-			// for the big xml files, use an external command
+			// for the big xml files, use an external command (  NOT TESTED ) =======
 			if ( $xmlFileSize > $this->getParameter('app.xmlfile_size_external_process')){
 				//
 				$cmd = $this->getParameter('kernel.project_dir')
@@ -250,7 +250,6 @@ class BookController extends AbstractController
 						->setNbWords($xmlParser->getNbWords())
 					;
 
-				
 					$this->em->persist($book);
 					$this->em->flush();
 
@@ -351,6 +350,7 @@ class BookController extends AbstractController
      */
     public function showHighlighted(Book $book, $paragraph_id): Response
     {
+		
         return $this->render('book/show.html.twig', [
             'book' => $book,
 			'jump_to' => $paragraph_id
