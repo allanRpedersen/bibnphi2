@@ -41,8 +41,8 @@ import 'select2';
   var progressFileName;
   
   console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
-  console.log( process );
-  console.log( process.env );
+  // console.log( process );
+  // console.log( process.env );
   // console.log( process.env.DATABASE_URL );  undefined !!-/
   //
   
