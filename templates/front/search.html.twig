@@ -7,7 +7,7 @@
 		<div id="searching-result-content">
 			<div id="searching-result-leftside">
 				{% if nbFoundStrings > 0 %}
-					<h5 class="mb-3">{{ nbFoundStrings }} occurrences de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+					<h5 class="mb-3">{{ nbFoundStrings }} occurrence{% if nbFoundStrings > 1 %}s{% endif %} de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
 				{% else %}
 					<h5 class="mb-3">Désolé, aucune occurrence de <span class="found-content">{{ string }}</span> n'a été trouvée dans la liste demandée !-/</h5>
 				{% endif %}
@@ -16,13 +16,21 @@
 				{% endfor %}
 			</div>
 			<div id="searching-result-rightside">
-				{% set book_slug = "" %}
-				{% for paragraph in paragraphs %}
-					{% if paragraph.book.slug != book_slug %}
-					{% set book_slug = paragraph.book.slug %}
-					<h3 id="{{ paragraph.book.id }}">{{ paragraph.book.title }}</h3><h4>{{ paragraph.book.author.lastName}}</h4>
-					{% endif %}
-					<p class="p-justify">{{paragraph.highlightedContent|raw}}</p>
+				{% for book in matchingBookList %}
+				<h3 id="{{ book.id }}">{{ book.title }}</h3><h4>{{ book.author.lastName}}</h4>
+
+					{% for paragraph in paragraphs %}
+						{% if paragraph.book.id == book.id %}
+						<p class="p-justify">{{paragraph.highlightedContent|raw}}</p>
+						{% endif %}
+					{% endfor %}
+					
+					{% for note in notes %}
+						{% if note.book.id == book.id %}
+						<p class="p-justify"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{note.highlightedContent|raw}}</p>
+						{% endif %}
+					{% endfor %}
+
 				{% endfor %}
 			</div>
 		</div>

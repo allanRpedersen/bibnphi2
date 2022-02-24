@@ -48,12 +48,7 @@ class FrontController extends AbstractController
 
 		if ($form->isSubmitted() && $form->isValid())
 		{
-			// spinner ?
-
 			$stringToSearch = $search->getStringToSearch();
-
-			// dd($stringToSearch);
-
 
 			if ($search->getBooks()->isEmpty()){
 
@@ -95,38 +90,55 @@ class FrontController extends AbstractController
 			//
 			//
 			$matchingParagraphs = [];
+			$matchingNotes = [];
 			$matchingBookList = [];
 			$lastId = 0;
 			$nbFoundStrings = 0;
 
 			foreach($bookList as $book){
 
-				$bookId = $book->getId();
+				// $bookId = $book->getId();
 				$paragraphs = $book->getBookParagraphs();
+				$notes = $book->getBookNotes();
 
 				foreach($paragraphs as $paragraph){
-					if ( $paragraph->isMatchingParagraph($stringToSearch)){
-						$matchingParagraphs[] = $paragraph;
 
+					if ( $paragraph->isContentMatching($stringToSearch)){
+
+						$matchingParagraphs[] = $paragraph;
 						$nbFoundStrings += sizeof($paragraph->getFoundStringsIndexes());
 
-						if ($bookId != $lastId){
-							$lastId = $bookId;
-							$matchingBookList[] = $book; // $paragraph->getBook();
-						} 
+						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
+
+						// if ($bookId != $lastId){
+						// 	$lastId = $bookId;
+						// 	$matchingBookList[] = $book; // $paragraph->getBook();
+						// } 
 					}
 
 				}
 
+				foreach($notes as $note){
+
+					if ( $note->isContentMatching($stringToSearch)){
+
+						$matchingNotes[] = $note;
+						$nbFoundStrings += sizeof($note->getFoundStringIndexes());
+
+						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
+
+					}
+				}
 
 			}
 
 			return $this->render('front/search.html.twig', [
-				'string' => $stringToSearch,
-				'bookList' => $bookList,
-				'matchingBookList' => $matchingBookList,
-				'paragraphs' => $matchingParagraphs,
-				'nbFoundStrings' => $nbFoundStrings
+				'string'			=> $stringToSearch,
+				'bookList'			=> $bookList,
+				'matchingBookList'	=> $matchingBookList,
+				'paragraphs'		=> $matchingParagraphs,
+				'notes'				=> $matchingNotes,
+				'nbFoundStrings'	=> $nbFoundStrings
 
 			]);
 

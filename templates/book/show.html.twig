@@ -28,9 +28,8 @@
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
-				<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content }}</p>
+				<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content | raw }}</p>
 			{% endfor %}
-
 		</div>
 	</div>
 </div>
@@ -38,10 +37,17 @@
 {% endblock %}
 
 {% block javascripts %}
-	{% if jump_to is defined %}
+	{% if jump2p is defined %}
 	<script type="text/javascript">
-		paragraph = document.getElementById("_{{ jump_to }}");
+		paragraph = document.getElementById("_{{ jump2p }}");
 		paragraph.scrollIntoView();
 	</script>
 	{% endif %}
+	{% if jump2n is defined %}
+	<script type="text/javascript">
+		note = document.getElementById("note_{{ jump2n }}");
+		note.scrollIntoView();
+	</script>
+	{% endif %}
+
 {% endblock %}

@@ -346,16 +346,29 @@ class BookController extends AbstractController
     }
 
     /**
-     * @Route("/{slug}/hl/{paragraph_id}", name="book_show_highlighted", methods={"GET"})
+     * @Route("/{slug}/matchingParagraph/{paragraph_id}", name="book_show_matching_paragraph", methods={"GET"})
      */
-    public function showHighlighted(Book $book, $paragraph_id): Response
+    public function showMatchingParagraph(Book $book, $paragraph_id): Response
     {
 		
         return $this->render('book/show.html.twig', [
-            'book' => $book,
-			'jump_to' => $paragraph_id
+            'book'		=> $book,
+			'jump2p'	=> $paragraph_id
         ]);
     }
+
+    /**
+     * @Route("/{slug}/matchingNote/{note_citation}", name="book_show_matching_note", methods={"GET"})
+     */
+    public function showMatchingNote(Book $book, $note_citation): Response
+    {
+		
+        return $this->render('book/show.html.twig', [
+            'book'		=> $book,
+			'jump2n'	=> $note_citation
+        ]);
+    }
+
 
     /**
      * @Route("/{slug}/edit", name="book_edit", methods={"GET","POST"})

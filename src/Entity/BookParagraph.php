@@ -27,7 +27,7 @@ class BookParagraph
      */
     private $book;
 
-    private $matchingSentences;
+    // private $matchingSentences;
 
     /**
      * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="bookParagraph", orphanRemoval=true)
@@ -38,26 +38,26 @@ class BookParagraph
      * @ORM\Column(type="text")
      * 
      * Le contenu du paragraphe
+     * 
      */
     private $content;
 
     /**
      * 
-     * 
-     * Le contenu qui correspond à une recherche et enrichi 
-     * avec les extraits du texte qui correspondent à la chaîne recherchée
-     * qui sont affectées par la classe .found-content
-     */
+     * Dans le cas d'une recherche réussie, le contenu du paragraphe
+     * est enrichi par des balises <span class="found-content"></span>
+     * qui encadrent les chaînes recherchées.
+    */
     private $highlightedContent;
     
+    // Collection des indices d'occurence de la chaine recherchée dans le paragraphe
+    private $foundStringsIndexes;
+
     // private $matchingSentence = [
-    //     'book'=> $this->book,
+    //     'book'=> $this->book,    
     //     'sentence' => "",
     //     'iNeedle' => NULL,
     // ];
-
-    // Collection des indices d'occurence de la chaine recherchée dans le paragraphe
-    private $foundStringsIndexes;
 
     public function __construct()
     {
@@ -116,7 +116,7 @@ class BookParagraph
         return $this->matchingSentences;
     }
 
-    public function isMatchingParagraph($stringToSearch)
+    public function isContentMatching($stringToSearch) : array
     {
         $encoding = mb_detect_encoding($this->content);
         
@@ -125,8 +125,6 @@ class BookParagraph
         $length = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
         $this->foundStringsIndexes = [];
-
-        // dd($stringToSearch, $length, $encoding);
 
         //
         //
@@ -139,7 +137,7 @@ class BookParagraph
             else
                 $this->highlightedContent = mb_substr($this->content, $fromIndex, $indexFound, $encoding);
 
-            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/hl/' . $this->id . '">';
+            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/matchingParagraph/' . $this->id . '">';
             $this->highlightedContent .= '<span class="found-content">';
             $this->highlightedContent .= mb_substr($this->content, $indexFound, $length, $encoding);
             $this->highlightedContent .= '</span></a>';
@@ -153,18 +151,8 @@ class BookParagraph
 
         }
 
-        //
-        //
-        // et les notes éventuellement associées ???
-        //
-        //
-
         // false if empty !! ?-/
         return ($this->foundStringsIndexes);
-
-
- 
-
 
     }
 
