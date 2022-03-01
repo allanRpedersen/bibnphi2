@@ -7,28 +7,33 @@
 	<div id="book-display-content">
 		<div id="book-display-leftside">
 			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}">{{ book.author.lastName }}</a></h3>
+			<p>{{ book.summary }}</p>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
 			{{ include('book/_delete_form.html.twig') }}
-			{% endif %}
-			{% if is_granted('ROLE_ADMIN') %}
-				{% if jump_to is defined %}
-					<p>{{jump_to}}</p>
-				{% endif %}		
 			{% endif %}
 
 		</div>
 		<div id="book-display-rightside">
 			{% for paragraph in book.bookParagraphs %}
-				{% if is_granted('ROLE_ADMIN') %}
-				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.id }} - {{ paragraph.content | raw }}</p>
+				{# {% if hlParagraphs is defined %}
+					{% if paragraph in hlParagraphs %}
+						<p class="p-justify" id="_{{ paragraph.id }}">[hlContent]{{ paragraph.content | raw }}</p>
+					{% endif %}
 				{% else %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
-				{% endif %}
+				{% endif %} #}
+				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
-				<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content | raw }}</p>
+				{# {% if hlNotes is defined %}
+					{% if paragraph in hlNotes %}
+						<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a>[hlContent]</sup>~{{ note.content | raw }}</p>
+						{% endif %}
+				{% else %}
+				{% endif %} #}
+				<p class="p-justify" id="note_{{ note.id }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content | raw }}</p>
 			{% endfor %}
 		</div>
 	</div>
@@ -37,17 +42,10 @@
 {% endblock %}
 
 {% block javascripts %}
-	{% if jump2p is defined %}
+	{% if jump2 is defined %}
 	<script type="text/javascript">
-		paragraph = document.getElementById("_{{ jump2p }}");
+		paragraph = document.getElementById("{{ jump2 }}");
 		paragraph.scrollIntoView();
 	</script>
 	{% endif %}
-	{% if jump2n is defined %}
-	<script type="text/javascript">
-		note = document.getElementById("note_{{ jump2n }}");
-		note.scrollIntoView();
-	</script>
-	{% endif %}
-
 {% endblock %}

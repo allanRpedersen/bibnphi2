@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Service\ContentMgr;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookParagraphRepository;
 use Doctrine\Common\Collections\Collection;
@@ -27,8 +28,6 @@ class BookParagraph
      */
     private $book;
 
-    // private $matchingSentences;
-
     /**
      * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="bookParagraph", orphanRemoval=true)
      */
@@ -50,19 +49,19 @@ class BookParagraph
     */
     private $highlightedContent;
     
-    // Collection des indices d'occurence de la chaine recherchée dans le paragraphe
-    private $foundStringsIndexes;
+    // Tableau/Collection des indices des occurences de la chaine recherchée dans le paragraphe
+    private $foundStringIndexes = [];
 
-    // private $matchingSentence = [
-    //     'book'=> $this->book,    
-    //     'sentence' => "",
-    //     'iNeedle' => NULL,
-    // ];
+    private $searchResult = [
+        'needle' => '',
+        'indexes' => [],
+    ];
 
     public function __construct()
     {
         $this->notes = new ArrayCollection();
-        $this->foundStringsIndexes = new ArrayCollection();
+        // $this->foundStringIndexes = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -82,77 +81,40 @@ class BookParagraph
         return $this;
     }
 
-	
-	public function getMatchingSentences($stringToSearch): ?Collection
-    {
-        $this->matchingSentences = new ArrayCollection();
-
-        // foreach($this->sentences as $sentence){
-
-        //        //
-        //        $content = $sentence->getContent();
-
-        //        $encoding = mb_detect_encoding($content);
-        //        $length = mb_strlen($stringToSearch);
-
-        // 	$iNeedle = mb_stripos($content, $stringToSearch, 0, $encoding);
-
-        // 	if(FALSE !== $iNeedle){
-
-        //            $tmp = mb_substr($content, 0, $iNeedle, $encoding);
-        //            $tmp .= '<strong>';
-        //            $tmp .= mb_substr($content, $iNeedle, $length, $encoding);
-        //            $tmp .= '</strong>';
-        //            $tmp .= mb_substr($content, $iNeedle + $length, NULL, $encoding);
-
-        //            $sentence->setContent($tmp);
-                
-        // 		$this->matchingSentences->add([$iNeedle, $sentence]);
-
-        // 	}
-
-        // }
-        
-        return $this->matchingSentences;
-    }
-
     public function isContentMatching($stringToSearch) : array
     {
         $encoding = mb_detect_encoding($this->content);
         
         $fromIndex = 0;
         $indexFound = 0;
-        $length = mb_strlen($stringToSearch);
+        $strLength = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
-        $this->foundStringsIndexes = [];
+        $this->foundStringIndexes = [];
 
         //
         //
         while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
-
-            $this->foundStringsIndexes[] = $indexFound;
-
-            if (count($this->foundStringsIndexes) > 1)
-                $this->highlightedContent .= mb_substr($this->content, $fromIndex, $indexFound - $fromIndex, $encoding);
-            else
-                $this->highlightedContent = mb_substr($this->content, $fromIndex, $indexFound, $encoding);
-
-            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/matchingParagraph/' . $this->id . '">';
-            $this->highlightedContent .= '<span class="found-content">';
-            $this->highlightedContent .= mb_substr($this->content, $indexFound, $length, $encoding);
-            $this->highlightedContent .= '</span></a>';
-
-            $fromIndex = $indexFound + $length;
             
+            $this->foundStringIndexes[] = $indexFound;
+            $fromIndex = $indexFound + $strLength;
+        }    
+
+        if ($this->foundStringIndexes){
+        
+            $contentMgr = new ContentMgr();
+            $beginTag = '<a href="book/' . $this->book->getSlug() . '/jumpTo/_' . $this->id . '"><mark>';
+            $endTag = '</mark></a>';
+    
+            $this->highlightedContent = $contentMgr
+                                            ->setOriginalContent($this->content)
+                                            ->addTags($this->foundStringIndexes, $strLength, $beginTag, $endTag);
+
         }
-        if ($this->foundStringsIndexes){
 
-            $this->highlightedContent .= mb_substr($this->content, $fromIndex, NULL, $encoding);
+        $this->searchResult[] = [$stringToSearch, $this->foundStringIndexes];
 
-        }
-
-        // false if empty !! ?-/
-        return ($this->foundStringsIndexes);
+        // false if empty !!
+        return ($this->foundStringIndexes);
 
     }
 
@@ -188,7 +150,7 @@ class BookParagraph
 
     public function getContent(): ?string
     {
-        return $this->content;
+        return($this->highlightedContent?$this->highlightedContent:$this->content);
     }
 
     public function setContent(string $content): self
@@ -211,10 +173,10 @@ class BookParagraph
     }
 
     /**
-     * Get the value of foundStringsIndexes
+     * Get the value of foundStringIndexes
      */ 
-    public function getFoundStringsIndexes()
+    public function getFoundStringIndexes()
     {
-        return $this->foundStringsIndexes;
+        return $this->foundStringIndexes;
     }
 }

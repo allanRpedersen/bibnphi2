@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Service\ContentMgr;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookNoteRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -84,8 +85,8 @@ class BookNote
 
     public function getContent(): ?string
     {
-        return $this->content;
-    }
+        return($this->highlightedContent?$this->highlightedContent:$this->content);
+        }
 
     public function setContent(string $content): self
     {
@@ -149,7 +150,7 @@ class BookNote
         
         $fromIndex = 0;
         $indexFound = 0;
-        $length = mb_strlen($stringToSearch);
+        $strLength = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
         $this->foundStringIndexes = [];
 
@@ -158,27 +159,23 @@ class BookNote
         while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
 
             $this->foundStringIndexes[] = $indexFound;
+            $fromIndex = $indexFound + $strLength;
 
-            if (count($this->foundStringIndexes) > 1)
-                $this->highlightedContent .= mb_substr($this->content, $fromIndex, $indexFound - $fromIndex, $encoding);
-            else
-                $this->highlightedContent = mb_substr($this->content, $fromIndex, $indexFound, $encoding);
-
-            $this->highlightedContent .= '<a href="book/' . $this->book->getSlug() . '/matchingNote/' . $this->citation . '">';
-            $this->highlightedContent .= '<span class="found-content">';
-            $this->highlightedContent .= mb_substr($this->content, $indexFound, $length, $encoding);
-            $this->highlightedContent .= '</span></a>';
-
-            $fromIndex = $indexFound + $length;
-            
         }
+
         if ($this->foundStringIndexes){
-
-            $this->highlightedContent .= mb_substr($this->content, $fromIndex, NULL, $encoding);
-
+        
+            $contentMgr = new ContentMgr();
+            $beginTag = '<a href="book/' . $this->book->getSlug() . '/jumpTo/note_' . $this->id . '"><mark>';
+            $endTag = '</mark></a>';
+    
+            $this->highlightedContent = $contentMgr
+                                            ->setOriginalContent($this->content)
+                                            ->addTags($this->foundStringIndexes, $strLength, $beginTag, $endTag);
+    
         }
 
-        // false if empty !! ?-/
+        // false if empty !!
         return ($this->foundStringIndexes);
 
     }

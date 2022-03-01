@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\Entity\SentenceSearch;
 use App\Form\SentenceSearchType;
+use App\Entity\HighlightedContent;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
+use App\Repository\HighlightedContentRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +18,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class FrontController extends AbstractController
 {
+	private $em;
+
+	private $hlRepo;
+
+	public function __construct(EntityManagerInterface $em, HighlightedContentRepository $hlRepo){
+
+		$this->em = $em;
+
+		$this->hlRepo = $hlRepo;
+	}
+
 
     /**
      * @Route("/", name="front")
@@ -36,6 +50,19 @@ class FrontController extends AbstractController
 			'iNeedle' => 0,
 		];
 
+
+		//
+		$this->hlRepo->DeleteAll();
+		$this->em->flush();
+
+		//
+		// $hlContents = $this->hlRepo->findAll();
+		// if (count($hlContents)){
+		// 	foreach($hlContents as $hlContent){
+		// 		$this->em->remove($hlContent);
+		// 	}
+		// 	$this->em->flush();
+		// }
 		
 		//
 		$nbBooksInLibrary = count($bookRepository->findAll());
@@ -92,12 +119,10 @@ class FrontController extends AbstractController
 			$matchingParagraphs = [];
 			$matchingNotes = [];
 			$matchingBookList = [];
-			$lastId = 0;
 			$nbFoundStrings = 0;
 
 			foreach($bookList as $book){
 
-				// $bookId = $book->getId();
 				$paragraphs = $book->getBookParagraphs();
 				$notes = $book->getBookNotes();
 
@@ -106,14 +131,20 @@ class FrontController extends AbstractController
 					if ( $paragraph->isContentMatching($stringToSearch)){
 
 						$matchingParagraphs[] = $paragraph;
-						$nbFoundStrings += sizeof($paragraph->getFoundStringsIndexes());
+						$nbFoundStrings += sizeof($paragraph->getFoundStringIndexes());
 
 						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
 
-						// if ($bookId != $lastId){
-						// 	$lastId = $bookId;
-						// 	$matchingBookList[] = $book; // $paragraph->getBook();
-						// } 
+						$foundContent = new HighlightedContent();
+
+						$foundContent
+									->setBookId($book->getId())
+									->setContentType('paragraph')
+									->setOrigId($paragraph->getId())
+									->setHighlightedString($stringToSearch)
+									->setMatchingIndexes($paragraph->getFoundStringIndexes());
+						
+						$this->em->persist($foundContent);
 					}
 
 				}
@@ -127,9 +158,21 @@ class FrontController extends AbstractController
 
 						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
 
+						$foundContent = new HighlightedContent();
+
+						$foundContent
+									->setBookId($book->getId())
+									->setContentType('note')
+									->setOrigId($note->getId())
+									->setHighlightedString($stringToSearch)
+									->setMatchingIndexes($note->getFoundStringIndexes());
+						
+						$this->em->persist($foundContent);
+
 					}
 				}
 
+				if ($nbFoundStrings) $this->em->flush();
 			}
 
 			return $this->render('front/search.html.twig', [

@@ -7,8 +7,11 @@ use App\Entity\Book;
 use App\Entity\Author;
 use App\Form\BookType;
 use App\Service\XmlParser;
+use App\Service\ContentMgr;
 use App\Entity\BookSentence;
 use App\Entity\BookParagraph;
+use App\Repository\BookNoteRepository;
+use App\Repository\BookParagraphRepository;
 use App\Repository\BookRepository;
 use Monolog\Handler\StreamHandler;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,9 +21,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\Annotation\Route;
 use Vich\UploaderBundle\Form\Type\VichFileType;
+use App\Repository\HighlightedContentRepository;
+
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -29,6 +33,7 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 //
 // $bool=pcntl_async_signals(true);
@@ -39,39 +44,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class BookController extends AbstractController
 {
-
-	/**
-	 * XML parser
-	 *
-	 */
-	private $parser;
-
-	private $insideNote,
-			$insideAnnotation,
-			$counter,
-			$text,
-			$isNoteBody,
-			$isNoteCitation,
-			$noteBody,
-			$noteCitation,
-			$noteCollection;
-
-	private $nbBookWords,
-			$nbBookSentences,
-			$nbBookParagraphs,
-			$xmlFileSize,
-			$iCurrentBuffer;
-	
-	private $book;
-
-	private $uploaderHelper;
-	private $logger;
-	private $projectDir;
-	private $em;
-
-	// 
-	private $fDev; 
-
 
 	public function __construct(KernelInterface $kernel, EntityManagerInterface $em, UploaderHelper $uploaderHelper)
 	{
@@ -206,6 +178,8 @@ class BookController extends AbstractController
 			}
 			else {
 
+				//
+				// is that relevant ???
 				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_xl');
 				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_l');
 				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_m');
@@ -345,30 +319,105 @@ class BookController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{slug}/matchingParagraph/{paragraph_id}", name="book_show_matching_paragraph", methods={"GET"})
-     */
-    public function showMatchingParagraph(Book $book, $paragraph_id): Response
-    {
-		
-        return $this->render('book/show.html.twig', [
-            'book'		=> $book,
-			'jump2p'	=> $paragraph_id
-        ]);
-    }
+	/**
+	 * @Route("/{slug}/jumpTo/{whereToJump}", name="book_show_with_jump", methods={"GET"})
+	 */
+	public function showAndJump(Book $book, $whereToJump, HighlightedContentRepository $hlRepo, BookParagraphRepository $pRepo, BookNoteRepository $nRepo)
+	{
+		// This route is reached after a string research in the library
+		$highlightedContents = $hlRepo->findByBookId($book->getId());
 
-    /**
-     * @Route("/{slug}/matchingNote/{note_citation}", name="book_show_matching_note", methods={"GET"})
-     */
-    public function showMatchingNote(Book $book, $note_citation): Response
-    {
-		
-        return $this->render('book/show.html.twig', [
-            'book'		=> $book,
-			'jump2n'	=> $note_citation
-        ]);
-    }
+		$circumArray = [];
+		$targetArray = [];
 
+		foreach($highlightedContents as $highlightedContent){
+			$circumArray[] = [$highlightedContent->getContentType(), $highlightedContent->getOrigId()];
+		}
+
+		for ($i=0;$i<sizeof($circumArray)-1;$i++){
+
+			switch ($circumArray[$i+1][0]){
+				case 'paragraph' :
+					$targetArray[$i] = '_' . $circumArray[$i+1][1];
+					break;
+
+				case 'note' :
+					$targetArray[$i] = 'note_' . $circumArray[$i+1][1];
+					break;
+
+			}
+		}
+		
+		switch ($circumArray[0][0]){
+			case 'paragraph' :
+				$targetArray[$i]='_' . $circumArray[0][1];
+				break;
+
+			case 'note' :
+				$targetArray[$i] = 'note_' . $circumArray[0][1];
+				break;
+
+		}
+		
+
+		$endTag = '</mark></a>' ;
+		
+		$contentMgr = new ContentMgr();
+		$hlParagraphs = [];
+		$hlNotes = [];
+		
+		foreach($highlightedContents as $key => $highlightedContent){
+			
+			$indexArray = $highlightedContent->getMatchingIndexes();
+			$lengthToSurround = mb_strlen($highlightedContent->getHighlightedString());
+
+			$beginTag = '<a href="#' . $targetArray[$key]. '"><mark>';
+			
+			switch ($highlightedContent->getContentType()){
+				
+				case 'paragraph' :
+					
+					$paragraph = $pRepo->findOneById($highlightedContent->getOrigId());
+					
+					$paragraph->setHighlightedContent(
+						$contentMgr->setOriginalContent($paragraph->getContent())
+									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
+						);
+					
+					$hlParagraphs[] = $paragraph;
+				break;
+
+				case 'note' :
+
+					$note = $nRepo->findOneById($highlightedContent->getOrigId());
+
+					$note->setHighlightedContent(
+						$contentMgr->setOriginalContent($note->getContent())
+									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
+						);
+					
+					$hlNotes[] = $note;
+
+				break;
+
+				default :
+					//error
+				
+
+			}
+
+
+		}
+
+        return $this->render('book/show.html.twig', [
+            'book'			=> $book,
+			'jump2'			=> $whereToJump,
+			'hlParagraphs'	=> $hlParagraphs,
+			'hlNotes'		=> $hlNotes,
+        ]);
+
+
+	}
 
     /**
      * @Route("/{slug}/edit", name="book_edit", methods={"GET","POST"})
