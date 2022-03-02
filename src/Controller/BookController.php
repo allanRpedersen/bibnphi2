@@ -371,7 +371,9 @@ class BookController extends AbstractController
 			$indexArray = $highlightedContent->getMatchingIndexes();
 			$lengthToSurround = mb_strlen($highlightedContent->getHighlightedString());
 
-			$beginTag = '<a href="#' . $targetArray[$key]. '"><mark>';
+			$beginTag = '<a title="Aller à la prochaine occurrence" href="#'
+					. $targetArray[$key]
+					. '"><mark>';
 			
 			switch ($highlightedContent->getContentType()){
 				

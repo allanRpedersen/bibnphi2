@@ -166,7 +166,11 @@ class BookNote
         if ($this->foundStringIndexes){
         
             $contentMgr = new ContentMgr();
-            $beginTag = '<a href="book/' . $this->book->getSlug() . '/jumpTo/note_' . $this->id . '"><mark>';
+            $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
+                        . $this->book->getSlug()
+                        . '/jumpTo/note_'
+                        . $this->id
+                        . '"><mark>';
             $endTag = '</mark></a>';
     
             $this->highlightedContent = $contentMgr

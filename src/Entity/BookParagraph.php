@@ -102,7 +102,11 @@ class BookParagraph
         if ($this->foundStringIndexes){
         
             $contentMgr = new ContentMgr();
-            $beginTag = '<a href="book/' . $this->book->getSlug() . '/jumpTo/_' . $this->id . '"><mark>';
+            $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
+                        . $this->book->getSlug()
+                        . '/jumpTo/_'
+                        . $this->id
+                        . '"><mark>';
             $endTag = '</mark></a>';
     
             $this->highlightedContent = $contentMgr
