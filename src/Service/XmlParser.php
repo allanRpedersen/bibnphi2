@@ -504,7 +504,7 @@ class XmlParser {
 						$index = $note['index'];
 
 						$htmlToAdd =	'<sup id="citation_' . $citation . '">
-										<a class="" href="#note_' . $citation .'">'	. $citation .
+										<a class="" href="#note_' . $bookNote->getId() .'">'	. $citation .
 										'</a></sup>';
 						
 						// in case of several notes in the paragraph ..
