@@ -11,6 +11,7 @@
 
 ###>
 /src/DataFixtures/
+/localTesting/
 
 ###> symfony/framework-bundle ###
 /.env.local

@@ -323,8 +323,13 @@ class XmlParser {
 				break;
 				
 			case "TEXT:SPAN":
+				// $this->logger->info("<$element>, $attribs " );
 				break;
 				
+			case "STYLE:STYLE" :
+				// $this->logger->info("<$element>, $attribs " );
+				break;
+
 			case "DRAW:FRAME" ;
 				$this->logger->info("<$element> " . json_encode($attribs) );
 				break;
@@ -503,9 +508,13 @@ class XmlParser {
 						$citation = $note['citation'];
 						$index = $note['index'];
 
-						$htmlToAdd =	'<sup id="citation_' . $citation . '">
-										<a class="" href="#note_' . $bookNote->getId() .'">'	. $citation .
-										'</a></sup>';
+						$htmlToAdd = '<sup id="citation_'
+									. $citation
+									. '"><a class="" href="#note_'
+									. $bookNote->getId()
+									.'">'
+									. $citation
+									. '</a></sup>';
 						
 						// in case of several notes in the paragraph ..
 						// .. add the length of each previous html string inserted to the index
