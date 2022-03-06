@@ -35,17 +35,17 @@ class HighlightedContentRepository extends ServiceEntityRepository
         ;
     }
     */
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
+    // public function findByExampleField($value)
+    // {
+    //     return $this->createQueryBuilder('h')
+    //         ->andWhere('h.exampleField = :val')
+    //         ->setParameter('val', $value)
+    //         ->orderBy('h.id', 'ASC')
+    //         ->setMaxResults(10)
+    //         ->getQuery()
+    //         ->getResult()
+    //     ;
+    // }
 
     public function deleteAll(){
         $query = $this->createQueryBuilder('e')

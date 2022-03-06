@@ -9,7 +9,7 @@
 			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}">{{ book.author.lastName }}</a></h3>
 			<p>{{ book.summary }}</p>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-			<a href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
+			<a class="btn btn-info" href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
 			{{ include('book/_delete_form.html.twig') }}
 			{% endif %}
 
@@ -23,7 +23,12 @@
 				{% else %}
 				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
 				{% endif %} #}
-				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
+				<p class="p-justify" id="_{{ paragraph.id }}">
+					{% if is_granted('ROLE_ADMIN')%}
+					<a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>_{{ paragraph.id }}</sub></a>
+					{% endif %}
+					{{ paragraph.content | raw }}
+				</p>
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
