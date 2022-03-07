@@ -9,8 +9,17 @@
 			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}">{{ book.author.lastName }}</a></h3>
 			<p>{{ book.summary }}</p>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-			<a class="btn btn-info" href="{{ path('book_edit', {'slug': book.slug}) }}">modifier l'entrée</a>
-			{{ include('book/_delete_form.html.twig') }}
+				<a class="btn btn-info" title="modifier" href="{{ path('book_edit', {'slug': book.slug}) }}">
+					<i class="fas fa-edit" style="width: 15px; font-size:15px"></i></a>
+				<form method="post"
+					action="{{ path('book_delete', {'slug': book.slug}) }}"
+					onsubmit="confirm('Voulez vous vraiment supprimer cette entrée ?');">
+					<input type="hidden" name="_method" value="DELETE">
+					<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ book.id) }}">
+					<button class="btn btn-danger mt-2"><i class="fas fa-trash" style="width: 15px; font-size:15px"></i></button>
+				</form>
+					
+				{# {{ include('book/_delete_form.html.twig') }} #}
 			{% endif %}
 
 		</div>
@@ -25,7 +34,7 @@
 				{% endif %} #}
 				<p class="p-justify" id="_{{ paragraph.id }}">
 					{% if is_granted('ROLE_ADMIN')%}
-					<a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>_{{ paragraph.id }}</sub></a>
+					<a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
 					{% endif %}
 					{{ paragraph.content | raw }}
 				</p>

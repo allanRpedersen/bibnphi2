@@ -329,86 +329,88 @@ class BookController extends AbstractController
 
 		$circumArray = [];
 		$targetArray = [];
+		$hlParagraphs = [];
+		$hlNotes = [];
 
 		foreach($highlightedContents as $highlightedContent){
 			$circumArray[] = [$highlightedContent->getContentType(), $highlightedContent->getOrigId()];
 		}
 
-		for ($i=0;$i<sizeof($circumArray)-1;$i++){
+		if ($circumArray){
+			//
+			//
+			for ($i=0;$i<sizeof($circumArray)-1;$i++){
 
-			switch ($circumArray[$i+1][0]){
+				switch ($circumArray[$i+1][0]){
+					case 'paragraph' :
+						$targetArray[$i] = '_' . $circumArray[$i+1][1];
+						break;
+
+					case 'note' :
+						$targetArray[$i] = 'note_' . $circumArray[$i+1][1];
+						break;
+
+				}
+			}
+			
+			switch ($circumArray[0][0]){
 				case 'paragraph' :
-					$targetArray[$i] = '_' . $circumArray[$i+1][1];
+					$targetArray[$i]='_' . $circumArray[0][1];
 					break;
 
 				case 'note' :
-					$targetArray[$i] = 'note_' . $circumArray[$i+1][1];
+					$targetArray[$i] = 'note_' . $circumArray[0][1];
 					break;
 
 			}
-		}
-		
-		switch ($circumArray[0][0]){
-			case 'paragraph' :
-				$targetArray[$i]='_' . $circumArray[0][1];
-				break;
-
-			case 'note' :
-				$targetArray[$i] = 'note_' . $circumArray[0][1];
-				break;
-
-		}
-		
-
-		$endTag = '</mark></a>' ;
-		
-		$contentMgr = new ContentMgr();
-		$hlParagraphs = [];
-		$hlNotes = [];
-		
-		foreach($highlightedContents as $key => $highlightedContent){
 			
-			$indexArray = $highlightedContent->getMatchingIndexes();
-			$lengthToSurround = mb_strlen($highlightedContent->getHighlightedString());
-
-			$beginTag = '<a title="Aller à la prochaine occurrence" href="#'
-					. $targetArray[$key]
-					. '"><mark>';
+			$endTag = '</mark></a>' ;
+			$contentMgr = new ContentMgr();
 			
-			switch ($highlightedContent->getContentType()){
+			foreach($highlightedContents as $key => $highlightedContent){
 				
-				case 'paragraph' :
-					
-					$paragraph = $pRepo->findOneById($highlightedContent->getOrigId());
-					
-					$paragraph->setHighlightedContent(
-						$contentMgr->setOriginalContent($paragraph->getContent())
-									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
-						);
-					
-					$hlParagraphs[] = $paragraph;
-				break;
+				$indexArray = $highlightedContent->getMatchingIndexes();
+				$lengthToSurround = mb_strlen($highlightedContent->getHighlightedString());
 
-				case 'note' :
-
-					$note = $nRepo->findOneById($highlightedContent->getOrigId());
-
-					$note->setHighlightedContent(
-						$contentMgr->setOriginalContent($note->getContent())
-									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
-						);
-					
-					$hlNotes[] = $note;
-
-				break;
-
-				default :
-					//error
+				$beginTag = '<a title="Aller à la prochaine occurrence" href="#'
+						. $targetArray[$key]
+						. '"><mark>';
 				
+				switch ($highlightedContent->getContentType()){
+					
+					case 'paragraph' :
+						
+						$paragraph = $pRepo->findOneById($highlightedContent->getOrigId());
+						
+						$paragraph->setHighlightedContent(
+							$contentMgr->setOriginalContent($paragraph->getContent())
+										->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
+							);
+						
+						$hlParagraphs[] = $paragraph;
+					break;
+
+					case 'note' :
+
+						$note = $nRepo->findOneById($highlightedContent->getOrigId());
+
+						$note->setHighlightedContent(
+							$contentMgr->setOriginalContent($note->getContent())
+										->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
+							);
+						
+						$hlNotes[] = $note;
+
+					break;
+
+					default :
+						//error
+					
+
+				}
+
 
 			}
-
-
 		}
 
         return $this->render('book/show.html.twig', [

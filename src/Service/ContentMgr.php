@@ -9,7 +9,9 @@ use Monolog\Logger;
 class ContentMgr
 {
     private $originalContent = '';
+    private $originalLength;
     private $encoding = NULL;
+    private $newContent;
 
     /**
      * 
@@ -50,7 +52,43 @@ class ContentMgr
     public function setOriginalContent($originalContent)
     {
         $this->originalContent = $originalContent;
+        $this->originalLength = mb_strlen($this->originalContent);
         $this->encoding = mb_detect_encoding($originalContent);
+
+        return $this;
+    }
+
+    /**
+     * 
+     */
+    public function removeTag($tag): self {
+
+        //
+        //
+        //
+        $this->newContent = mb_eregi_replace($tag, '', $this->originalContent);
+        return($this);
+
+
+
+    } 
+
+    /**
+     * Get the value of newContent
+     */ 
+    public function getNewContent()
+    {
+        return $this->newContent;
+    }
+
+    /**
+     * Set the value of newContent
+     *
+     * @return  self
+     */ 
+    public function setNewContent($newContent)
+    {
+        $this->newContent = $newContent;
 
         return $this;
     }

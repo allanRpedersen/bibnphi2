@@ -66,7 +66,8 @@ class UpdateDBContentCommand extends Command
         $io->note('Updating is running ... ');
 
         $notes = $this->nr->findAll();
-        $count = 0;
+        $count = count($notes);
+        
 
         // foreach($notes as $note){
         //     $io->text('[_' . $note->getBookParagraph()->getId() . ']');
@@ -76,60 +77,81 @@ class UpdateDBContentCommand extends Command
         // return Command::SUCCESS;
 
 
+        //
+        // Correction / Ajout des notes dans l'objet BookParagraph concerné
+        //
         foreach($notes as $key => $note){
 
+
+            $io->text($note->getContent());
+            $io->text('===========');
+
             //
             //
 
-            $paragraph = $this->pr->find($note->getBookParagraph());
+            $paragraph = $this->pr->findOneById($note->getBookParagraph()->getId());
+            $paragraph->addNote($note);
 
-            $content = $paragraph->getContent();
-            $content = ltrim($content, "\n\t");
-
-
-            $citation = $note->getCitation();
-            $citationIndex = $note->getCitationIndex();
-            
-            $strToPut = '<sup id="citation_'
-            . $citation
-            . '"><a class="" href="#note_'
-            . $note->getId()
-            . '">'
-            . $citation
-            . '</a></sup>';
-            
-
-            $strToReach = '<sup id="citation_'
-                        . $citation;
-
-            $strToRemove = $strToReach
-                        . '"><a class="" href="#note_'
-                        . $note->getCitation()
-                        . '">'
-                        . $citation
-                        . '</a></sup>'
-                        ;
-            
-            $lengthToRemove = mb_strlen($strToRemove);
-
-            $indexFound = mb_stripos($content, $strToReach);
-
-            $newContent = mb_substr( $content, 0, $indexFound );
-            $newContent .= $strToPut;
-            $newContent .= mb_substr( $content, $indexFound + $lengthToRemove + 11 ); // <<<<< magic 11 !-)
-
-            $io->text('<<< ' . $paragraph->getBook()->getTitle() . ' >>> ' . $paragraph->getId() );
-            // $io->text($content);
-            // $io->text($newContent);
-
-
-            $paragraph->setContent($newContent);
             $this->em->persist($paragraph);
+            $this->em->flush();
 
-            if ( !($key%20) ){
-                // every 20 paragraphs
-                $this->em->flush();
-            }
+            //
+            // jump over !!
+            // if(false){
+
+            //     dd('boum');
+
+            //     $content = $paragraph->getContent();
+            //     $content = ltrim($content, "\n\t");
+                
+            //     $citation = $note->getCitation();
+            //     $citationIndex = $note->getCitationIndex();
+                
+            //     $strToPut = '<sup id="citation_'
+            //     . $citation
+            //     . '"><a class="" href="#note_'
+            //     . $note->getId()
+            //     . '">'
+            //     . $citation
+            //     . '</a></sup>';
+            
+
+            //     $strToReach = '<sup id="citation_'
+            //                 . $citation;
+
+            //     $strToRemove = $strToReach
+            //                 . '"><a class="" href="#note_'
+            //                 . $note->getCitation()
+            //                 . '">'
+            //                 . $citation
+            //                 . '</a></sup>'
+            //                 ;
+                            
+            //                 $lengthToRemove = mb_strlen($strToRemove);
+
+            //     $indexFound = mb_stripos($content, $strToReach);
+                
+            //     $newContent = mb_substr( $content, 0, $indexFound );
+            //     $newContent .= $strToPut;
+            //     $newContent .= mb_substr( $content, $indexFound + $lengthToRemove + 11 ); // <<<<< magic 11 !-)
+
+            //     $io->text('<<< ' . $paragraph->getBook()->getTitle() . ' >>> ' . $paragraph->getId() );
+            //     // $io->text($content);
+            //     // $io->text($newContent);
+                
+                
+            //     $paragraph->setContent($newContent);
+            //     $this->em->persist($paragraph);
+                
+            // }
+            //
+            //
+
+
+            // if ( !($key%20) ){
+            //     // every 20 paragraphs
+            //     $this->em->flush();
+            // }
             // 
 
             // dd($content, $strToReach, $strToRemove, $newContent);
@@ -159,6 +181,11 @@ class UpdateDBContentCommand extends Command
     // }
     
     $this->em->flush(); // before leaving ..
+
+    $io->text('===========');
+    $io->text('nb de notes ' . $count);
+
+
     //
     return Command::SUCCESS;
 

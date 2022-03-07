@@ -526,8 +526,9 @@ class XmlParser {
 										. $htmlToAdd
 										. mb_substr($rawParagraph, $index);
 
+										
+						$bookParagraph->addNote($bookNote); //
 					}
-					$bookParagraph->addNote($bookNote); //
 				}
 
 				$bookParagraph->setContent($rawParagraph);

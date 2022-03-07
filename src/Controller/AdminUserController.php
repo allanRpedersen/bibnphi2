@@ -7,6 +7,7 @@ use App\Form\UserType;
 use App\Entity\PasswordUpdate;
 use App\Form\PasswordUpdateType;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,15 +71,25 @@ class AdminUserController extends AbstractController
      * @Route("/{id}/edit", name="admin_user_edit", methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function edit(Request $request, User $user): Response
+    public function edit(Request $request, User $user, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('user_index');
+            $userRoles = $user->getUserRoles();
+            foreach($userRoles as $userRole){
+                $userRole->addUser($user);
+                $em->persist($userRole);
+            }
+
+            $em->persist($user);
+            $em->flush();
+            
+            // $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('admin_user_index');
         }
 
         return $this->render('admin/user/edit.html.twig', [

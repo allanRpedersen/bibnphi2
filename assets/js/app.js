@@ -196,6 +196,10 @@ $(function () {
 		width: '100%',
 		placeholder: 'parmi les auteurs ...',
 	});
+
+	$('#user_userRoles').select2({
+		width: '17%',
+	});
 	
 	$('.button-new-update').on('click', function(event) {
 		event.stopPropagation();
