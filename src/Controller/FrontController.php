@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use App\Entity\SentenceSearch;
 use App\Form\SentenceSearchType;
-use App\Entity\HighlightedContent;
+// use App\Entity\HighlightedContent;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
-use App\Repository\HighlightedContentRepository;
+// use App\Repository\HighlightedContentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,15 +18,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class FrontController extends AbstractController
 {
-	private $em;
+	private $em, $br, $ar;
 
 	private $hlRepo;
 
-	public function __construct(EntityManagerInterface $em, HighlightedContentRepository $hlRepo){
+	public function __construct(	EntityManagerInterface $em,
+									BookRepository $br,
+									AuthorRepository $ar ){
 
 		$this->em = $em;
+		$this->br = $br;
+		$this->ar = $ar;
 
-		$this->hlRepo = $hlRepo;
+		// $this->hlRepo = $hlRepo;
 	}
 
 
@@ -34,26 +38,53 @@ class FrontController extends AbstractController
      * @Route("/", name="front")
 	 * @return Response
      */
-    public function index(Request $request, PaginatorInterface $paginator, BookRepository $bookRepository, AuthorRepository $authorRepository)
+    public function index(Request $request) // , PaginatorInterface $paginator)
     {
 		// init
 		//
 		$authors = [];
 		$bookList = [];
+
+		// dump( $_SESSION );
+		// dump($request);
+		// $session = $request->getSession();
+		// dump ($session->getName(), $session->getId());
+		// dd($session->all());
+
+		// $get = $request->query->get('');
+		// $post = $request->request->get('');
+	
+		// // retrieves SERVER variables
+		// $server = $request->server->get('HTTP_HOST');
+		// dd($get, $post, $server);
+
+		$session = $request->getSession();
+
+		// $session->set('TestSession', 'tchac');
+		// $session->set('TestSessionArray', ['tchac', 'tchic']);
+		// $session->set('TestSessionKeyArray', ['a'=>'aaa', 'b'=>'bbb', 'c'=>'ccc']);
+		// $session->set('SessionId', $session->getId());
+
 		
-		// dd($this->getParameter('kernel.environment'));
-		//
-		$matchingSentences = [];
-		$matchingSentence = [
-			'book' => NULL,
-			'sentence' => NULL,
-			'iNeedle' => 0,
+		// $matchingSentences = [];
+		// $matchingSentence = [
+		// 	'book' => NULL,
+		// 	'sentence' => NULL,
+		// 	'iNeedle' => 0,
+		// ];
+
+		$hlContents = [];
+		$hlContent = [
+			'bookId' => 0,
+			'contentType' => 'p',
+			'origId'	=> 0,
+			'needles'	=> [],
 		];
 
 
 		//
-		$this->hlRepo->DeleteAll();
-		$this->em->flush();
+		// $this->hlRepo->DeleteAll();
+		// $this->em->flush();
 
 		//
 		// $hlContents = $this->hlRepo->findAll();
@@ -65,7 +96,7 @@ class FrontController extends AbstractController
 		// }
 		
 		//
-		$nbBooksInLibrary = count($bookRepository->findAll());
+		$nbBooksInLibrary = count($this->br->findAll());
 
 		//
 		// the search form
@@ -83,7 +114,7 @@ class FrontController extends AbstractController
 
 					// search in all the library .. huge !-|
 					// echo "<script>alert(\"(Vous allez effectuer une recherche sur toute la bibliothèque ??-)\")</script>";
-					$bookList = $bookRepository->findAll();
+					$bookList = $this->br->findAll();
 
 								// ===================================+
 								// std execution time is 30 sec.      |
@@ -100,7 +131,7 @@ class FrontController extends AbstractController
 					// search in all the books wrote by the given author list ..
 					$authors = $search->getAuthors();
 					foreach($authors as $author){
-						$books = $bookRepository->findByAuthor($author);
+						$books = $this->br->findByAuthor($author);
 						foreach($books as $book) $bookList[] = $book;
 					}
 					
@@ -121,6 +152,8 @@ class FrontController extends AbstractController
 			$matchingBookList = [];
 			$nbFoundStrings = 0;
 
+			$hlContents = [];
+
 			foreach($bookList as $book){
 
 				$paragraphs = $book->getBookParagraphs();
@@ -135,16 +168,15 @@ class FrontController extends AbstractController
 
 						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
 
-						$foundContent = new HighlightedContent();
-
-						$foundContent
-									->setBookId($book->getId())
-									->setContentType('paragraph')
-									->setOrigId($paragraph->getId())
-									->setHighlightedString($stringToSearch)
-									->setMatchingIndexes($paragraph->getFoundStringIndexes());
+						$hlContent = [
+							'bookId' 		=> $book->getId(),
+							'contentType'	=> 'p',
+							'origId'		=> $paragraph->getId(),
+							'needles'		=> $paragraph->getFoundStringIndexes(),
+						];
 						
-						$this->em->persist($foundContent);
+						$hlContents[] = $hlContent;
+
 					}
 
 				}
@@ -158,21 +190,23 @@ class FrontController extends AbstractController
 
 						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
 
-						$foundContent = new HighlightedContent();
-
-						$foundContent
-									->setBookId($book->getId())
-									->setContentType('note')
-									->setOrigId($note->getId())
-									->setHighlightedString($stringToSearch)
-									->setMatchingIndexes($note->getFoundStringIndexes());
+						$hlContent = [
+							'bookId' 		=> $book->getId(),
+							'contentType' 	=> 'n',
+							'origId'		=> $note->getId(),
+							'needles'		=> $note->getFoundStringIndexes(),
+						];
 						
-						$this->em->persist($foundContent);
+						$hlContents[] = $hlContent;
+
 
 					}
 				}
 
-				if ($nbFoundStrings) $this->em->flush();
+				if ($nbFoundStrings){
+					$session->set('hlString', $stringToSearch);
+					$session->set('hlContents', $hlContents);
+				}
 			}
 
 			return $this->render('front/search.html.twig', [
@@ -188,9 +222,9 @@ class FrontController extends AbstractController
 		}
 
         return $this->render('front/index.html.twig', [
-			'authors' => $authorRepository->findByLastName(),
+			'authors' => $this->ar->findByLastName(),
 			// 'authors' => $paginator->paginate(
-			// 			$authorRepository->findByLastNameQuery(),
+			// 			$this->ar->findByLastNameQuery(),
 			// 			$request->query->getInt('page', 1),
 			// 			3
 			// ),

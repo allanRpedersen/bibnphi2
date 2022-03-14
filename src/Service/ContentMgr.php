@@ -14,6 +14,29 @@ class ContentMgr
     private $newContent;
 
     /**
+     * Get the value of originalContent
+     */ 
+    public function getOriginalContent(): string
+    {
+        return $this->originalContent;
+    }
+
+    /**
+     * Set the value of originalContent
+     *
+     * @return  self
+     */ 
+    public function setOriginalContent($originalContent): self
+    {
+        $this->originalContent = $originalContent;
+        $this->originalLength = mb_strlen($this->originalContent);
+        $this->encoding = mb_detect_encoding($originalContent);
+
+        return $this;
+    }
+
+
+    /**
      * 
      * 
      */
@@ -34,28 +57,6 @@ class ContentMgr
         
         $newContent .= mb_substr($this->originalContent, $fromIndex, NULL, $this->encoding);
         return $newContent;
-    }
-
-    /**
-     * Get the value of originalContent
-     */ 
-    public function getOriginalContent()
-    {
-        return $this->originalContent;
-    }
-
-    /**
-     * Set the value of originalContent
-     *
-     * @return  self
-     */ 
-    public function setOriginalContent($originalContent)
-    {
-        $this->originalContent = $originalContent;
-        $this->originalLength = mb_strlen($this->originalContent);
-        $this->encoding = mb_detect_encoding($originalContent);
-
-        return $this;
     }
 
     /**

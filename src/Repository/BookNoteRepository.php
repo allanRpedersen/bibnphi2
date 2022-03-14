@@ -47,4 +47,13 @@ class BookNoteRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    //     public function deleteAll(){
+    //         $query = $this->createQueryBuilder('e')
+    //                  ->delete()
+    //                  ->getQuery()
+    //                  ->execute();
+    //         return $query;
+    // }
+
 }

@@ -540,7 +540,7 @@ class XmlParser {
 				$this->nbParagraphs++;				
 				$this->em->persist($bookParagraph);
 				
-				$this->em->flush(); // <<<<<<<<<<<< ?? to be moved
+				$this->em->flush(); // <<<<<<<<<<<< ?? to be moved for performance ??
 			}
 			
 		}

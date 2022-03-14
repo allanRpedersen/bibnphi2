@@ -91,14 +91,56 @@ class BookParagraph
         $this->highlightedContent = '';
         $this->foundStringIndexes = [];
 
+        $excludedZones = [];
+        $excludedZone = [
+            'begin' => 0,
+            'end'   => 0,
+        ];
+
+
+        // if there are notes in this paragraph, build an exclusion zone mapping the tags <sup>..</sup>
+        if ($this->notes){
+            $excludedZoneSize = 0;
+            foreach($this->notes as $key => $note){
+
+                $begin = $note->getCitationIndex() + $key * $excludedZoneSize; // index where <sup> has been added + n *
+                $end = mb_strpos($this->content, '</sup>', $begin ) + 6; // 6 == sizeof('</sup>') !!!! !-/
+                if (!$excludedZoneSize) $excludedZoneSize = $end - $begin; // always the same size !
+
+                $excludedZone = ['begin'=>$begin,'end'=>$end];
+                $excludedZones[] = $excludedZone;
+            }
+        }
+
         //
         //
         while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
-            
-            $this->foundStringIndexes[] = $indexFound;
-            $fromIndex = $indexFound + $strLength;
-        }    
+            //
+            //
+            $excluded = false;
+            if ($excludedZones){
+                foreach($excludedZones as $excludedZone){
 
+                    if($indexFound >= $excludedZone['begin'] && $indexFound < $excludedZone['end']){
+                        $fromIndex = $excludedZone['end'];
+                        $excluded = true;
+                        break;
+                    }
+                }
+            }
+            //
+            // if the index is not in an excluded area !!
+            // surrounded by : <sup> .. </sup>
+            //
+            if (!$excluded) {
+                $this->foundStringIndexes[] = $indexFound;
+                $fromIndex = $indexFound + $strLength;
+            }
+
+        }
+
+        //
+        //
         if ($this->foundStringIndexes){
         
             $contentMgr = new ContentMgr();

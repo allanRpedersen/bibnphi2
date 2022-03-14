@@ -8,8 +8,6 @@ use App\Entity\Author;
 use App\Form\BookType;
 use App\Service\XmlParser;
 use App\Service\ContentMgr;
-use App\Entity\BookSentence;
-use App\Entity\BookParagraph;
 use App\Repository\BookNoteRepository;
 use App\Repository\BookParagraphRepository;
 use App\Repository\BookRepository;
@@ -21,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\Annotation\Route;
 use Vich\UploaderBundle\Form\Type\VichFileType;
-use App\Repository\HighlightedContentRepository;
 
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -322,95 +319,95 @@ class BookController extends AbstractController
 	/**
 	 * @Route("/{slug}/jumpTo/{whereToJump}", name="book_show_with_jump", methods={"GET"})
 	 */
-	public function showAndJump(Book $book, $whereToJump, HighlightedContentRepository $hlRepo, BookParagraphRepository $pRepo, BookNoteRepository $nRepo)
+	public function showAndJump( Request $request,
+								 Book $book, 
+								 $whereToJump, 
+								 BookParagraphRepository $pRepo, 
+								 BookNoteRepository $nRepo)
 	{
-		// This route is reached after a string research in the library
-		$highlightedContents = $hlRepo->findByBookId($book->getId());
+		$session = $request->getSession();
+		$allHlContents = $session->get('hlContents');
+		$hlContents = [];
+		
+		//
+		// Extraire les éléments hlContent associés au livre courant ..
+		foreach($allHlContents as $hlContent){
+			if($hlContent['bookId']==$book->getId()) $hlContents[] = $hlContent;
+		}
 
-		$circumArray = [];
-		$targetArray = [];
+		// $aa = $session->get('TestSession');
+		// $bb = $session->get('TestSessionArray');
+		// $cc = $session->get('TestSessionKeyArray');
+		// $dd = $session->getId(); $ee = $session->get('SessionId');
+		// $ff = $session->all();
+
+		// This route is reached after a string research in the library
+		// $highlightedContents = $hlRepo->findByBookId($book->getId());
+
+		$navLinks = [];
+
 		$hlParagraphs = [];
 		$hlNotes = [];
 
-		foreach($highlightedContents as $highlightedContent){
-			$circumArray[] = [$highlightedContent->getContentType(), $highlightedContent->getOrigId()];
+		$s = sizeof($hlContents);
+
+		for($i=0; $i < $s; $i++){
+
+			if($i < $s-1){
+				$navLinks[] = ( 'p' == $hlContents[$i+1]['contentType'] ? '_' : 'note_' ) . $hlContents[$i+1]['origId'];
+			}
+			else {
+				$navLinks[] = ( 'p' == $hlContents[0]['contentType'] ? '_' : 'note_' ) . $hlContents[0]['origId'];
+			}
 		}
 
-		if ($circumArray){
-			//
-			//
-			for ($i=0;$i<sizeof($circumArray)-1;$i++){
 
-				switch ($circumArray[$i+1][0]){
-					case 'paragraph' :
-						$targetArray[$i] = '_' . $circumArray[$i+1][1];
-						break;
-
-					case 'note' :
-						$targetArray[$i] = 'note_' . $circumArray[$i+1][1];
-						break;
-
-				}
-			}
+		$endTag = '</mark></a>' ;
+		$contentMgr = new ContentMgr();
+		
+		foreach($hlContents as $key => $hlContent){
 			
-			switch ($circumArray[0][0]){
-				case 'paragraph' :
-					$targetArray[$i]='_' . $circumArray[0][1];
-					break;
+			$indexArray = $hlContent['needles'];
+			$lengthToSurround = mb_strlen($session->get('hlString'));
 
-				case 'note' :
-					$targetArray[$i] = 'note_' . $circumArray[0][1];
-					break;
-
-			}
+			$beginTag = '<a title="Aller à la prochaine occurrence" href="#'
+					. $navLinks[$key]
+					. '"><mark>';
 			
-			$endTag = '</mark></a>' ;
-			$contentMgr = new ContentMgr();
-			
-			foreach($highlightedContents as $key => $highlightedContent){
+			switch ($hlContent['contentType']){
 				
-				$indexArray = $highlightedContent->getMatchingIndexes();
-				$lengthToSurround = mb_strlen($highlightedContent->getHighlightedString());
+				case 'p' :
+					
+					$paragraph = $pRepo->findOneById($hlContent['origId']);
+					
+					$paragraph->setHighlightedContent(
+						$contentMgr->setOriginalContent($paragraph->getContent())
+									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
+						);
+					
+					$hlParagraphs[] = $paragraph;
+				break;
 
-				$beginTag = '<a title="Aller à la prochaine occurrence" href="#'
-						. $targetArray[$key]
-						. '"><mark>';
+				case 'n' :
+
+					$note = $nRepo->findOneById($hlContent['origId']);
+
+					$note->setHighlightedContent(
+						$contentMgr->setOriginalContent($note->getContent())
+									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
+						);
+					
+					$hlNotes[] = $note;
+
+				break;
+
+				default :
+					//error
 				
-				switch ($highlightedContent->getContentType()){
-					
-					case 'paragraph' :
-						
-						$paragraph = $pRepo->findOneById($highlightedContent->getOrigId());
-						
-						$paragraph->setHighlightedContent(
-							$contentMgr->setOriginalContent($paragraph->getContent())
-										->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
-							);
-						
-						$hlParagraphs[] = $paragraph;
-					break;
-
-					case 'note' :
-
-						$note = $nRepo->findOneById($highlightedContent->getOrigId());
-
-						$note->setHighlightedContent(
-							$contentMgr->setOriginalContent($note->getContent())
-										->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
-							);
-						
-						$hlNotes[] = $note;
-
-					break;
-
-					default :
-						//error
-					
-
-				}
-
 
 			}
+
+
 		}
 
         return $this->render('book/show.html.twig', [
