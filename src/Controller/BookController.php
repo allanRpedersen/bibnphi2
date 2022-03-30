@@ -16,21 +16,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\Annotation\Route;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 //
 // $bool=pcntl_async_signals(true);
@@ -327,6 +321,7 @@ class BookController extends AbstractController
 	{
 		$session = $request->getSession();
 		$allHlContents = $session->get('hlContents');
+		$hlString = $session->get('hlString');
 		$hlContents = [];
 		
 		//
@@ -380,11 +375,10 @@ class BookController extends AbstractController
 					
 					$paragraph = $pRepo->findOneById($hlContent['origId']);
 					
-					$paragraph->setHighlightedContent(
-						$contentMgr->setOriginalContent($paragraph->getContent())
-									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
-						);
-					
+					$paragraph->setFoundStringIndexes($hlContent['needles']);
+					$paragraph->setSearchedString($hlString);
+					$paragraph->setNextOccurence($navLinks[$key]);
+
 					$hlParagraphs[] = $paragraph;
 				break;
 
@@ -553,6 +547,7 @@ class BookController extends AbstractController
 			passthru('rm -v books/'. $dirName . ' > /dev/null 2>&1', $errCode );
 
 			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
+			$this->logger->info('Was parsed in : ' . $book->getParsingTime() . 'sec.');
 
 			// remove .whatever to get directory name << buggy !-(
 			$dirName = substr($dirName, 0, strpos($dirName, '.'));

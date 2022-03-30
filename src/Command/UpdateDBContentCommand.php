@@ -67,6 +67,8 @@ class UpdateDBContentCommand extends Command
 
         $notes = $this->nr->findAll();
         $count = count($notes);
+
+        $processAll = false;
         
 
         // foreach($notes as $note){
@@ -79,106 +81,114 @@ class UpdateDBContentCommand extends Command
 
         //
         // Correction / Ajout des notes dans l'objet BookParagraph concerné
+
+        // Suppression du formatage relatif aux notes inscrits "en dur" dans les paragraphes
         //
         foreach($notes as $key => $note){
 
 
-            $io->text($note->getContent());
-            $io->text('===========');
+            // $io->text($note->getContent());
+            $io->text('=====' . $note->getId() . '======');
 
             //
             //
 
             $paragraph = $this->pr->findOneById($note->getBookParagraph()->getId());
-            $paragraph->addNote($note);
+            //$paragraph->addNote($note);
 
-            $this->em->persist($paragraph);
-            $this->em->flush();
-
-            //
-            // jump over !!
-            // if(false){
-
-            //     dd('boum');
-
-            //     $content = $paragraph->getContent();
-            //     $content = ltrim($content, "\n\t");
-                
-            //     $citation = $note->getCitation();
-            //     $citationIndex = $note->getCitationIndex();
-                
-            //     $strToPut = '<sup id="citation_'
-            //     . $citation
-            //     . '"><a class="" href="#note_'
-            //     . $note->getId()
-            //     . '">'
-            //     . $citation
-            //     . '</a></sup>';
+            $content = $paragraph->getContent(true); // raw .. without formatting
             
+            $citation = $note->getCitation();
 
-            //     $strToReach = '<sup id="citation_'
-            //                 . $citation;
+            $strToReach = '<sup id="citation_'
+                        . $citation
+                        . '"><a class="" href="#note_'
+                        ;
 
-            //     $strToRemove = $strToReach
-            //                 . '"><a class="" href="#note_'
-            //                 . $note->getCitation()
-            //                 . '">'
-            //                 . $citation
-            //                 . '</a></sup>'
-            //                 ;
-                            
-            //                 $lengthToRemove = mb_strlen($strToRemove);
+            $strToRemove = $strToReach
+                        . $note->getId()
+                        . '">'
+                        . $citation
+                        . '</a></sup>'
+                        ;
+ 
+            $lengthToRemove = mb_strlen($strToRemove);
 
-            //     $indexFound = mb_stripos($content, $strToReach);
-                
-            //     $newContent = mb_substr( $content, 0, $indexFound );
-            //     $newContent .= $strToPut;
-            //     $newContent .= mb_substr( $content, $indexFound + $lengthToRemove + 11 ); // <<<<< magic 11 !-)
 
-            //     $io->text('<<< ' . $paragraph->getBook()->getTitle() . ' >>> ' . $paragraph->getId() );
-            //     // $io->text($content);
-            //     // $io->text($newContent);
-                
-                
-            //     $paragraph->setContent($newContent);
-            //     $this->em->persist($paragraph);
-                
+            // if (!$processAll){
+            //     switch($io->choice('validate this content ? ',['yes','no','all'],'yes')){
+            //         case 'all' :
+            //             $processAll = true;
+            //             $io->text('all');
+
+            //         case 'yes' :
+            //             // $paragraph->setContent($newContent);
+            //             // $this->em->persist($paragraph);
+            //             // $this->em->flush();
+            //             $io->text('yes');
+            //             break;
+
+            //         case 'no' :
+            //             $io->text('no');
+            //             break;
+
+            //     }
             // }
-            //
-            //
 
+            
+            if ($indexFound = mb_stripos($content, $strToReach)){
+                $newContent = mb_substr( $content, 0, $indexFound );
+                $newContent .= mb_substr( $content, $indexFound + $lengthToRemove );
+
+
+                $io->text('<<< ' . $paragraph->getBook()->getTitle() . ' >>> ' . $paragraph->getId() );
+                $io->text($content);
+                $io->text('<< replaced by >>');
+                $io->text($newContent);
+
+                if (!$processAll){
+                    switch($io->choice('validate this content ? ',['yes','no','all'],'yes')){
+                        case 'all' :
+                            $processAll = true;
+                            $io->text('all');
+
+                        case 'yes' :
+                            $paragraph->setContent($newContent);
+                            $this->em->persist($paragraph);
+                            $this->em->flush();
+                            $io->text('yes');
+                            break;
+
+                        case 'no' :
+                            $io->text('no');
+                            break;
+
+                    }
+                }
+                else {
+                    $paragraph->setContent($newContent);
+                    $this->em->persist($paragraph);
+                    $this->em->flush();
+                }
+
+  
+                // if ($io->confirm("validate new content",false))
+                // {
+                //     $paragraph->setContent($newContent);
+                //     $this->em->persist($paragraph);
+                //     $this->em->flush();
+                // }
+            };
+
+
+            
 
             // if ( !($key%20) ){
             //     // every 20 paragraphs
             //     $this->em->flush();
             // }
-            // 
 
-            // dd($content, $strToReach, $strToRemove, $newContent);
-
-
-
-            // $indexesFound = [];
-            // //
-            // //
-            // while (FALSE !== ($indexFound = mb_stripos($content, $strToRemove, $fromIndex))){
-
-            //     $indexesFound[] = $indexFound;
-            //     $fromIndex = $indexFound + $lengthToRemove;
-
-            // }
-
-            // $nbFound = count($indexesFound);
-
-            // dd($content, $strToRemove, $indexesFound);
-
-            //
         }
-
-    // foreach($paragraphs as $paragraph)
-    // {
-    //     $io->text($paragraph->getContent());
-    // }
     
     $this->em->flush(); // before leaving ..
 

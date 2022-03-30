@@ -62,7 +62,7 @@ function setProgressBar(){
 	progressFileName = protocol_host + '/percentProgress.log';
 	console.log('setProgressBar, avec le fichier de progress : ' + progressFileName );
 
-	setInterval(renderProgressBar, 700); // 700 ~ 900 ??
+	setInterval(renderProgressBar, 1000); // en millisecondes
 
 }
 
@@ -99,7 +99,7 @@ function unsetProgressBar(){
 
 
 	var myRequest = new Request(progressFileName, myInit);
-	console.log(myRequest);
+	// console.log(myRequest);
 	// console.log('fetch: ' + fileName);
     fetch(myRequest)
     .then(function(response) {

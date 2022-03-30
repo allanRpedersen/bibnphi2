@@ -4,10 +4,8 @@ namespace App\Controller;
 
 use App\Entity\SentenceSearch;
 use App\Form\SentenceSearchType;
-// use App\Entity\HighlightedContent;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
-// use App\Repository\HighlightedContentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,22 +13,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-
+/**
+ * 
+ */
 class FrontController extends AbstractController
 {
-	private $em, $br, $ar;
+	private $br, $ar; 
 
-	private $hlRepo;
+	public function __construct( AuthorRepository $ar, BookRepository $br ){
 
-	public function __construct(	EntityManagerInterface $em,
-									BookRepository $br,
-									AuthorRepository $ar ){
-
-		$this->em = $em;
 		$this->br = $br;
 		$this->ar = $ar;
 
-		// $this->hlRepo = $hlRepo;
 	}
 
 
@@ -38,40 +32,14 @@ class FrontController extends AbstractController
      * @Route("/", name="front")
 	 * @return Response
      */
-    public function index(Request $request) // , PaginatorInterface $paginator)
+    public function index(Request $request): Response // , PaginatorInterface $paginator)
     {
 		// init
 		//
 		$authors = [];
 		$bookList = [];
 
-		// dump( $_SESSION );
-		// dump($request);
-		// $session = $request->getSession();
-		// dump ($session->getName(), $session->getId());
-		// dd($session->all());
-
-		// $get = $request->query->get('');
-		// $post = $request->request->get('');
-	
-		// // retrieves SERVER variables
-		// $server = $request->server->get('HTTP_HOST');
-		// dd($get, $post, $server);
-
 		$session = $request->getSession();
-
-		// $session->set('TestSession', 'tchac');
-		// $session->set('TestSessionArray', ['tchac', 'tchic']);
-		// $session->set('TestSessionKeyArray', ['a'=>'aaa', 'b'=>'bbb', 'c'=>'ccc']);
-		// $session->set('SessionId', $session->getId());
-
-		
-		// $matchingSentences = [];
-		// $matchingSentence = [
-		// 	'book' => NULL,
-		// 	'sentence' => NULL,
-		// 	'iNeedle' => 0,
-		// ];
 
 		$hlContents = [];
 		$hlContent = [
@@ -82,19 +50,6 @@ class FrontController extends AbstractController
 		];
 
 
-		//
-		// $this->hlRepo->DeleteAll();
-		// $this->em->flush();
-
-		//
-		// $hlContents = $this->hlRepo->findAll();
-		// if (count($hlContents)){
-		// 	foreach($hlContents as $hlContent){
-		// 		$this->em->remove($hlContent);
-		// 	}
-		// 	$this->em->flush();
-		// }
-		
 		//
 		$nbBooksInLibrary = count($this->br->findAll());
 
@@ -198,7 +153,6 @@ class FrontController extends AbstractController
 						];
 						
 						$hlContents[] = $hlContent;
-
 
 					}
 				}

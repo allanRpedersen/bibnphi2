@@ -210,104 +210,6 @@ class XmlParser {
 	}
 
 
-	/**
-	 * 
-	 *
-	 * 
-	 * 
-	 * 
-	 */
-
-	public function parse_async()
-	{
-
-
-		//
-		if ($this->timeStart == 0){
-
-			// various initialization settings
-			$this->noteCollection = [];
-			$this->text = '';
-			$this->nbWords = 0;
-			$this->nbSentences = 0;
-			$this->nbParagraphs = 0;
-			$this->numBuffer= 0;
-
-			// init parsing time 
-			$this->timeStart = microtime(true);
-			if ($this->ratio > 3) ini_set('max_execution_time', '0'); // no execution time out !
-
-			$this->parser = xml_parser_create();
-
-			//
-			// set up the handlers
-			xml_set_element_handler($this->parser, [$this, "start_element_handler"], [$this, "end_element_handler"]);
-			xml_set_character_data_handler($this->parser, [$this, "character_data_handler"]);
-
-		}
-
-		//
-		if ( $this->xmlfh ){
-
-			// if( ($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE ){
-			// 	$this->numBuffer ++;
-	
-			// 	xml_parse($this->parser, $buffer);
-			// 	$this->logger->info('n° read buffer : ' . $this->numBuffer );
-
-			// }
-			// else {
-			// 	xml_parse($this->parser, '', true); // to finalize parsing
-			// 	xml_parser_free($this->parser);
-			// 	unset($this->parser);
-	
-			// 	if (feof($this->xmlfh)){
-			// 		$this->parsingCompleted = true;
-			// 		$this->parsingTime = \microtime(true) - $this->timeStart;
-			// 		$this->logger->info("ParsingCompleted : " . $this->parsingTime);
-			// 	}
-			// 	else {
-			// 		$this->parsingTime = -1;
-			// 		$this->logger->info("ERREUR: feof(xmlFile) retourne FALSE !! ???");
-			// 	}
-			// 	fclose($this->xmlfh);
-			// }
-
-
-			// while (($buffer = fread($this->xmlfh, self::READ_BUFFER_SIZE)) != FALSE){
-			while (($buffer = fread($this->xmlfh, $this->READ_BUFFER_SIZE)) != FALSE){
-
-				$this->numBuffer ++;
-				$percentProgress = intval($this->numBuffer / $this->ratio *100) . '%';
-	
-				xml_parse($this->parser, $buffer);
-
-				$this->logger->info('n° read buffer : ' . $this->numBuffer . ' / ' . $this->ratio );
-				$this->logger->info('percentProgress : ' . $percentProgress );
-
-				file_put_contents('percentProgress.log', $percentProgress);
-
-			}
-
-			xml_parse($this->parser, '', true); // to finalize parsing
-			xml_parser_free($this->parser);
-			unset($this->parser);
-
-			if (feof($this->xmlfh)) {
-				$this->parsingCompleted = true;
-				$this->parsingTime = \microtime(true) - $this->timeStart;
-				$this->logger->info("ParsingCompleted : " . $this->parsingTime);
-			}
-			else {
-				$this->logger->info("ERREUR: feof(xmlFile) retourne FALSE !! ???");
-			}
-			fclose($this->xmlfh);
-
-		}
-
-	}
-
-
 
 	/**
 	 *      O D T   X M L   p a r s i n g
@@ -478,7 +380,7 @@ class XmlParser {
 			// }
 
 
-			// remove all non-breaking spaces !! ( regex / /u means unicode support )
+			// remove all non-breaking spaces !! (  "/ regex /u" means unicode support )
 			// 
 			$rawParagraph = preg_replace("/[\x{00a0}\s]+/u", " ", $rawParagraph);
 			$rawParagraph = ltrim($rawParagraph);
@@ -496,6 +398,7 @@ class XmlParser {
 					foreach($noteCollection as $key => $note){
 
 						$bookNote = new BookNote();
+
 						$bookNote->setBook($this->book);
 						$bookNote->setBookParagraph($bookParagraph);
 
@@ -505,28 +408,6 @@ class XmlParser {
 
 						$this->em->persist($bookNote);
 
-						$citation = $note['citation'];
-						$index = $note['index'];
-
-						$htmlToAdd = '<sup id="citation_'
-									. $citation
-									. '"><a class="" href="#note_'
-									. $bookNote->getId()
-									.'">'
-									. $citation
-									. '</a></sup>';
-						
-						// in case of several notes in the paragraph ..
-						// .. add the length of each previous html string inserted to the index
-						$index = $index + $indexShift;
-						$indexShift += strlen($htmlToAdd);
-
-						// inject html to set superscript note tags
-						$rawParagraph = mb_substr($rawParagraph, 0, $index)
-										. $htmlToAdd
-										. mb_substr($rawParagraph, $index);
-
-										
 						$bookParagraph->addNote($bookNote); //
 					}
 				}
@@ -540,7 +421,8 @@ class XmlParser {
 				$this->nbParagraphs++;				
 				$this->em->persist($bookParagraph);
 				
-				$this->em->flush(); // <<<<<<<<<<<< ?? to be moved for performance ??
+				$this->em->flush(); // <<<<<<<<<<<< ?? can it be done later, to flush several paragraphs at once ??
+
 			}
 			
 		}

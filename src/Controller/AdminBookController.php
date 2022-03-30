@@ -2,12 +2,17 @@
 
 namespace App\Controller;
 
+use Monolog\Logger;
 use App\Entity\Book;
 use App\Repository\BookRepository;
+use Monolog\Handler\StreamHandler;
 use App\Repository\AuthorRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -16,6 +21,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminBookController extends AbstractController
 {
+    public function __construct(KernelInterface $kernel, EntityManagerInterface $em, UploaderHelper $uploaderHelper)
+	{
+		$this->projectDir = $kernel->getProjectDir();
+
+		$this->em = $em;
+
+		$this->uploaderHelper = $uploaderHelper;
+
+		$this->logger = new Logger('bibnphi');
+		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/public/bibnphi.log', Logger::DEBUG) );
+
+
+	}
+
     /**
      * @Route("/book/{sortBy}", name="admin_book_index")
      */
@@ -40,17 +59,14 @@ class AdminBookController extends AbstractController
                 
             case 'Author':
                 $authors = $authorRepo->findAll();
+
                 $books = [];
                 foreach( $authors as $author){
-                    $books[] = $author->getBooks();
+                    foreach( $author->getBooks() as $book )$books[] = $book;
                 }
 
                 break;
                 
-            // default:
-            //     $books = $repo->findByTitle();
-            //     break;
-    
         }
 
         return $this->render('admin/book/index.html.twig', [
@@ -78,6 +94,9 @@ class AdminBookController extends AbstractController
 			passthru('rm -v books/'. $dirName . ' >>books/sorties_console 2>&1', $errCode );
 
 			// $this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
+			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
+			$this->logger->info('Was parsed in : ' . $book->getParsingTime() . 'sec.');
+
 
 			// remove .whatever to get directory name << buggy !-(
 			$dirName = substr($dirName, 0, strpos($dirName, '.'));
