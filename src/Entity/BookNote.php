@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Service\ContentMgr;
+// use App\Service\ContentMgr;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookNoteRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -48,11 +48,11 @@ class BookNote
     private $content;
 
     /**
-     * Content modified if the note matches a searched string 
      * 
-     */
-    private $highlightedContent;
+     */    
     private $foundStringIndexes = [];
+    private $searchedString = '';
+    private $nextOccurence;
 
     public function getId(): ?int
     {
@@ -85,7 +85,7 @@ class BookNote
 
     public function getContent(): ?string
     {
-        return($this->highlightedContent?$this->highlightedContent:$this->content);
+        return $this->content;
         }
 
     public function setContent(string $content): self
@@ -119,27 +119,90 @@ class BookNote
         return $this;
     }
 
-
-
     /**
-     * Get the content modified if the note matches a searched string
-     */ 
-    public function getHighlightedContent()
+     * 
+     */
+    public function getFormattedContent(): string
     {
-        return $this->highlightedContent;
+        $htmlToInsert = [];
+        $formattedContent = '';
+
+        // les index des sous-chaîne(s) à afficher en surbrillance
+        if (count($this->foundStringIndexes)){
+
+            // $beginTag = '<mark>';
+            // $endTag = '</mark>';
+
+            if ($this->nextOccurence){
+
+                $beginTag = '<a title="Aller à la prochaine occurrence" href="#'
+                . $this->nextOccurence
+                . '"><mark>';
+            }
+            else
+            {   
+                $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
+                . $this->book->getSlug()
+                . '/jumpTo/note_'
+                . $this->id
+                . '"><mark>';
+            }
+	    	
+            $endTag = '</mark></a>';
+
+            $strLength = mb_strlen($this->searchedString);
+
+            foreach($this->foundStringIndexes as $foundStringIndex){
+
+                    $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
+                    $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+
+            }
+                //
+            //
+            $indexes = array_column($htmlToInsert, 'index');
+            array_multisort($indexes, SORT_ASC, $htmlToInsert);
+
+            //
+            //
+            $currentIndex = 0;
+            $insertIndex = 0;
+            for($i=0; $i<count($htmlToInsert); $i++){
+
+                $insertIndex = $htmlToInsert[$i]['index'];
+                $formattedContent .= mb_substr($this->content, $currentIndex, $insertIndex-$currentIndex);
+                $formattedContent .= $htmlToInsert[$i]['string'];
+                $currentIndex = $insertIndex;
+            }
+            $formattedContent .= mb_substr($this->content, $insertIndex);
+
+            return $formattedContent;
+
+        }
+
+        return $this->content;
+
     }
 
-    /**
-     * Set the content modified if the note matches a searched string
-     *
-     * @return  self
-     */ 
-    public function setHighlightedContent($highlightedContent)
-    {
-        $this->highlightedContent = $highlightedContent;
+    // /**
+    //  * Get the content modified if the note matches a searched string
+    //  */ 
+    // public function getHighlightedContent()
+    // {
+    //     return $this->highlightedContent;
+    // }
 
-        return $this;
-    }
+    // /**
+    //  * Set the content modified if the note matches a searched string
+    //  *
+    //  * @return  self
+    //  */ 
+    // public function setHighlightedContent($highlightedContent)
+    // {
+    //     $this->highlightedContent = $highlightedContent;
+
+    //     return $this;
+    // }
 
     /**
      * isContentMatching
@@ -150,9 +213,10 @@ class BookNote
         
         $fromIndex = 0;
         $indexFound = 0;
-        $strLength = mb_strlen($stringToSearch);
         $this->highlightedContent = '';
         $this->foundStringIndexes = [];
+        $this->searchedString = $stringToSearch;
+        $strLength = mb_strlen($this->searchedString);
 
         //
         //
@@ -163,21 +227,21 @@ class BookNote
 
         }
 
-        if ($this->foundStringIndexes){
+        // if ($this->foundStringIndexes){
         
-            $contentMgr = new ContentMgr();
-            $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
-                        . $this->book->getSlug()
-                        . '/jumpTo/note_'
-                        . $this->id
-                        . '"><mark>';
-            $endTag = '</mark></a>';
+        //     $contentMgr = new ContentMgr();
+        //     $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
+        //                 . $this->book->getSlug()
+        //                 . '/jumpTo/note_'
+        //                 . $this->id
+        //                 . '"><mark>';
+        //     $endTag = '</mark></a>';
     
-            $this->highlightedContent = $contentMgr
-                                            ->setOriginalContent($this->content)
-                                            ->addTags($this->foundStringIndexes, $strLength, $beginTag, $endTag);
+        //     $this->highlightedContent = $contentMgr
+        //                                     ->setOriginalContent($this->content)
+        //                                     ->addTags($this->foundStringIndexes, $strLength, $beginTag, $endTag);
     
-        }
+        // }
 
         // false if empty !!
         return ($this->foundStringIndexes);
@@ -202,6 +266,30 @@ class BookNote
     public function setFoundStringIndexes($foundStringIndexes)
     {
         $this->foundStringIndexes = $foundStringIndexes;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of nextOccurence
+     *
+     * @return  self
+     */ 
+    public function setNextOccurence($nextOccurence)
+    {
+        $this->nextOccurence = $nextOccurence;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of searchedString
+     *
+     * @return  self
+     */ 
+    public function setSearchedString($searchedString)
+    {
+        $this->searchedString = $searchedString;
 
         return $this;
     }

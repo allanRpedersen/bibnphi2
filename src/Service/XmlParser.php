@@ -364,11 +364,8 @@ class XmlParser {
 
 		if ($rawParagraph != ''){
 
-			// $entityManager = $this->getDoctrine()->getManager(); <<<<<<<< !!!!!
-
-			
 			// split the paragraph using the punctuation signs [.?!], into sentences
-			// with a negative look-behind feature to exclude :
+			// with a "negative look-behind feature" to exclude :
 			// 			- roman numbers (example CXI.)
 			//			- ordered list ( 1. aaa 2. bbb 3. ccc etc)
 			//			- S. as St, Saint

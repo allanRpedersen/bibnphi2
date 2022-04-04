@@ -21,13 +21,13 @@
 
 					{% for paragraph in paragraphs %}
 						{% if paragraph.book.id == book.id %}
-						<p class="p-justify">{{paragraph.content|raw}}</p>
+						<p class="p-justify">{{paragraph.formattedContent|raw}}</p>
 						{% endif %}
 					{% endfor %}
 					
 					{% for note in notes %}
 						{% if note.book.id == book.id %}
-						<p class="p-justify"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{note.content|raw}}</p>
+						<p class="p-justify"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{note.formattedContent|raw}}</p>
 						{% endif %}
 					{% endfor %}
 

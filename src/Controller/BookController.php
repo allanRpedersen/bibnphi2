@@ -320,6 +320,9 @@ class BookController extends AbstractController
 								 BookNoteRepository $nRepo)
 	{
 		$session = $request->getSession();
+
+		// after a search, the matching strings are parameters of the session
+		// $hlString: searched string, $allHlContents: array of needles index which may referenced several books
 		$allHlContents = $session->get('hlContents');
 		$hlString = $session->get('hlString');
 		$hlContents = [];
@@ -329,15 +332,6 @@ class BookController extends AbstractController
 		foreach($allHlContents as $hlContent){
 			if($hlContent['bookId']==$book->getId()) $hlContents[] = $hlContent;
 		}
-
-		// $aa = $session->get('TestSession');
-		// $bb = $session->get('TestSessionArray');
-		// $cc = $session->get('TestSessionKeyArray');
-		// $dd = $session->getId(); $ee = $session->get('SessionId');
-		// $ff = $session->all();
-
-		// This route is reached after a string research in the library
-		// $highlightedContents = $hlRepo->findByBookId($book->getId());
 
 		$navLinks = [];
 
@@ -357,21 +351,11 @@ class BookController extends AbstractController
 		}
 
 
-		$endTag = '</mark></a>' ;
-		$contentMgr = new ContentMgr();
-		
 		foreach($hlContents as $key => $hlContent){
-			
-			$indexArray = $hlContent['needles'];
-			$lengthToSurround = mb_strlen($session->get('hlString'));
-
-			$beginTag = '<a title="Aller à la prochaine occurrence" href="#'
-					. $navLinks[$key]
-					. '"><mark>';
-			
+						
 			switch ($hlContent['contentType']){
 				
-				case 'p' :
+				case 'p' : // paragraph
 					
 					$paragraph = $pRepo->findOneById($hlContent['origId']);
 					
@@ -382,17 +366,15 @@ class BookController extends AbstractController
 					$hlParagraphs[] = $paragraph;
 				break;
 
-				case 'n' :
+				case 'n' : // note
 
 					$note = $nRepo->findOneById($hlContent['origId']);
 
-					$note->setHighlightedContent(
-						$contentMgr->setOriginalContent($note->getContent())
-									->addTags($indexArray, $lengthToSurround, $beginTag, $endTag )
-						);
+					$note->setFoundStringIndexes($hlContent['needles']);
+					$note->setSearchedString($hlString);
+					$note->setNextOccurence($navLinks[$key]);
 					
 					$hlNotes[] = $note;
-
 				break;
 
 				default :
@@ -401,14 +383,13 @@ class BookController extends AbstractController
 
 			}
 
-
 		}
 
         return $this->render('book/show.html.twig', [
             'book'			=> $book,
 			'jump2'			=> $whereToJump,
-			'hlParagraphs'	=> $hlParagraphs,
-			'hlNotes'		=> $hlNotes,
+			// 'hlParagraphs'	=> $hlParagraphs,
+			// 'hlNotes'		=> $hlNotes,
         ]);
 
 

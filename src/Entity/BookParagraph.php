@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Service\ContentMgr;
+// use App\Service\ContentMgr;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookParagraphRepository;
 use Doctrine\Common\Collections\Collection;
@@ -36,41 +36,16 @@ class BookParagraph
     /**
      * @ORM\Column(type="text")
      * 
-     * Le contenu du paragraphe 'raw' cad sans aucun attribut de mise en forme ou de citation de note
+     * Le contenu brut du paragraphe cad sans aucun attribut de mise en forme ou de citation de note
      * 
      */
     private $content;
 
-    /**
-     * Le contenu mise en forme pour l'affichage.
-     * C'est le contenu brut dans lequel sont ajoutés des balises de mise en forme.
-     * 
-     * 1- présence de notes, ajout des citations encadrées par des balises <sup><a href="note_$noteId>..</a></sup>
-     * 2- application du surlignage <mark>..</mark>
-     * 3- application de styles, <strong>, <em>, .. (à venir)
-     * 
-     */
-    private $formattedContent;
-
-    /**
-     * 
-     * Dans le cas d'une recherche réussie, le contenu du paragraphe
-     * est enrichi par des balises <span class="found-content"></span>
-     * qui encadrent les chaînes recherchées.
-    */
-    private $highlightedContent;
-    
-    // Tableau/Collection des indices des occurences de la chaine recherchée dans le paragraphe
-    private $foundStringIndexes = [];
-    private $searchedString = '';
-    private $nextOccurence;
-
-    private $noteCitationIndexes = [];
-
-    private $searchResult = [
-        'needle' => '',
-        'indexes' => [],
-    ];
+    // Recherche de chaîne de cararactères dans le paragraphe.
+    //
+    private $foundStringIndexes = []; // Les indices des occurences de la chaine recherchée dans le paragraphe
+    private $searchedString = '';   // La chaîne recherchée
+    private $nextOccurence;         // la prochaine occurence dans le livre (paragraphe ou note)
 
 
     public function __construct()
@@ -97,6 +72,9 @@ class BookParagraph
         return $this;
     }
 
+    /**
+     * 
+     */
     public function isContentMatching($stringToSearch) : array
     {
         $encoding = mb_detect_encoding($this->content);
@@ -105,82 +83,18 @@ class BookParagraph
         $indexFound = 0;
         $strLength = mb_strlen($stringToSearch);
 
-        $this->highlightedContent = '';
+        // $this->highlightedContent = '';
         $this->foundStringIndexes = [];
         $this->searchedString = $stringToSearch;
 
-        // $excludedZones = [];
-        // $excludedZone = [
-        //     'begin' => 0,
-        //     'end'   => 0,
-        // ];
-
-
-        // // if there are notes in this paragraph, build an exclusion zone mapping the tags <sup>..</sup>
-        // if ($this->notes){
-        //     $excludedZoneSize = 0;
-        //     foreach($this->notes as $key => $note){
-
-        //         $begin = $note->getCitationIndex() + $key * $excludedZoneSize; // index where <sup> has been added + n *
-        //         $end = mb_strpos($this->content, '</sup>', $begin ) + 6; // 6 == sizeof('</sup>') !!!! !-/
-        //         if (!$excludedZoneSize) $excludedZoneSize = $end - $begin; // always the same size !
-
-        //         $excludedZone = ['begin'=>$begin,'end'=>$end];
-        //         $excludedZones[] = $excludedZone;
-        //     }
-        // }
-
-        // //
-        // //
-        // while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
-        //     //
-        //     //
-        //     $excluded = false;
-        //     if ($excludedZones){
-        //         foreach($excludedZones as $excludedZone){
-
-        //             if($indexFound >= $excludedZone['begin'] && $indexFound < $excludedZone['end']){
-        //                 $fromIndex = $excludedZone['end'];
-        //                 $excluded = true;
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     //
-        //     // if the index is not in an excluded area !!
-        //     // surrounded by : <sup> .. </sup>
-        //     //
-        //     if (!$excluded) {
-        // }
-
+        //
+        //
         while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
 
             $this->foundStringIndexes[] = $indexFound;
             $fromIndex = $indexFound + $strLength;
 
         }
-
-        //
-        //
-        // if ($this->foundStringIndexes){
-        
-        //     $contentMgr = new ContentMgr();
-        //     $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
-        //                 . $this->book->getSlug()
-        //                 . '/jumpTo/_'
-        //                 . $this->id
-        //                 . '"><mark>';
-        //     $endTag = '</mark></a>';
-    
-        //     $this->highlightedContent = $contentMgr
-        //                                     ->setOriginalContent($this->content)
-        //                                     ->addTags($this->foundStringIndexes, $strLength, $beginTag, $endTag);
-
-        // }
-
-        // $this->searchResult[] = [$stringToSearch, $this->foundStringIndexes];
-
-
 
         // false if empty !!
         return ($this->foundStringIndexes);
@@ -218,10 +132,11 @@ class BookParagraph
 
     public function getContent($raw=false): ?string
     {
+        return($this->content);
+        
         if ($raw) return($this->content);
         return($this->getFormattedContent());
-        // return($this->highlightedContent?$this->highlightedContent:$this->content);
-        // return($this->content);
+
     }
 
     public function setContent(string $content): self
@@ -231,20 +146,15 @@ class BookParagraph
         return $this;
     }
 
-    public function getHighlightedContent(): ?string
-    {
-        return $this->highlightedContent;
-    }
-
-    public function setHighlightedContent(string $highlightedContent): self
-    {
-        $this->highlightedContent = $highlightedContent;
-
-        return $this;
-    }
-
     /**
-     * construit et retourne le contenu mise en forme pour l'affichage.
+     * Construit et retourne le contenu mise en forme pour l'affichage.
+     *
+     * C'est le contenu brut dans lequel sont ajoutés des balises de mise en forme.
+     * 
+     * 1- présence de notes, ajout des citations encadrées par des balises <sup><a href="note_$noteId>..</a></sup>
+     * 2- application du surlignage <mark>..</mark>
+     * 3- application de styles, <strong>, <em>, .. (à venir)
+     * 
      */ 
     public function getFormattedContent(): string
     {
@@ -254,7 +164,7 @@ class BookParagraph
 
         // du coup on "glane" les mises en forme
 
-        // sous-chaîne(s) à afficher en surbrillance
+        // les index des sous-chaîne(s) à afficher en surbrillance
         if (count($this->foundStringIndexes)){
 
             // $beginTag = '<mark>';
@@ -306,7 +216,7 @@ class BookParagraph
             }
         }
 
-        // si mises en forme, on les insère ..
+        // si on trouve des mises en forme, on les insère ..
         if ($htmlToInsert){
 
             //

@@ -8,46 +8,38 @@
 		<div id="book-display-leftside">
 			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}">{{ book.author.lastName }}</a></h3>
 			<p>{{ book.summary }}</p>
+			<p></p>
+				<div style="display: flex;">
+					<a class="btn btn-outline-dark" style="margin-right: 5px;" href="/books/{{ book.odtBookName }}">Télécharger</a>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-				<a class="btn btn-info" title="modifier" href="{{ path('book_edit', {'slug': book.slug}) }}">
-					<i class="fas fa-edit" style="width: 15px; font-size:15px"></i></a>
-				<form method="post"
-					action="{{ path('book_delete', {'slug': book.slug}) }}"
-					onsubmit="confirm('Voulez vous vraiment supprimer cette entrée ?');">
-					<input type="hidden" name="_method" value="DELETE">
-					<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ book.id) }}">
-					<button class="btn btn-danger mt-2"><i class="fas fa-trash" style="width: 15px; font-size:15px"></i></button>
-				</form>
-					
-				{# {{ include('book/_delete_form.html.twig') }} #}
+					<a class="btn btn-outline-info" title="modifier" href="{{ path('book_edit', {'slug': book.slug}) }}">
+						<i class="fas fa-edit"></i></a>
+					<form method="post"
+						action="{{ path('book_delete', {'slug': book.slug}) }}"
+						onsubmit="return confirm('Voulez vous vraiment supprimer cette entrée ?');">
+						<input type="hidden" name="_method" value="DELETE">
+						<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ book.id) }}">
+						<button class="btn btn-outline-danger" title="supprimer"><i class="fas fa-trash"></i></button>
+					</form>
 			{% endif %}
+				</div>	
+				{# {{ include('book/_delete_form.html.twig') }} #}
 
 		</div>
 		<div id="book-display-rightside">
 			{% for paragraph in book.bookParagraphs %}
-				{# {% if hlParagraphs is defined %}
-					{% if paragraph in hlParagraphs %}
-						<p class="p-justify" id="_{{ paragraph.id }}">[hlContent]{{ paragraph.content | raw }}</p>
-					{% endif %}
-				{% else %}
-				<p class="p-justify" id="_{{ paragraph.id }}">{{ paragraph.content | raw }}</p>
-				{% endif %} #}
 				<p class="p-justify" id="_{{ paragraph.id }}">
 					{% if is_granted('ROLE_ADMIN')%}
 					<a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
 					{% endif %}
-					{{ paragraph.content | raw }}
+					{{ paragraph.FormattedContent | raw }}
 				</p>
 			{% endfor %}
 		
 			{% for note in book.bookNotes %}
-				{# {% if hlNotes is defined %}
-					{% if paragraph in hlNotes %}
-						<p class="p-justify" id="note_{{ note.citation }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a>[hlContent]</sup>~{{ note.content | raw }}</p>
-						{% endif %}
-				{% else %}
-				{% endif %} #}
-				<p class="p-justify" id="note_{{ note.id }}"><sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.content | raw }}</p>
+				<p class="p-justify" id="note_{{ note.id }}">
+					<sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.formattedContent | raw }}
+				</p>
 			{% endfor %}
 		</div>
 	</div>
