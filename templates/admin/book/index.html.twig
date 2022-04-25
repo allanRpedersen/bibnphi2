@@ -13,6 +13,7 @@
                     <th><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'Title'})}}">Titre</a></th>
                     <th><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'Author'})}}">Auteur.e</a></th>
                     <th>odtBookName</th>
+                    <th class="text-center"><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'XmlFileSize'})}}">xmlFileSize</a></th>
                     <th class="text-center"><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'ParsingTime'})}}">parsingTime(sec)</a></th>
                     <th class="text-center"><a class="anchor-no-decoration" href="{{path('admin_book_index',{sortBy: 'NbParagraphs'})}}">nbParagraphs</a></th>
                     {# <th class="text-center">nbSentences</th> #}
@@ -27,13 +28,15 @@
                     <td><a class="anchor-no-decoration" href="{{path('book_show',{slug: book.slug})}}">{{book.title}}</a></td>
                     <td>{{book.author.lastName}}</td>
                     <td><a href="/books/{{book.odtBookName}}">{{book.odtBookName}}</a></td>
+                    <td class="text-center"><span class="badge badge-primary rounded">{{book.xmlFileSize}}</span></td>
                     <td class="text-center">
                         {% if (book.parsingTime == 0) %}
                         <span class="badge badge-danger">
                         {% else %}
                         <span class="badge badge-info">
-                        {% endif %}    
-                            {{(book.parsingTime)  | round(3, 'floor')}}</span>
+                        {% endif %}
+
+                        {{(book.parsingTime)  | round(3, 'floor')}}</span>
                     </td>
                     {# <td class="text-center"><span class="badge badge-info">{{(book.parsingTime / 60)  | round(1, 'floor')}}</span></td> #}
                     <td class="text-center"><span class="badge badge-primary rounded">{{book.nbParagraphs}}</span></td>

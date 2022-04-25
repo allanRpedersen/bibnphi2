@@ -118,12 +118,7 @@ class Book
     /**
      * @ORM\Column(type="integer")
      */
-    private $nbSentences;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $nbWords;
+    private $xmlFileSize;
 
     /**
      * @ORM\Column(type="float")
@@ -135,13 +130,16 @@ class Book
      */
     private $bookNotes;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $frontPage;
+
 
     public function __construct()
     {
         $this->bookParagraphs = new ArrayCollection();
         $this->bookNotes = new ArrayCollection();
-
-
     }
 	//
 	//
@@ -157,13 +155,13 @@ class Book
 	 * @return void
 	 */
 	public function InitializeSlug()
-               	{
-               		// if ( empty($this->slug) ){}
-               
-               		// le slug est systèmatiquement recalculé ..
-               		$slugify = new Slugify();
-               		$this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
-               	}
+    {
+        // if ( empty($this->slug) ){}
+    
+        // le slug est systèmatiquement recalculé ..
+        $slugify = new Slugify();
+        $this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
+    }
 
 
     public function getId(): ?int
@@ -279,9 +277,9 @@ class Book
     }
 
 	public function setBookMimeType(?string $bookMimeType): void
-               	{
-               		$this->bookMimeType = $bookMimeType;
-               	}
+    {
+        $this->bookMimeType = $bookMimeType;
+    }
 
     public function getBookMimeType(): ?string
     {
@@ -289,9 +287,9 @@ class Book
     }
 
 	public function setOdtOriginalName(?string $odtOriginalName): void
-               	{
-               		$this->odtOriginalName = $odtOriginalName;
-               	}
+    {
+        $this->odtOriginalName = $odtOriginalName;
+    }
 
     public function getOdtOriginalName(): ?string
     {
@@ -352,30 +350,6 @@ class Book
         return $this;
     }
 
-    public function getNbSentences(): ?int
-    {
-        return $this->nbSentences;
-    }
-
-    public function setNbSentences(int $nbSentences): self
-    {
-        $this->nbSentences = $nbSentences;
-
-        return $this;
-    }
-
-    public function getNbWords(): ?int
-    {
-        return $this->nbWords;
-    }
-
-    public function setNbWords(int $nbWords): self
-    {
-        $this->nbWords = $nbWords;
-
-        return $this;
-    }
-
     public function getParsingTime(): ?float
     {
         return $this->parsingTime;
@@ -417,5 +391,38 @@ class Book
 
         return $this;
     }
+
+    public function getFrontPage(): ?string
+    {
+        return $this->frontPage;
+    }
+
+    public function setFrontPage(?string $frontPage): self
+    {
+        $this->frontPage = $frontPage;
+
+        return $this;
+    }
     
+
+    /**
+     * Get the value of xmlFileSize
+     */ 
+    public function getXmlFileSize(): int
+    {
+        return $this->xmlFileSize;
+    }
+
+    /**
+     * Set the value of xmlFileSize
+     *
+     * @return  self
+     */ 
+    public function setXmlFileSize($xmlFileSize): self
+    {
+        $this->xmlFileSize = $xmlFileSize;
+
+        return $this;
+    }
+
 }

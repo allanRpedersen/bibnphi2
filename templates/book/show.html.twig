@@ -6,7 +6,7 @@
 <div class="container">
 	<div id="book-display-content">
 		<div id="book-display-leftside">
-			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}">{{ book.author.lastName }}</a></h3>
+			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}" title="{{book.author.lastName}}">{{ book.title }}</a></h3>
 			<p>{{ book.summary }}</p>
 			<p></p>
 				<div style="display: flex;">
@@ -28,7 +28,11 @@
 		</div>
 		<div id="book-display-rightside">
 			{% for paragraph in book.bookParagraphs %}
-				<p class="p-justify" id="_{{ paragraph.id }}">
+				{% if paragraph.paragraphStyles %}
+				<p {{ paragraph.paragraphStyles|raw }} id="_{{ paragraph.id }}">
+				{% else %}
+				<p class="p-justify"  id="_{{ paragraph.id }}">
+				{% endif %}
 					{% if is_granted('ROLE_ADMIN')%}
 					<a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
 					{% endif %}

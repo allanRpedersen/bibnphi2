@@ -90,6 +90,23 @@ class BookRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+    /**
+	 * findByXmlFileSize
+	 * 
+	 * @param string $orderBy
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByXmlFileSize($orderBy='DESC') : array
+    {
+        return $this->createQueryBuilder('t')
+            //->andWhere('t.title = :val')
+            //->setParameter('val', $value)
+            ->orderBy('t.xmlFileSize', $orderBy)
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     /**
 	 * findByAuthor

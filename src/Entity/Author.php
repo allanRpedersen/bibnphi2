@@ -63,6 +63,10 @@ class Author
      */
     private $books;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $picture;
 
 	//
 	//
@@ -78,16 +82,16 @@ class Author
 	 * @return void
 	 */
 	public function InitializeSlug()
-	{
-		// if ( empty($this->slug) ){
-					
-				// le slug est systèmatiquement recalculé ..
-
-				$slugify = new Slugify();
-				$this->slug = $slugify->slugify($this->firstName . '-' . $this->lastName );
-
-				// }
-	}
+                  	{
+                  		// if ( empty($this->slug) ){
+                  					
+                  				// le slug est systèmatiquement recalculé ..
+                  
+                  				$slugify = new Slugify();
+                  				$this->slug = $slugify->slugify($this->firstName . '-' . $this->lastName );
+                  
+                  				// }
+                  	}
 
     public function __construct()
     {
@@ -130,9 +134,9 @@ class Author
     }
 
 	public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
+                      {
+                          return $this->slug;
+                      }
 
     public function setSlug(string $slug): self
     {
@@ -221,5 +225,18 @@ class Author
 
         return $this;
     }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): self
+    {
+        $this->picture = $picture;
+
+        return $this;
+    }
+
 
 }

@@ -26,9 +26,6 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-//
-// $bool=pcntl_async_signals(true);
-//
 
 /**
  * @Route("/book")
@@ -65,9 +62,9 @@ class BookController extends AbstractController
 	}
 	
 	/**
-	 * 
+	 * Return dirName where is the xml file to parse or false
 	 */
-	public function isXmlFileValid(Book $book): ?string
+	public function isXmlFileValid(Book $book): ? string
 	{
 		//
 		// get the xml file out of odt file
@@ -77,13 +74,13 @@ class BookController extends AbstractController
 
 		// to rip the leading slash ..
 		$odtFilePath = substr($odtFilePath, 1);
-		$this->logger->debug('$odtFilePath : ' . $odtFilePath );
+		// $this->logger->debug('$odtFilePath : ' . $odtFilePath );
 
 		$dirName = \pathinfo($odtFilePath, PATHINFO_DIRNAME) . '/' . \pathinfo($odtFilePath, PATHINFO_FILENAME);
 		$xmlFileName = $dirName . '/content.xml';
 
-		$this->logger->info( '$dirName : ' . $dirName);
-		$this->logger->info( '$xmlFileName : ' . $xmlFileName);
+		// $this->logger->info( '$dirName : ' . $dirName);
+		// $this->logger->info( '$xmlFileName : ' . $xmlFileName);
 
 		if (!file_exists($odtFilePath)){
 			$this->logger->info( '$odtFilePath : ' . $odtFilePath . ' does not exist !!!');
@@ -113,7 +110,8 @@ class BookController extends AbstractController
 		}
 
 		// success ..
-		return $xmlFileName;
+		// return $xmlFileName;
+		return $dirName;
 	}
 
 	/**
@@ -121,12 +119,12 @@ class BookController extends AbstractController
 	 */
 	public function bookProcessing(Request $request, Book $book, KernelInterface $kernel)
 	{
+		$xmlFileName = '';
 
+		// check if odt file is well-founded and get the dir name of the xml file content.xml
+		$workingDir = $this->isXmlFileValid($book);
 
-		// check if odt file is well-founded and get xml file name from it
-		$xmlFileName = $this->isXmlFileValid($book);
-
-		if ($xmlFileName){
+		if ($workingDir){
 
 
 			// $application = new Application($kernel);
@@ -155,37 +153,50 @@ class BookController extends AbstractController
 			// // return new Response($content);
 			// return new Response("");
  
+			$xmlFileName = $workingDir . '/content.xml';
 			$xmlFileSize = filesize($xmlFileName);
+			$book->setXmlFileSize($xmlFileSize);
 
 			// for the big xml files, use an external command (  NOT TESTED ) =======
 			if ( $xmlFileSize > $this->getParameter('app.xmlfile_size_external_process')){
 				//
 				$cmd = $this->getParameter('kernel.project_dir')
-						. '/bin/console app:xml-parser --env=prod --quiet '
-						. $xmlFileName . ' '
+						. '/bin/console app:xml-parser --mode=prod --quiet '
+						. $workingDir . ' '
 						. $book->getId() . ' > /dev/null 2>&1';
 				
 				passthru( $cmd );  /////////////////
+
+				$this->addFlash(
+					'info',
+					'L\'analyse du document : ' . $book->getTitle() . ' s\'est terminée avec succès par la commande extèrieure !');
+
+
 			}
 			else {
 
 				//
 				// is that relevant ???
-				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_xl');
-				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_l');
-				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_m');
-				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_s');
-				if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_xs');
+				// $fileBufferSize = $this->getParameter('app.parsing_buffer_size_xl');
+				// if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_l');
+				// if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_m');
+				// if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_s');
+				// if ( $xmlFileSize < $fileBufferSize ) $fileBufferSize = $this->getParameter('app.parsing_buffer_size_xs');
+				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_l');
 
 				$xmlParser = new XmlParser(
 											$book, 
-											$xmlFileName, 
+											$workingDir, 
 											$this->getParameter('kernel.project_dir'), 
 											$fileBufferSize, 
 											$this->em,
+											/// "dev"
 										);
 
 				$this->xmlParser = $xmlParser;
+				
+				// issue with platon-gorgias if not set !! 
+				// ini_set('max_execution_time', '0');
 
 				// setting no execution time out .. bbrrrr !! 
 				// if ($xmlParser->getRatio() > 1) ini_set('max_execution_time', '0');
@@ -204,15 +215,13 @@ class BookController extends AbstractController
 				// ContainerInterface $container->get('krlove.service')->call('app.service.parse', 'parse');
 
 				// could be a long time process ..
-				$xmlParser->parse(); // can be very, very long for some books !-/ get a command for it !!!!!
+				$xmlParser->parse();
 				
 				if ($xmlParser->isParsingCompleted()){
 					//
 					//
 					$book->setParsingTime($xmlParser->getParsingTime())
 						->setNbParagraphs($xmlParser->getNbParagraphs())
-						->setNbSentences($xmlParser->getNbSentences())
-						->setNbWords($xmlParser->getNbWords())
 					;
 
 					$this->em->persist($book);
@@ -225,16 +234,21 @@ class BookController extends AbstractController
 					return $this->redirectToRoute('book_show', [
 						'slug' => $book->getSlug()
 						]);
-				}
 					
-				else {
-					// flash message
-					$this->addFlash(
-						'warning',
-						'Le fichier xml : ' . $xmlFileName . ' est invalide ou absent (cf bibnphi.log) !-\\'
-					);
 				}
+
 			}
+
+		}
+		else {
+
+
+			// flash message
+			$this->addFlash(
+				'warning',
+				'Le document odt : ' . $book->getOdtBookName() . ' est invalide ou absent (cf bibnphi.log) !-\\'
+			);
+
 
 		}
 		//
@@ -247,41 +261,31 @@ class BookController extends AbstractController
      * @Route("/new", name="book_new", methods={"GET","POST"})
 	 * @IsGranted("ROLE_USER")
      */
-	public function new( Request $request, 
-						 EntityManagerInterface $entityManager ): Response
+	public function new( Request $request ): Response
     {
 
 		//
-		$this->logger->info('>>> Entrée BookController->new()' . microtime(true));
-		$this->logger->info('>>> $request->getMethod() : ' . $request->getMethod() );
+		// $this->logger->info('>>> Entrée BookController->new()' . microtime(true));
+		// $this->logger->info('>>> $request->getMethod() : ' . $request->getMethod() );
 
 		//
         $book = new Book();
 		$form = $this->createForm(BookType::class, $book);
 
-		// if ($request->getMethod()!='GET'){
-
-		// 	// $data1 = $request->getContent();
-		// 	// dd($request->getMethod(), $data1, $request, $book);
-			
-		// 	// $data2 = $this->get('serializer')->deserialize($data1, 'App\Entity\Book', 'json');
-		// 	// dd($data2);
-		// }
-
 		//
-		if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
+		if (!file_put_contents($this->projectDir.'/public/percentProgress.log', '0%'))
+			$this->logger->error('>>> on file_put_contents');
 
 		$form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
 			$book->setNbParagraphs(0)
-				->setNbSentences(0)
-				->setNbWords(0)
 				->setParsingTime(0)
+				->setXmlFileSize(0)
 				;
 
-            $entityManager->persist($book);
-			$entityManager->flush();
+            $this->em->persist($book);
+			$this->em->flush();
 
 			$this->logger->info('>>> $book->getOdtOriginalName() : ' . $book->getOdtOriginalName() );
 			//
@@ -399,13 +403,9 @@ class BookController extends AbstractController
      * @Route("/{slug}/edit", name="book_edit", methods={"GET","POST"})
 	 * @IsGranted("ROLE_USER")
      */
-    public function edit(Request $request, Book $book, EntityManagerInterface $entityManager, UploaderHelper $uploaderHelper): Response
+    public function edit(Request $request, Book $book, UploaderHelper $uploaderHelper): Response
     {
 	
-		// $odtBookSize = $book->getOdtBookSize(); // set if exists <-- never used !-))
-
-		// dump($book);
-
 		$localPath = $uploaderHelper->asset($book, 'odtBookFile');
 		$fileName = \pathinfo($localPath, PATHINFO_FILENAME);
 		$fileExt = \pathinfo($localPath, PATHINFO_EXTENSION);
@@ -435,8 +435,7 @@ class BookController extends AbstractController
 		
 		if ($form->isSubmitted() && $form->isValid()) {
 			
-            // $entityManager = $this->getDoctrine()->getManager();
-			$entityManager->flush();
+			$this->em->flush();
 			
 			if (null !== $book->getOdtBookFile()){
 
@@ -474,19 +473,18 @@ class BookController extends AbstractController
 					else{
 
 						//
-						if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
+						// if (!file_put_contents('percentProgress.log', '0%')) $this->logger->error('>>> on file_put_contents');
 		
 						//
 						// xml parsing !!
 						$this->book = $book;
 						$book->setNbParagraphs(0)
-							->setNbSentences(0)
-							->setNbWords(0)
 							->setParsingTime(0)
+							->setXmlFileSize(0)
 							;
 		
-						$entityManager->persist($book);
-						$entityManager->flush();
+						$this->em->persist($book);
+						$this->em->flush();
 						
 						return $this->redirectToRoute('book_processing', [
 							'slug' => $book->getSlug()
@@ -515,7 +513,6 @@ class BookController extends AbstractController
     public function delete(Request $request, Book $book): Response
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->request->get('_token'))) {
-			$entityManager = $this->getDoctrine()->getManager();
 			
 			foreach( $book->getBookParagraphs() as $paragraph ){
 				$book->removeBookParagraph($paragraph);
@@ -537,8 +534,8 @@ class BookController extends AbstractController
 
 			//
 			//
-            $entityManager->remove($book);
-            $entityManager->flush();
+            $this->em->remove($book);
+            $this->em->flush();
         }
 
         // return $this->redirectToRoute('book_index');

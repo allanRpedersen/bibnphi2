@@ -57,6 +57,10 @@ class AdminBookController extends AbstractController
                 $books = $bookRepo->findByParsingTime();
                 break;
                 
+            case 'XmlFileSize':
+                $books = $bookRepo->findByXmlFileSize();
+                break;
+                
             case 'Author':
                 $authors = $authorRepo->findAll();
 
@@ -81,7 +85,6 @@ class AdminBookController extends AbstractController
     public function delete(Request $request, Book $book): Response
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->request->get('_token'))) {
-			$entityManager = $this->getDoctrine()->getManager();
 			
 			foreach( $book->getBookParagraphs() as $paragraph ){
 				$book->removeBookParagraph($paragraph);
@@ -91,7 +94,7 @@ class AdminBookController extends AbstractController
 			// unix cmd
 			// remove odt file
 			$dirName = $book->getOdtBookName();
-			passthru('rm -v books/'. $dirName . ' >>books/sorties_console 2>&1', $errCode );
+			passthru('rm -v books/'. $dirName . ' > /dev/null 2>&1', $errCode );
 
 			// $this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
 			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
@@ -101,12 +104,12 @@ class AdminBookController extends AbstractController
 			// remove .whatever to get directory name << buggy !-(
 			$dirName = substr($dirName, 0, strpos($dirName, '.'));
 			// then delete associated directory recursive
-			passthru('rm -v -r books/' . $dirName . ' >>books/sorties_console 2>&1', $errCode );
+			passthru('rm -v -r books/' . $dirName . ' > /dev/null 2>&1', $errCode );
 
 			//
 			//
-            $entityManager->remove($book);
-            $entityManager->flush();
+            $this->em->remove($book);
+            $this->em->flush();
         }
 
         return $this->redirectToRoute('admin_book_index');

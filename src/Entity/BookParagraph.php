@@ -29,11 +29,6 @@ class BookParagraph
     private $book;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="bookParagraph", orphanRemoval=true)
-     */
-    private $notes;
-
-    /**
      * @ORM\Column(type="text")
      * 
      * Le contenu brut du paragraphe cad sans aucun attribut de mise en forme ou de citation de note
@@ -41,17 +36,49 @@ class BookParagraph
      */
     private $content;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="bookParagraph", orphanRemoval=true)
+     */
+    private $notes;
+
+    /**
+     * @ORM\OneToMany(targetEntity=TextAlteration::class, mappedBy="bookParagraph", orphanRemoval=true)
+     * 
+     * La liste des altérations applicables au contenu du paragraphe
+     */
+    private $alterations;
+
     // Recherche de chaîne de cararactères dans le paragraphe.
     //
-    private $foundStringIndexes = []; // Les indices des occurences de la chaine recherchée dans le paragraphe
-    private $searchedString = '';   // La chaîne recherchée
-    private $nextOccurence;         // la prochaine occurence dans le livre (paragraphe ou note)
+    private $foundStringIndexes = [];   // Les indices des occurences de la chaine recherchée dans le paragraphe
+    private $searchedString = '';       // La chaîne recherchée
+    private $nextOccurence;             // la prochaine occurence dans le livre (paragraphe ou note)
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * 
+     * La chaine de caractères qui contient les attributs de mise en forme applicables au paragraphe entier
+     * 
+     * e.g. "text-align:justify; font-weight: normal; font-style: normal;"
+     * 
+     * text-align: start || end || center || justify
+     * font-weight: normal || bold || light
+     * font-style: normal || italic
+     * 
+     */
+    private $paragraphStyles;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Illustration::class, mappedBy="bookParagraph", orphanRemoval=true)
+     */
+    private $illustrations;
 
 
     public function __construct()
     {
         $this->notes = new ArrayCollection();
-        // $this->foundStringIndexes = new ArrayCollection();
+        $this->alterations = new ArrayCollection();
+        $this->illustrations = new ArrayCollection();
 
     }
 
@@ -133,10 +160,6 @@ class BookParagraph
     public function getContent($raw=false): ?string
     {
         return($this->content);
-        
-        if ($raw) return($this->content);
-        return($this->getFormattedContent());
-
     }
 
     public function setContent(string $content): self
@@ -163,6 +186,20 @@ class BookParagraph
         $formattedContent = '';
 
         // du coup on "glane" les mises en forme
+
+        // ajout des mises en forme permanentes ( bold, italic, ..)
+        if (count($this->alterations)){
+            foreach ($this->alterations as $alteration){
+                $i = $alteration->getPosition();
+                $l = $alteration->getLength();
+
+                $htmlToInsert[] = [ 'index'=>$i, 'string'=>$alteration->getBeginTag() ];
+                if ($l > 0){
+                    // length may be null ..
+                    $htmlToInsert[] = [ 'index'=>$i+$l, 'string'=>$alteration->getEndTag() ];
+                }
+            }
+        }
 
         // les index des sous-chaîne(s) à afficher en surbrillance
         if (count($this->foundStringIndexes)){
@@ -198,7 +235,7 @@ class BookParagraph
     
         }
 
-        // ajouts des notes
+        // ajouts des citations des notes
         if (count($this->notes)){
 
             foreach($this->notes as $note){
@@ -212,6 +249,57 @@ class BookParagraph
                         . '</a></sup>';
 
                 $htmlToInsert[] = ['index' => $note->getCitationIndex(), 'string' => $str];
+
+            }
+        }
+
+        // ajouts des illustrations
+        if (count($this->illustrations)){
+
+            foreach($this->illustrations as $illustration){
+
+                $mimeType = $illustration->getMimeType();
+                if ($mimeType){
+
+                    $str = '<img src="'
+                            . $illustration->getFileName()
+                            . '" alt="'
+                            . $illustration->getName()
+                            . '" title="'
+                            . $illustration->getSvgTitle();
+
+                    if($mimeType == "image/jpeg"){
+                        $str .= '" width="'
+                                . $illustration->getSvgWidth()
+                                . '" height="'
+                                . $illustration->getSvgHeight()
+                                . '" style="'
+                                . "margin:0px 5px";
+                    }
+                    // else $mimeType could be "image/svg+xml" , "image/png"
+                    //
+
+                    $str .= '">';
+                    $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];
+                }
+                else {
+                    // $mimeType null or "" not set ..
+
+
+                    // $str = '<img src="'
+                    //         . "/default-image.jpg"
+                    //         . '" alt="'
+                    //         . "image par défaut"
+                    //         . '" width="'
+                    //         . "20"
+                    //         . '" height="'
+                    //         . "20"
+                    //         . '" title="'
+                    //         . "format d'image non supporté"
+                    //         . '" style="'
+                    //         . "margin:0px 5px"
+                    //         . '">';
+                }
 
             }
         }
@@ -248,7 +336,7 @@ class BookParagraph
      *
      * @return  self
      */ 
-    public function setFoundStringIndexes($foundStringIndexes)
+    public function setFoundStringIndexes($foundStringIndexes): self
     {
         $this->foundStringIndexes = $foundStringIndexes;
 
@@ -285,6 +373,78 @@ class BookParagraph
     public function setNextOccurence($nextOccurence)
     {
         $this->nextOccurence = $nextOccurence;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TextAlteration>
+     */
+    public function getAlterations(): Collection
+    {
+        return $this->alterations;
+    }
+
+    public function addAlteration(TextAlteration $alteration): self
+    {
+        if (!$this->alterations->contains($alteration)) {
+            $this->alterations[] = $alteration;
+            $alteration->setBookParagraph($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlteration(TextAlteration $alteration): self
+    {
+        if ($this->alterations->removeElement($alteration)) {
+            // set the owning side to null (unless already changed)
+            if ($alteration->getBookParagraph() === $this) {
+                $alteration->setBookParagraph(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getParagraphStyles(): ?string
+    {
+        return $this->paragraphStyles;
+    }
+
+    public function setParagraphStyles(string $paragraphStyles): self
+    {
+        $this->paragraphStyles = $paragraphStyles;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Illustration>
+     */
+    public function getIllustrations(): Collection
+    {
+        return $this->illustrations;
+    }
+
+    public function addIllustration(Illustration $illustration): self
+    {
+        if (!$this->illustrations->contains($illustration)) {
+            $this->illustrations[] = $illustration;
+            $illustration->setBookParagraph($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIllustration(Illustration $illustration): self
+    {
+        if ($this->illustrations->removeElement($illustration)) {
+            // set the owning side to null (unless already changed)
+            if ($illustration->getBookParagraph() === $this) {
+                $illustration->setBookParagraph(null);
+            }
+        }
 
         return $this;
     }

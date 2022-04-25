@@ -2,8 +2,10 @@
 
 namespace App\Command;
 
+use Monolog\Logger;
 use App\Entity\Book;
 use App\Service\XmlParser;
+use Monolog\Handler\StreamHandler;
 use App\Repository\BookRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +25,8 @@ class XmlParserCommand extends Command
     private $parser;
     private $book;
 
+    private $projectDir;
+
     private $br;
     private $em;
     private $params;
@@ -35,6 +39,13 @@ class XmlParserCommand extends Command
         $this->em = $em;
         $this->params = $params;
 
+        $this->projectDir = $this->params->get('kernel.project_dir');
+
+
+        // $this->logger = $logger;
+		$this->logger = new Logger('_xmlParserCommand');
+		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/public/bibnphi.log', Logger::DEBUG) );
+
     }
 
     protected function configure()
@@ -43,13 +54,15 @@ class XmlParserCommand extends Command
             ->setDescription(self::$defaultDescription)
             ->addArgument('xmlFileName', InputArgument::REQUIRED, 'The name of the xml file to be parsed')
             ->addArgument('bookId', InputArgument::REQUIRED, 'the id of the book')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+            ->addOption('mode', 'm', InputOption::VALUE_OPTIONAL, 'Running mode', 'prod')
         ;
 
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        //
+        //
         $io = new SymfonyStyle($input, $output);
         $xmlFileName = $input->getArgument('xmlFileName');
 
@@ -63,34 +76,44 @@ class XmlParserCommand extends Command
 
         }
 
-        if ($input->getOption('option1')) {
-            // ...
+        if ($mode = $input->getOption('mode')) {
+            $io->note(sprintf('mode: %s', $mode));
         }
 
+        //
+        //
+        if ('test+' == $mode) return 0;
 
+        //
+        //
+        $this->logger->info('~~~~~ Through the XmlParserCommand ~~~~~');
+
+        //
+        //
         $book = $this->br->find($bookId);
-
+        $readBufferSize = $this->params->get('app.parsing_buffer_size_l');
 
         $parser = new XmlParser(
                         $book,
                         $xmlFileName,
-                        $this->params->get('kernel.project_dir'),
-                        $this->params->get('app.parsing_buffer_size_xl'),
+                        $this->projectDir,
+                        $readBufferSize,
                         $this->em,
+                        $mode
         );
 
         $parser->parse();
 
-
+        //
+        //
         if ( $parser->isParsingCompleted() ){
 
             //
             //
             $book->setParsingTime($parser->getParsingTime())
                 ->setNbParagraphs($parser->getNbParagraphs())
-                ->setNbSentences($parser->getNbSentences())
-                ->setNbWords($parser->getNbWords())
-                ;
+                ->setXmlFileSize($parser->getXmlFileSize())
+            ;
 
         
             $this->em->persist($book);

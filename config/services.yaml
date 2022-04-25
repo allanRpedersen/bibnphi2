@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    # 512kb = 524288 xl
+    # 512Kb = 524288 xl
     # 256Kb = 262144 l
     # 128Kb = 131072 m <<<<
     # 64Kb  =  65536 s
@@ -17,7 +17,8 @@ parameters:
     app.parsing_buffer_size_xs: 32768
     
     # 4Mb = 4194304 - i.e. 4*1024*1024
-    app.xmlfile_size_external_process: 4194304
+    # 2Mb = 2097152
+    app.xmlfile_size_external_process: app.parsing_buffer_size_l
 
 services:
 
