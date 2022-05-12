@@ -52,8 +52,8 @@ class XmlParser {
 			$noteBody,
 			$noteCitation,
 			$indexNoteCitation,
-			$indexDrawFrame,
-			$drawFrameWithObject,
+			// $indexDrawFrame,
+			// $drawFrameWithObject,
 			$text;
 
 	private $style = [
@@ -61,13 +61,8 @@ class XmlParser {
 		'family'		=> '', // "text"
 		'fontStyle'		=> '', // "normal" | "italic" ..
 		'fontWeight'	=> '', // "bold" ..
-		'others'		=> '',
+		'text-position'	=> 'normal',
 	];
-
-	/**
-	 * table indexées par le nom d'un style du doc qui satisfait aux altérations: 'bold', 'italic' ou'bolditalic'
-	 */
-	private $managedStyles = []; // [ 'styleName' => altération ]
 
 	private $styleProperty = [
 		'name'			=> '',
@@ -75,19 +70,15 @@ class XmlParser {
 		'text-align'	=> 'justify',
 		'font-style'	=> 'normal',
 		'font-weight'	=> 'normal',
+		'text-position'	=> 'normal',
 	];
 
+	/**
+	 * Table indexées par le nom d'un style qui spécifie des altérations du texte ou du paragraphe
+	 */
 	private $abnormalStyles = []; // all the styles with non-default attributes - "nobody's normal" (PSB :-))
 
 	private $currentStyleName = '';
-
-	private $pStyleProperty = [ 
-		'text-align'	=> 'justify',
-		'font-weight'	=> 'normal',
-		'font-style'	=> 'normal',
-	];
-
-	private $pStyleProperties = [];
 
 	/**
 	 * Une balise <SPAN TEXT:STYLE-NAME> dans le texte du paragraphe
@@ -97,7 +88,6 @@ class XmlParser {
 		'beginIndex'	=> 0,
 		'endIndex'		=> 0,
 	];
-
 	/**
 	 * Une balise <SPAN TEXT:STYLE-NAME> dans le texte d'une note
 	 */
@@ -106,7 +96,9 @@ class XmlParser {
 		'beginIndex'	=> 0,
 		'endIndex'		=> 0,
 	];
-
+	/**
+	 * Le saut de ligne considéré comme une altération du contenu
+	 */
 	private $lineBreak = [
 		'styleName'		=> '',
 		'beginIndex'	=> 0,
@@ -259,7 +251,7 @@ class XmlParser {
 
 			$this->noteCollection = [];
 			$this->text = '';
-			$this->drawFrameWithObject = false;
+			// $this->drawFrameWithObject = false;
 
 			// init parsing time 
 			$this->timeStart = microtime(true);
@@ -403,22 +395,21 @@ class XmlParser {
 				break;
 				
 			case "STYLE:TEXT-PROPERTIES":
-				// $this->logger->info("<$element> " . json_encode($attribs) );
-				// dump($attribs);
-
 				// FO:FONT-STYLE ('normal', 'italic')
 				if(array_key_exists('FO:FONT-STYLE', $attribs)){
 					$this->styleProperty['font-style'] = $attribs['FO:FONT-STYLE'];
 				}
-
 				// FO:FONT-WEIGHT ('normal', 'bold')
 				if(array_key_exists('FO:FONT-WEIGHT', $attribs)){
 					$this->styleProperty['font-weight'] = $attribs['FO:FONT-WEIGHT'];
 				}
+				// STYLE:TEXT-POSITION ("super 58%", "0% 100%" )
+				if(array_key_exists('STYLE:TEXT-POSITION', $attribs)){
+					$this->styleProperty['text-position'] = ( "super 58%" == $attribs['STYLE:TEXT-POSITION'] ) ? 'sup' : 'normal';
+				}
 				
 				// All the other attributes ..
 				// $this->style['others'] = $this->mapped_implode(', ', $attribs);
-
 				break;
 
 			case "SVG:TITLE":
@@ -450,6 +441,49 @@ class XmlParser {
 				break;
 
 			case "TEXT:H":
+				if (!$this->insideNote){
+					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
+
+					if (array_key_exists($this->currentStyleName, $this->abnormalStyles)){
+							if ($this->abnormalStyles[$this->currentStyleName]['font-style'] != 'italic')
+									// set to bold
+									$this->abnormalStyles[$this->currentStyleName]['font-weight'] = 'bold';
+					}
+					else {
+						// add a new 
+						$styleProperty = [
+							'name'			=> $this->currentStyleName,
+							'family'		=> 'paragraph',
+							'text-align'	=> 'center',
+							'font-weight'	=> 'bold',
+							'font-style'	=> 'normal',
+							'text-position' => 'normal',
+						];
+						$this->abnormalStyles[$this->currentStyleName] = $styleProperty;
+					}
+
+					// reset paragraph style properties and illustrations
+					
+					$this->styleProperty = [
+						'text-align'	=> 'justify',
+						'font-weight'	=> 'bold',
+						'font-style'	=> 'normal',
+						'text-position' => 'normal',
+					];
+
+					$this->illustration = [
+						'index'		=> 0,	// index from the beginning of the paragraph
+						'name'		=> '',	// "DRAW:NAME"
+						'svgWidth'	=> '',	// "SVG:WIDTH"
+						'svgHeight'	=> '',	// "SVG:HEIGHT"
+						'fileName'	=> '',	// "XLINK:HREF"
+						'mimeType'	=> '',	// "DRAW:MIME-TYPE
+						'svgTitle'	=> '',
+					];
+
+				}
+				break;
+
 			case "TEXT:P":
 				if (!$this->insideNote){
 					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
@@ -460,6 +494,7 @@ class XmlParser {
 						'text-align'	=> 'justify',
 						'font-weight'	=> 'normal',
 						'font-style'	=> 'normal',
+						'text-position' => 'normal',
 					];
 
 					$this->illustration = [
@@ -521,9 +556,10 @@ class XmlParser {
 				break;
 
 			case "STYLE:STYLE":
-				if( $this->styleProperty['font-weight'] != 'normal'	||
-					$this->styleProperty['font-style'] != 'normal'	||
-					$this->styleProperty['text-align'] != 'justify'	)
+				if( $this->styleProperty['font-weight']		!= 'normal'		||
+					$this->styleProperty['font-style']		!= 'normal'		||
+					$this->styleProperty['text-align']		!= 'justify'	||
+					$this->styleProperty['text-position']	!= 'normal'		)
 				{
 					$name = $this->styleProperty['name'];
 					$this->abnormalStyles[$name] = $this->styleProperty;
@@ -536,7 +572,7 @@ class XmlParser {
 					'text-align'	=> 'justify',
 					'font-style' 	=> 'normal',
 					'font-weight'	=> 'normal',
-					// 'others'		=> '',
+					'text-position'	=> 'normal',
 				];
 				break;
 			
@@ -544,7 +580,9 @@ class XmlParser {
 				break;
 
 			case "TEXT:LINE-BREAK":
-				// $this->logger->info("!!!!! </$element> ");
+				// Cette balise est traitée comme un span, une altération du texte.
+				// Un style spécifique est ajouté à la liste des styles pris en compte
+				// pour l'ajout de la balise html <BR> dans le contenu du texte.
 
 				if (!array_key_exists($element, $this->abnormalStyles)){
 					$this->abnormalStyles[$element] = [
@@ -588,8 +626,8 @@ class XmlParser {
 				$this->isNoteCitation = FALSE;
 				break;
 
-			case "TEXT:P":
 			case "TEXT:H":
+			case "TEXT:P":
 				if (!$this->insideNote){
 
 					// handle paragraph content, notes, alterations, illustrations
@@ -799,12 +837,6 @@ class XmlParser {
 						->setContent($rawParagraph);
 		}
 
-
-		// DEBUG =================================================================== DEBUG =========
-		// return;
-		// DEBUG !!!!
-
-
 		//
 		if ( NULL !== $bookParagraph ){
 
@@ -828,14 +860,6 @@ class XmlParser {
 	}
 
 	/**
-	 * Get the value of managedStyles
-	 */ 
-	public function getManagedStyles()
-	{
-		return $this->managedStyles;
-	}
-
-	/**
 	 * Check if the text style name is managed, if true return associated alteration object
 	 */
 	private function isStyleManaged($styleName): ? TextAlteration {
@@ -846,8 +870,9 @@ class XmlParser {
 
 			if ($styleName == "TEXT:LINE-BREAK"){ $bt = "<BR>" ; $et = ""; }
 			else {
-				if ($this->abnormalStyles[$styleName]['font-style'] == 'italic'){ $bt .= '<EM>'; $et .= '</EM>'; }
-				if ($this->abnormalStyles[$styleName]['font-weight'] == 'bold'){ $bt .= '<STRONG>'; $et .= '</STRONG>';}
+				if ($this->abnormalStyles[$styleName]['font-style']		== 'italic'){ $bt .= '<EM>'; $et .= '</EM>'; }
+				if ($this->abnormalStyles[$styleName]['font-weight']	== 'bold'){ $bt .= '<STRONG>'; $et .= '</STRONG>'; }
+				if ($this->abnormalStyles[$styleName]['text-position']	== 'sup' ){ $bt .= '<SUP>'; $et .= '</SUP>'; }
 			}
 
 			$alt = new TextAlteration();

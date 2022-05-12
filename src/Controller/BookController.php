@@ -117,7 +117,7 @@ class BookController extends AbstractController
 	/**
 	 * @Route("/{slug}/processing", name="book_processing")
 	 */
-	public function bookProcessing(Request $request, Book $book, KernelInterface $kernel)
+	public function bookProcessing(Request $request, Book $book)
 	{
 		$xmlFileName = '';
 
@@ -125,53 +125,31 @@ class BookController extends AbstractController
 		$workingDir = $this->isXmlFileValid($book);
 
 		if ($workingDir){
-
-
-			// $application = new Application($kernel);
-
-			// $application->setAutoExit(false);
-
-			// $input = new ArrayInput([
-			// 	'command' => 'app.:xml-parser',
-			// 	// (optional) define the value of command arguments
-			// 	'xmlFileName' => $xmlFileName,
-			// 	'bookId' => $book->getId(),
-			// 	// (optional) pass options to the command
-			// 	// '--message-limit' => $messages,
-			// ]);
-
-			// // You can use NullOutput() if you don't need the output
-			// $output = new BufferedOutput();
-
-			// $output = new NullOutput();
-			// $application->run($input, $output);
-
-			// // return the output, don't use if you used NullOutput()
-			// // $content = $output->fetch();
-
-			// // return new Response(""), if you used NullOutput()
-			// // return new Response($content);
-			// return new Response("");
  
 			$xmlFileName = $workingDir . '/content.xml';
 			$xmlFileSize = filesize($xmlFileName);
 			$book->setXmlFileSize($xmlFileSize);
 
-			// for the big xml files, use an external command (  NOT TESTED ) =======
+			// for the big xml files, use an external command =======
 			if ( $xmlFileSize > $this->getParameter('app.xmlfile_size_external_process')){
+				//
 				//
 				$cmd = $this->getParameter('kernel.project_dir')
 						. '/bin/console app:xml-parser --mode=prod --quiet '
 						. $workingDir . ' '
 						. $book->getId() . ' > /dev/null 2>&1';
 				
-				passthru( $cmd );  /////////////////
+							////////
+				passthru( $cmd );///
+							////////
 
 				$this->addFlash(
 					'info',
 					'L\'analyse du document : ' . $book->getTitle() . ' s\'est terminée avec succès par la commande extèrieure !');
 
-
+				return $this->redirectToRoute('book_show', [
+					'slug' => $book->getSlug()
+					]);
 			}
 			else {
 
@@ -236,13 +214,18 @@ class BookController extends AbstractController
 						]);
 					
 				}
+				else {
+					$this->addFlash(
+						'info',
+						'Echec de l\'analyse du document : ' . $book->getTitle());
 
+					return $this->redirectToRoute('front');
+
+				}
 			}
 
 		}
 		else {
-
-
 			// flash message
 			$this->addFlash(
 				'warning',
@@ -253,7 +236,7 @@ class BookController extends AbstractController
 		}
 		//
 		//
-        return $this->redirectToRoute('book_index');
+        return $this->redirectToRoute('front');
 
 	}
 

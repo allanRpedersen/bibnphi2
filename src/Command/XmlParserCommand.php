@@ -91,7 +91,7 @@ class XmlParserCommand extends Command
         //
         //
         $book = $this->br->find($bookId);
-        $readBufferSize = $this->params->get('app.parsing_buffer_size_l');
+        $readBufferSize = $this->params->get('app.parsing_buffer_size_xl');
 
         $parser = new XmlParser(
                         $book,

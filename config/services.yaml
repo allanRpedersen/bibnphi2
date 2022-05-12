@@ -18,7 +18,7 @@ parameters:
     
     # 4Mb = 4194304 - i.e. 4*1024*1024
     # 2Mb = 2097152
-    app.xmlfile_size_external_process: app.parsing_buffer_size_l
+    app.xmlfile_size_external_process: '%app.parsing_buffer_size_xl%'
 
 services:
 
