@@ -242,7 +242,9 @@ class BookParagraph
 
                 $str =  '<sup id="citation_'
                         . $note->getCitation()
-                        . '"><a class="" href="#note_'
+                        . '"><a title="'
+                        . $note->getContent()
+                        . '" class="" href="#note_'
                         . $note->getId()
                         .'">'
                         . $note->getCitation()

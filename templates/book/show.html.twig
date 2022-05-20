@@ -6,7 +6,8 @@
 <div class="container">
 	<div id="book-display-content">
 		<div id="book-display-leftside">
-			<h3><a href="{{ path('author_show', {'slug': book.author.slug}) }}" title="{{book.author.lastName}}">{{ book.title }}</a></h3>
+			<h2><a href="{{ path('author_show', {'slug': book.author.slug}) }}" title="{{book.author.lastName}}">{{ book.title }}</a></h2>
+			<h6>{{book.author.lastName}}</h6>
 			<p>{{ book.summary }}</p>
 			<p></p>
 				<div style="display: flex;">

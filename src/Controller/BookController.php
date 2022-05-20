@@ -231,8 +231,6 @@ class BookController extends AbstractController
 				'warning',
 				'Le document odt : ' . $book->getOdtBookName() . ' est invalide ou absent (cf bibnphi.log) !-\\'
 			);
-
-
 		}
 		//
 		//
