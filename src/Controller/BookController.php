@@ -44,7 +44,6 @@ class BookController extends AbstractController
 		$this->logger = new Logger('bibnphi');
 		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/public/bibnphi.log', Logger::DEBUG) );
 
-
 	}
 
     /**
@@ -62,31 +61,27 @@ class BookController extends AbstractController
 	}
 	
 	/**
-	 * Return dirName where is the xml file to parse or false
+	 * Return dirName where is located the xml file to parse or false
 	 */
-	public function isXmlFileValid(Book $book): ? string
+	public function isOdtDocValid(Book $book): ? string
 	{
 		//
-		// get the xml file out of odt file
+		// get the xml files out of odt file
 
 		// uploaded odt file, $odtFilePath, is set once the entity has been persisted ..
 		$odtFilePath = $this->uploaderHelper->asset($book, 'odtBookFile');
 
 		// to rip the leading slash ..
 		$odtFilePath = substr($odtFilePath, 1);
-		// $this->logger->debug('$odtFilePath : ' . $odtFilePath );
-
-		$dirName = \pathinfo($odtFilePath, PATHINFO_DIRNAME) . '/' . \pathinfo($odtFilePath, PATHINFO_FILENAME);
-		$xmlFileName = $dirName . '/content.xml';
-
-		// $this->logger->info( '$dirName : ' . $dirName);
-		// $this->logger->info( '$xmlFileName : ' . $xmlFileName);
 
 		if (!file_exists($odtFilePath)){
 			$this->logger->info( '$odtFilePath : ' . $odtFilePath . ' does not exist !!!');
 			// internal error !!
 			return null;
 		}
+
+		$dirName = \pathinfo($odtFilePath, PATHINFO_DIRNAME) . '/' . \pathinfo($odtFilePath, PATHINFO_FILENAME);
+
 		//
 		// unix cmd
 		passthru('mkdir -v ' . $dirName . ' > /dev/null 2>&1', $errCode );
@@ -103,14 +98,56 @@ class BookController extends AbstractController
 		}
 		//
 		//
+		//
+		//
+		$xmlFileName	= $dirName . '/content.xml';
+		$styleFileName 	= $dirName . '/styles.xml';
+		$docFileName	= $dirName . '/document.xml';
+
 		if (!file_exists($xmlFileName)){
-			$this->logger->info( '$xmlFileName : ' . $xmlFileName . ' does not exist !!!');
 			// internal error !!
+			$this->logger->info( '$xmlFileName : ' . $xmlFileName . ' does not exist !!!');
+			return null;
+		}
+		//
+		// append styles.xml
+		//
+		if (!file_exists($styleFileName)){
+			// internal error !!
+			$this->logger->info( '$styleFileName : ' . $styleFileName . ' does not exist !!!');
+			return null;
+		}
+
+		// $balise1 = '<bibnphi>';
+		// $balise2 = '</bibnphi>';
+
+		$b1 = $this->projectDir . '/public/balise-bibnphi-1.xml';
+		$b2 = $this->projectDir . '/public/balise-bibnphi-2.xml';
+
+		// remove xml prolog in files
+		// sed -i".bak" "1d" content.xml
+
+		passthru('sed -i".bak" "1d" ' . $styleFileName, $errCode);
+		if ($errCode){
+			$this->logger->debug('Err: ' . $errCode . ', sed "1d" sur ' . $styleFileName);
+			return null;
+		}
+		passthru('sed -i".bak" "1d" ' . $xmlFileName, $errCode);
+		if ($errCode){
+			$this->logger->debug('Err: ' . $errCode . ', sed "1d" sur ' . $xmlFileName);
+			return null;
+		}
+
+		// then build bibnphi document.xml ..
+
+		passthru('cat '. $b1 . ' ' . $styleFileName . ' ' . $xmlFileName . ' ' . $b2 . ' > ' . $docFileName, $errCode);
+		if ($errCode){
+			$this->logger->debug('Err: ' . $errCode . ', lors de la concatenation de : ' . $xmlFileName . ' avec ' . $styleFileName);
 			return null;
 		}
 
 		// success ..
-		// return $xmlFileName;
+		// un fichier document.xml est présent dans le répertoire de travail
 		return $dirName;
 	}
 
@@ -122,11 +159,11 @@ class BookController extends AbstractController
 		$xmlFileName = '';
 
 		// check if odt file is well-founded and get the dir name of the xml file content.xml
-		$workingDir = $this->isXmlFileValid($book);
+		$workingDir = $this->isOdtDocValid($book);
 
 		if ($workingDir){
  
-			$xmlFileName = $workingDir . '/content.xml';
+			$xmlFileName = $workingDir . '/document.xml';
 			$xmlFileSize = filesize($xmlFileName);
 			$book->setXmlFileSize($xmlFileSize);
 

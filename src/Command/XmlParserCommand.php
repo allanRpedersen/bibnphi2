@@ -52,7 +52,7 @@ class XmlParserCommand extends Command
     {
         $this
             ->setDescription(self::$defaultDescription)
-            ->addArgument('xmlFileName', InputArgument::REQUIRED, 'The name of the xml file to be parsed')
+            ->addArgument('workingDir', InputArgument::REQUIRED, 'The working directory where stands the document to be parsed')
             ->addArgument('bookId', InputArgument::REQUIRED, 'the id of the book')
             ->addOption('mode', 'm', InputOption::VALUE_OPTIONAL, 'Running mode', 'prod')
         ;
@@ -64,10 +64,10 @@ class XmlParserCommand extends Command
         //
         //
         $io = new SymfonyStyle($input, $output);
-        $xmlFileName = $input->getArgument('xmlFileName');
+        $workingDir = $input->getArgument('workingDir');
 
-        if ($xmlFileName) {
-            $io->note(sprintf('le fichier xml: %s', $xmlFileName));
+        if ($workingDir) {
+            $io->note(sprintf('le document: %s.odt', $workingDir));
         }
 
         $bookId = $input->getArgument('bookId');
@@ -95,7 +95,7 @@ class XmlParserCommand extends Command
 
         $parser = new XmlParser(
                         $book,
-                        $xmlFileName,
+                        $workingDir,
                         $this->projectDir,
                         $readBufferSize,
                         $this->em,
@@ -129,7 +129,7 @@ class XmlParserCommand extends Command
 
         }
         else {
-            $io->note('Parsing of ' . $xmlFileName . ' is NOT completed !!');
+            $io->note('Parsing of ' . $workingDir . '.odt is NOT completed !!');
         }
 
         // foreach($paragraphs as $paragraph)

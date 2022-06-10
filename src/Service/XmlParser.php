@@ -141,7 +141,7 @@ class XmlParser {
 		$this->READ_BUFFER_SIZE = $bufferSize;
 		
 		$this->workingDir = $workingDir;
-		$xmlFileName = $workingDir . '/content.xml';
+		$xmlFileName = $workingDir . '/document.xml';
 
 		$this->em = $em;
 		$this->runningMode = $mode; // 'prod' | 'dev'
@@ -318,6 +318,12 @@ class XmlParser {
 
 		switch($element){
 
+			case "BIBNPHI":
+			case "OFFICE:DOCUMENT-STYLES":
+			case "OFFICE:DOCUMENT-CONTENT":
+				// $this->logger->info($element);
+				break;
+			
 			case "DRAW:A":
 				break;
 
@@ -536,6 +542,14 @@ class XmlParser {
 	private function end_element_handler($parser, $element)
 	{
 		switch($element){
+
+			case "BIBNPHI":
+			case "OFFICE:DOCUMENT-STYLES":
+			case "OFFICE:DOCUMENT-CONTENT":
+				// $this->logger->info($element);
+				break;
+				
+	
 			
 			case "DRAW:FRAME":
 				// handle illustration(s)
