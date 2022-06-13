@@ -114,7 +114,7 @@ class BookRepository extends ServiceEntityRepository
 	 * @param Author $author
      * @return Book[] Returns an array of Book objects
      */
-    public function findByAuthor($author, $orderBy='DESC') : array
+    public function findByAuthor($author, $orderBy='ASC') : array
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.author = :id')

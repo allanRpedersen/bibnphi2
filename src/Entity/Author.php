@@ -96,6 +96,7 @@ class Author
     public function __construct()
     {
         $this->books = new ArrayCollection();
+
     }
 
 
@@ -200,7 +201,29 @@ class Author
      */
     public function getBooks(): Collection
     {
-        return $this->books;
+        $books = $this->books;
+
+        $sortedBooks = new ArrayCollection;
+        $titles = [];
+
+        // ascendant sort on title
+        foreach ($books as $book){
+            $titles[] = $book->getTitle();
+        }
+
+        if (sizeof($titles) > 1){
+
+            asort($titles);
+
+            foreach( $titles as $key => $val){
+                $sortedBooks[] = $books[$key];
+            }
+
+            return $sortedBooks;
+
+        }
+        
+        return $books;
     }
 
     public function addBook(Book $book): self

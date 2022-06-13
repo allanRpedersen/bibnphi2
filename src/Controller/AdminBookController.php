@@ -62,11 +62,11 @@ class AdminBookController extends AbstractController
                 break;
                 
             case 'Author':
-                $authors = $authorRepo->findAll();
+                $authors = $authorRepo->findbyLastName();
 
                 $books = [];
                 foreach( $authors as $author){
-                    foreach( $author->getBooks() as $book )$books[] = $book;
+                    foreach( $author->getBooks() as $book ) $books[] = $book;
                 }
 
                 break;
