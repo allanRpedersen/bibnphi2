@@ -176,7 +176,8 @@ class BookParagraph
      * 
      * 1- présence de notes, ajout des citations encadrées par des balises <sup><a href="note_$noteId>..</a></sup>
      * 2- application du surlignage <mark>..</mark>
-     * 3- application de styles, <strong>, <em>, .. (à venir)
+     * 3- application de styles, <strong>, <em>, ..
+     * 4- insertion des illustrations
      * 
      */ 
     public function getFormattedContent(): string
@@ -185,9 +186,9 @@ class BookParagraph
         $htmlToInsert = [];
         $formattedContent = '';
 
-        // du coup on "glane" les mises en forme
+        // du coup on "glane" les mises en forme ...
 
-        // ajout des mises en forme permanentes ( bold, italic, ..)
+        // mises en forme permanentes ( bold, italic, ..)
         if (count($this->alterations)){
             foreach ($this->alterations as $alteration){
                 $i = $alteration->getPosition();
@@ -201,7 +202,7 @@ class BookParagraph
             }
         }
 
-        // les index des sous-chaîne(s) à afficher en surbrillance
+        // sous-chaîne(s) à afficher en surbrillance du fait d'une recherche
         if (count($this->foundStringIndexes)){
 
             // $beginTag = '<mark>';
@@ -235,7 +236,7 @@ class BookParagraph
     
         }
 
-        // ajouts des citations des notes
+        // citations des notes et contenu en title
         if (count($this->notes)){
 
             foreach($this->notes as $note){
@@ -255,7 +256,7 @@ class BookParagraph
             }
         }
 
-        // ajouts des illustrations
+        // illustrations
         if (count($this->illustrations)){
 
             foreach($this->illustrations as $illustration){
@@ -306,7 +307,7 @@ class BookParagraph
             }
         }
 
-        // si on trouve des mises en forme, on les insère ..
+        // et si a trouvé des mises en forme, on les insère ..
         if ($htmlToInsert){
 
             //

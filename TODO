@@ -7,12 +7,11 @@ forget me not !
 2.  Modif d'un paragraphe dans la base non répercutée dans le doc d'origine !!
 3.  Suppression de rôle dans le user !!
 4.  Ya un truc qui coince dans la modification/prise en compte du document odt originel.
-5.  ! 
 
-1. Pour les notes de bas de page, ce serait pratique que la note apparaisse en tooltip juste en survolant le numéro de l'appel de note, en plus (et non à la place) du lien vers le bas de page. -------------------->>>>>>>>>>>>   O K ! ! 
+5.  Prise en compte de la balise xml <TABLE> ..... 
 
+1. 
 2. La possibilité d'exporter une œuvre en PDF en plus d'ODT. ------------>>>>>>>>>>>>>>>       odt2pdf () unoconv
-
 3. La possibilité d'exporter en ODT et en PDF la liste des résultats d'une requête.
 
 4. Il faudra prévoir au moins deux nouvelles pages :

@@ -127,6 +127,7 @@ class XmlParser {
 		'svgTitle'	=> '',
 	];
 	private $illustrations = [];
+	private $noteIllustrations = [];
 
 
 	private $logger;
@@ -334,19 +335,16 @@ class XmlParser {
 				$this->insideDrawFrame = true;
 				$this->firstImage = true;
 				
-				$this->illustration['index'] = iconv_strlen($this->text);
+				//
+				// des illustrations apparaissent dans les notes de fin de texte ..
+				// 
+				$this->illustration['index'] = $this->insideNote ? iconv_strlen($this->noteBody): iconv_strlen($this->text);
 
-				if(array_key_exists('DRAW:NAME', $attribs)){
-					$this->illustration['name'] = $attribs['DRAW:NAME'];
-				}
+				if (array_key_exists('DRAW:NAME', $attribs)) $this->illustration['name'] = $attribs['DRAW:NAME'];
 				//
 				// svg:width="5.009cm" svg:height="3.03cm"
-				if(array_key_exists('SVG:WIDTH', $attribs)){
-					$this->illustration['svgWidth'] = $attribs['SVG:WIDTH'];
-				}
-				if(array_key_exists('SVG:HEIGHT', $attribs)){
-					$this->illustration['svgHeight'] = $attribs['SVG:HEIGHT'];
-				}
+				if(array_key_exists('SVG:WIDTH', $attribs)) $this->illustration['svgWidth'] = $attribs['SVG:WIDTH'];
+				if(array_key_exists('SVG:HEIGHT', $attribs)) $this->illustration['svgHeight'] = $attribs['SVG:HEIGHT'];
 				
 				break;
 
@@ -356,18 +354,14 @@ class XmlParser {
 				if ($this->firstImage){
 					//
 					//
-					if(array_key_exists('XLINK:HREF', $attribs)){
-						$this->illustration['fileName'] = $attribs['XLINK:HREF'];
-					}
+					if(array_key_exists('XLINK:HREF', $attribs)) $this->illustration['fileName'] = $attribs['XLINK:HREF'];
+
 					//
 					// "image/jpeg" | "image/svg+xml" | "image/png"
 					$m1 = array_key_exists('DRAW:MIME-TYPE', $attribs) ? $attribs['DRAW:MIME-TYPE'] : "";
 					$m2 = array_key_exists('LOEXT:MIME-TYPE', $attribs) ? $attribs['LOEXT:MIME-TYPE'] : "";
-
 					$this->illustration['mimeType'] = $m1 ? $m1 : $m2;
-					//
-					// 'LOEXT:MIME-TYPE'
-					//
+
 					$this->firstImage = false;
 				}
 
@@ -427,23 +421,20 @@ class XmlParser {
 				break;
 			case "TEXT:NOTE":
 				//
-				// strlen, number of bytes, some characters may be multi-bytes ...
+				// strlen, number of bytes and some characters may be multi-bytes ...
 				// iconv_strlen, number of characters
 				//
 				// index from the beginning of the paragraph !!
 				$this->indexNoteCitation = iconv_strlen($this->text);
 				$this->insideNote = true;
-
 				break;
 				
 			case "TEXT:NOTE-BODY":
 				$this->isNoteBody = true;
-				// dump([$element, $attribs]);
 				break;
 			
 			case "TEXT:NOTE-CITATION":
 				$this->isNoteCitation = TRUE;
-				// dump([$element, $attribs]);
 				break;
 
 			case "TEXT:H":
@@ -504,7 +495,7 @@ class XmlParser {
 					];
 
 					$this->illustration = [
-						'index'		=> 0,	// index from the beginning of the paragraph
+						'index'		=> 0,	// index from the beginning of the text of the paragraph or the body of a note !!!
 						'name'		=> '',	// "DRAW:NAME"
 						'svgWidth'	=> '',	// "SVG:WIDTH"
 						'svgHeight'	=> '',	// "SVG:HEIGHT"
@@ -555,7 +546,11 @@ class XmlParser {
 				// handle illustration(s)
 				//
 				$this->illustration['svgTitle'] = $this->svgTitle ? $this->svgTitle : '';
-				$this->illustrations[] = $this->illustration;
+
+				if ($this->insideNote)
+					$this->noteIllustrations[] = $this->illustration;
+				else
+					$this->illustrations[] = $this->illustration;
 
 				$this->svgTitle = '';
 				$this->insideDrawFrame = false;
@@ -629,6 +624,7 @@ class XmlParser {
 				$this->insideNote = false;
 				$this->noteBody = '';
 				$this->noteSpans = [];
+				$this->noteIllustrations =[];
 				break;
 
 			case "TEXT:NOTE-BODY":
@@ -687,13 +683,13 @@ class XmlParser {
 	{
 		//
 		// Les données récupérées peuvent être :
-		//		- un contenu de paragraphe à ajouter au texte déjà existant
-		//		- un contenu de note à ajouter au texte de la note en cours
-		//		- le texte de la citation qui fait référence à la note en cours
+		//		- un contenu de paragraphe à ajouter au texte déjà existant		> ajouté à $this->text
+		//		- un contenu de note à ajouter au texte de la note en cours		> ajouté à $this->noteBody
+		//		- le texte de la citation qui fait référence à la note en cours	> ajouté à $this->noteCitation
+		//		- le titre d'une image !!										> ajouté à $this->svgTitle
 		//
-		//		- le titre d'une image !!
+		//
 
-		//
 		if ($this->isNoteBody) $this->noteBody .= $data;
 		else if (!$this->insideAnnotation){
 			if ($this->isNoteCitation) $this->noteCitation = $data; 

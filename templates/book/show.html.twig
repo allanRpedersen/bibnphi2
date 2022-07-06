@@ -43,7 +43,7 @@
 		
 			{% for note in book.bookNotes %}
 				<p class="p-justify" id="note_{{ note.id }}">
-					<sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup>~{{ note.formattedContent | raw }}
+					<sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup> {{ note.formattedContent | raw }}
 				</p>
 			{% endfor %}
 		</div>
