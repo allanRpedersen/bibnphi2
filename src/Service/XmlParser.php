@@ -619,7 +619,8 @@ class XmlParser {
 				$this->noteCollection[] = [ 'index'			=> $this->indexNoteCitation,
 											'citation'		=> $this->noteCitation,
 											'content'		=> $this->noteBody,
-											'alterations'	=> $this->noteSpans ];
+											'alterations'	=> $this->noteSpans,
+											'illustrations'	=> $this->noteIllustrations ];
 											
 				$this->insideNote = false;
 				$this->noteBody = '';
@@ -791,12 +792,42 @@ class XmlParser {
 						}
 					}
 				
+					if ($note['illustrations']){
+						foreach($note['illustrations'] as $illustration){
+							$ill = new Illustration();
+
+							//
+							// convert width and height from cm to pixels
+							// 1 cm is 37.7952755906 px   or   1 cm = 37.79527559055118 px
+							$cmWidth = substr($illustration['svgWidth'], 0, -2);
+							$pxWidth =  intval($cmWidth * 37.7952755906);
+			
+							$cmHeight = substr($illustration['svgHeight'], 0, -2);
+							$pxHeight =  intval($cmHeight * 37.7952755906);
+			
+							$ill->setIllustrationIndex($illustration['index'])
+								->setName($illustration['name'])
+								->setSvgWidth($pxWidth)
+								->setSvgHeight($pxHeight)
+								->setFileName('/' . $this->workingDir . '/' . $illustration['fileName'])
+								->setMimeType(($illustration['mimeType']))
+								->setSvgTitle($illustration['svgTitle'])
+								->setBookNote($bookNote)
+								;
+			
+							$this->em->persist($ill);
+							$bookNote->addIllustration($ill);
+			
+						}
+
+					}
+
 					$this->em->persist($bookNote);
 					$bookParagraph->addNote($bookNote); //
 				}
 			}
 			//
-			// handle illustrations
+			// handle paragraph illustrations
 			foreach ($illustrations as $illustration){
 				$ill = new Illustration();
 

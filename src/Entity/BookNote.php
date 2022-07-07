@@ -55,6 +55,12 @@ class BookNote
     private $alterations;
 
     /**
+     * @ORM\OneToMany(targetEntity=Illustration::class, mappedBy="bookNote", orphanRemoval=true)
+     */
+    private $illustrations;
+
+
+    /**
      * 
      */    
     private $foundStringIndexes = [];
@@ -64,6 +70,7 @@ class BookNote
     public function __construct()
     {
         $this->alterations = new ArrayCollection();
+        $this->illustrations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +187,58 @@ class BookNote
 
         }
         
+        // illustrations
+        if (count($this->illustrations)){
+
+            foreach($this->illustrations as $illustration){
+
+                $mimeType = $illustration->getMimeType();
+                if ($mimeType){
+
+                    $str = '<img src="'
+                            . $illustration->getFileName()
+                            . '" alt="'
+                            . $illustration->getName()
+                            . '" title="'
+                            . $illustration->getSvgTitle();
+
+                    if($mimeType == "image/jpeg"){
+                        $str .= '" width="'
+                                . $illustration->getSvgWidth()
+                                . '" height="'
+                                . $illustration->getSvgHeight()
+                                . '" style="'
+                                . "margin:0px 5px";
+                    }
+                    // else $mimeType could be "image/svg+xml" , "image/png"
+                    //
+
+                    $str .= '">';
+                    $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];
+                }
+                else {
+                    // $mimeType null or "" not set ..
+
+
+                    // $str = '<img src="'
+                    //         . "/default-image.jpg"
+                    //         . '" alt="'
+                    //         . "image par défaut"
+                    //         . '" width="'
+                    //         . "20"
+                    //         . '" height="'
+                    //         . "20"
+                    //         . '" title="'
+                    //         . "format d'image non supporté"
+                    //         . '" style="'
+                    //         . "margin:0px 5px"
+                    //         . '">';
+                }
+
+            }
+        }
+
+        //
         if ($count=count($htmlToInsert)){
 
             //
@@ -321,6 +380,36 @@ class BookNote
             // set the owning side to null (unless already changed)
             if ($alteration->getBookNote() === $this) {
                 $alteration->setBookNote(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Illustration>
+     */
+    public function getIllustrations(): Collection
+    {
+        return $this->illustrations;
+    }
+
+    public function addIllustration(Illustration $illustration): self
+    {
+        if (!$this->illustrations->contains($illustration)) {
+            $this->illustrations[] = $illustration;
+            $illustration->setBookNote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIllustration(Illustration $illustration): self
+    {
+        if ($this->illustrations->removeElement($illustration)) {
+            // set the owning side to null (unless already changed)
+            if ($illustration->getBookNote() === $this) {
+                $illustration->setBookNote(null);
             }
         }
 

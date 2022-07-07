@@ -54,9 +54,15 @@ class Illustration
 
     /**
      * @ORM\ManyToOne(targetEntity=BookParagraph::class, inversedBy="illustrations")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $bookParagraph;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=BookNote::class, inversedBy="illustrations")
+     */
+    private $bookNote;
+
+
 
     public function getId(): ?int
     {
@@ -155,6 +161,26 @@ class Illustration
     public function setSvgHeight(int $svgHeight): self
     {
         $this->svgHeight = $svgHeight;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of bookNote
+     */ 
+    public function getBookNote()
+    {
+        return $this->bookNote;
+    }
+
+    /**
+     * Set the value of bookNote
+     *
+     * @return  self
+     */ 
+    public function setBookNote($bookNote)
+    {
+        $this->bookNote = $bookNote;
 
         return $this;
     }

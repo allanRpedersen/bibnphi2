@@ -48,11 +48,10 @@ class BookParagraph
      */
     private $alterations;
 
-    // Recherche de chaîne de cararactères dans le paragraphe.
-    //
-    private $foundStringIndexes = [];   // Les indices des occurences de la chaine recherchée dans le paragraphe
-    private $searchedString = '';       // La chaîne recherchée
-    private $nextOccurence;             // la prochaine occurence dans le livre (paragraphe ou note)
+    /**
+     * @ORM\OneToMany(targetEntity=Illustration::class, mappedBy="bookParagraph", orphanRemoval=true)
+     */
+    private $illustrations;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -68,10 +67,11 @@ class BookParagraph
      */
     private $paragraphStyles;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Illustration::class, mappedBy="bookParagraph", orphanRemoval=true)
-     */
-    private $illustrations;
+    // Recherche de chaîne de cararactères dans le paragraphe.
+    //
+    private $foundStringIndexes = [];   // Les indices des occurences de la chaine recherchée dans le paragraphe
+    private $searchedString = '';       // La chaîne recherchée
+    private $nextOccurence;             // la prochaine occurence dans le livre (paragraphe ou note)
 
 
     public function __construct()
