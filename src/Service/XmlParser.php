@@ -116,6 +116,7 @@ class XmlParser {
 	 * 
 	 */
 
+	private $isSvgTitle;
 	private $svgTitle ='';
 	private $illustration = [
 		'index'		=> 0,	// index from the beginning of the paragraph
@@ -373,6 +374,7 @@ class XmlParser {
 					
 			case "OFFICE:ANNOTATION":
 				$this->insideAnnotation = true;
+				$this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 
 			case "OFFICE:AUTOMATIC-STYLES":
@@ -413,6 +415,8 @@ class XmlParser {
 				break;
 
 			case "SVG:TITLE":
+			case "SVG:DESC":	// dans platon-menon, 
+				$this->isSvgTitle = true;
 				$this->svgTitle = '';
 				break;
 
@@ -586,6 +590,8 @@ class XmlParser {
 				break;
 			
 			case "SVG:TITLE":
+			case "SVG:DESC":
+				$this->isSvgTitle = false;
 				break;
 
 			case "TEXT:LINE-BREAK":
@@ -691,14 +697,29 @@ class XmlParser {
 		//
 		//
 
-		if ($this->isNoteBody) $this->noteBody .= $data;
-		else if (!$this->insideAnnotation){
-			if ($this->isNoteCitation) $this->noteCitation = $data; 
-			else if ($this->insideDrawFrame){
-					$this->svgTitle .= $data;
-				} 
-				else $this->text .= $data;
+									// if ($this->isNoteBody) $this->noteBody .= $data;
+									// else if (!$this->insideAnnotation){
+									// 	if ($this->isNoteCitation) $this->noteCitation = $data; 
+									// 	else if ($this->insideDrawFrame){
+									// 			$this->svgTitle .= $data;
+									// 		} 
+									// 		else $this->text .= $data;
+									// }
+
+		if (!$this->insideAnnotation){
+			//
+			//
+			if ( $this->isSvgTitle ) $this->svgTitle = $data;
+			else
+				if ($this->isNoteCitation) $this->noteCitation = $data;
+				else
+					if ($this->isNoteBody) $this->noteBody .= $data;
+					else $this->text .= $data;
+			//
+			//
 		}
+
+
 	}
 
 	/**
