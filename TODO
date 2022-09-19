@@ -10,6 +10,8 @@ forget me not !
 
 5.  Prise en compte de la balise xml <TABLE> ..... 
 
+6.  L'esprit des lois - la citation de la note 1099 (entre autres) est en italique <em> ??? 
+
 1. 
 2. La possibilité d'exporter une œuvre en PDF en plus d'ODT. ------------>>>>>>>>>>>>>>>       odt2pdf () unoconv
 3. La possibilité d'exporter en ODT et en PDF la liste des résultats d'une requête.
@@ -24,3 +26,4 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 - de surligner / souligner des passages de ces œuvres sélectionnées de différentes couleurs (une dizaines proposées) et de retrouver ces modifications d'une session à l'autre.
 - de faire des annotations au texte, dans une "marge" ou quelque chose comme ça.
 
+6. Gestion de l'image d'illustrtation de l'entité Author
