@@ -105,16 +105,16 @@ class Author
 	 * @return void
 	 */
 	public function InitializeSlug()
-                  	{
-                  		// if ( empty($this->slug) ){
-                  					
-                  				// le slug est systèmatiquement recalculé ..
-                  
-                  				$slugify = new Slugify();
-                  				$this->slug = $slugify->slugify($this->firstName . '-' . $this->lastName );
-                  
-                  				// }
-                  	}
+    {
+        // if ( empty($this->slug) ){
+                    
+            // le slug est systèmatiquement recalculé ..
+
+            $slugify = new Slugify();
+            $this->slug = $slugify->slugify($this->firstName . '-' . $this->lastName );
+
+            // }
+    }
 
     public function __construct()
     {
