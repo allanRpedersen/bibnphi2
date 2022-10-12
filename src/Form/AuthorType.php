@@ -18,10 +18,11 @@ class AuthorType extends GenericType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-			->add('lastName', TextType::class, $this->mkBasics("nom/nom d'usage", "le nom de l'auteur(e)"))
+			->add('lastName', TextType::class, $this->mkBasics("nom / nom d'usage", "son nom ou nom d'usage"))
             ->add('firstName', TextType::class, $this->mkBasics("prénom", "son prénom (facultatif)", false))
-            ->add('birthYear', TextType::class, $this->mkBasics("naissance","l'année de sa naissance (facultatif)", false))
-            ->add('deathYear', TextType::class, $this->mkBasics("mort","celle de sa mort (facultatif)", false))
+            // ->add('');
+            ->add('birthYear', TextType::class, $this->mkBasics("naissance","année de naissance (facultatif)", false))
+            ->add('deathYear', TextType::class, $this->mkBasics("mort","année de mort (facultatif)", false))
             ->add('summary', TextType::class, $this->mkBasics("présentation", "Une phrase de présentation (facultatif)", false))
             ->add('content',CKEditorType::class, $this->mkBasics( "description", 
                                                                   "(facultatif)",

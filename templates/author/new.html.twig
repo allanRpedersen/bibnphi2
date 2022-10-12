@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvel(le) Auteur(e){% endblock %}
+{% block title %}Ajout philosophe{% endblock %}
 
 {% block body %}
 	<div class="container">
-		<h1>Ajouter un(e) auteur(e)</h1>
+		<h1>Ajouter un.e philosophe</h1>
 
 		{{ include('author/_form.html.twig') }}
 
-		<a type="button" class="btn btn-info" href="{{ path('author_index') }}">Retour</a>
+		<a type="button" class="btn btn-info" href="{{ path('author_index') }}">Annulation</a>
 	</div>
 {% endblock %}

@@ -1,6 +1,17 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
 {{ form_start(form) }}
-{# {{ form_widget(form) }} #}
-{{ form_row(form.lastName)}}
-{{ form_row(form.firstName)}}
-    <button class="btn btn-info mb-2">{{ button_label|default('Ajout') }}</button>
+
+{{form_row(form.lastName)}}
+
+<div class="row">
+    <div class="col-md-6">{{ form_row(form.firstName)}}</div>
+    <div class="col-md-3">{{ form_row(form.birthYear)}}</div>
+    <div class="col-md-3">{{ form_row(form.deathYear)}}</div>
+</div>
+<div class="row">
+</div>
+
+{{ form_widget(form) }}
+<button class="btn btn-info mt-2 mb-2">{{ button_label|default('Ajout') }}</button>
 {{ form_end(form) }}
