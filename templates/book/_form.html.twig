@@ -1,18 +1,38 @@
+
 {{ form_start(form) }}
-	<div class="row">
-		<div class="col-md-7">
-	    {{ form_row(form.title, {'label': 'titre'}) }}
-		</div>
-		<div class="col-md-4">
+{{ form_row(form.title, {'label': 'titre'}) }}
+<div class="row">
+	<div class="col-md-4">
 		{{ form_row(form.author, {'label': 'auteur.e'}) }}
-		</div>
-		<div class="col">
+	</div>	
+	<div class="col-md-3">
 		{{ form_row(form.publishedYear, {'label': 'publié en'}) }}
-		</div>
 	</div>
-	{{ form_row(form.summary, {'label': 'résumé'}) }}
-	{{ form_row(form.odtBookFile, {'label': 'fichier format odt'})}}
-	<button class="button-new-update btn btn-info ">
-		{{ button_label|default('Ajout') }}
-	</button>
+	<div class="col-md-5">
+		{{ form_row(form.odtBookFile) }}
+	</div>
+</div>
+{{ form_row(form.summary, {'label': 'résumé'}) }}
+
+<div class="row">
+	<div class="col-md-6">
+		{{ form_row(form.fpImageFile) }}
+	</div>
+	<div class="col-md-2"></div>
+	<div class="col-md-4">
+		{% if book.fpImageFileName %}
+		<img src="{{ vich_uploader_asset(book, 'fpImageFile') | imagine_filter('fp_thumb') }}" alt="">
+		{% else %}
+		{# <img src="/default-image.png" alt=""> #}
+
+		{% endif %}
+	</div>
+</div>
+
+{{ form_widget(form) }}
+
+<button class="button-new-update btn btn-info ">
+	{{ button_label|default('Ajout') }}
+</button>
+
 {{ form_end(form) }}

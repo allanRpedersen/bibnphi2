@@ -59,4 +59,9 @@ services:
             # - '@mailer'
             # - 'superadmin@example.com'    
         public: true
+    
+    App\Listener\ImageCacheSubscriber:
+        tags:
+        - { name: 'doctrine.event_subscriber' }
+    
 

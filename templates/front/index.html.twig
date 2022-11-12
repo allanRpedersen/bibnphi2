@@ -6,14 +6,15 @@
 
 <div id="frontpage-content">
 	<div id="frontpage-rightside">
-		<p class="text-center mt-5">
+		{# <p class="text-center mt-5">
 			<img src="/handala.png" alt="handala .. when will you turn round ?" title="handala .. quand te retourneras-tu ?">
-		</p>
-		<h5 class="mt-3 text-center">Recherche d'un mot ou d'une phrase</h5>
+		</p> #}
+		<h5 class="mt-3 text-center">Recherche d'un mot ou d'une phrase dans la bibliothèque</h5>
+		<p class="text-center">({{ nbBooks }} ouvrages)</p>
 		{{ form_start(form) }}
-		{{ form_row(form.stringToSearch)}}
-		{{ form_row(form.authors)}}
-		{{ form_row(form.books)}}
+		{{ form_widget(form.stringToSearch)}}
+		{{ form_widget(form.authors)}}
+		{{ form_widget(form.books)}}
 
 		<button id="search_button" class="btn btn-primary" onclick="showSpinner()">
 			Rechercher
@@ -21,14 +22,12 @@
 		{{ form_end(form) }}	
 	</div>
 	<div id="frontpage-leftside">
-		<h2 class="text-center mt-3">Bibliothèque</h2>
-		<p class="text-center">({{ nbBooks }} ouvrages)</p>
 		{# <div class="row"> #}
 			{% for author in authors %}
 				{% for book in author.books %}
 					{# <div class="col-md-2"> #}
 						<div style="display: inline;">
-							{% include 'book/_book_2.html.twig' %}
+							{% include 'book/_book.html.twig' %}
 						</div>
 					{# </div> #}
 				{% endfor %}

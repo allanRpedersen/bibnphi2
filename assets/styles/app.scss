@@ -7,16 +7,22 @@
 // @import '~bootstrap/dist/css/bootstrap.min.css';
 // @import 'bootswatch';
 
+$bibnphi-background: rgb(162, 247, 162);
+$bibnphi-text-color: #212529;
+
 body {
+    background-image: url('/public/fondecrannuages.jpeg');
     background-color: lightgray;
 }
 
 .book-card {
-    background-color: rgb(223, 158, 37);
-    // background-color: rgb(216, 240, 241);
-    border: 1px solid black;
-    border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
+    background-color: rgb(200, 201, 212);
+    //background-color: rgb(223, 158, 37);
+    border: 1px solid darkblue;
+    box-shadow: 5px 5px 5px darkblue;
+    // border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
     // width: 19.5%;
+
     width: 14.5%;
     display: inline-block;
     vertical-align: top;
@@ -56,10 +62,20 @@ h3:target {
 //     scroll-padding-top: 70px; /* height of sticky header */
 //   }
 
-
 .anchor-no-decoration:hover {
     text-decoration: none;
 }
+
+a:hover {
+    color: $bibnphi-text-color;
+}
+a:link {
+    color: $bibnphi-text-color;
+}
+a {
+    color: $bibnphi-text-color;
+}
+
   
 .p-justify {
     text-align: justify;
@@ -93,6 +109,8 @@ h3:target {
     height: calc(100vh - 91px);
     overflow-y: scroll;
     padding: 0px 3px;
+    //  olor: $bibnphi-background;
+
     // border:rgb(233, 185, 27) solid 1px;
 }
 
@@ -100,7 +118,10 @@ h3:target {
     width: 77%;
     height: calc(100vh - 91px);
     overflow: auto;
-    padding: 0 3px;
+    padding: 0 5px;
+    background-image: url('/public/papier.jpg');
+    //  olor: $bibnphi-background;
+
     border:rgb(11, 131, 31) solid 1px;
 
 }
@@ -115,6 +136,7 @@ h3:target {
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 3px;
+    //  olor: $bibnphi-background;
     // border:rgb(11, 131, 31) solid 1px;
 
 }
@@ -126,7 +148,7 @@ h3:target {
     overflow-y: auto;
     padding: 0px 3px;
     // border:rgb(233, 27, 27) solid 1px;
-
+    //  olor: $bibnphi-background;
 }
 
 .blink {

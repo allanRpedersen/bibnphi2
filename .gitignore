@@ -1,6 +1,7 @@
 ###> 
 /public/percentProgress.log
 /public/books
+/public/images
 /public/bibnphi.log
 /bibnphi.log
 /xyz_trash/
@@ -30,3 +31,9 @@ yarn-error.log
 /composer.lock
 /package-lock.json
 ###< symfony/webpack-encore-bundle ###
+package-lock.json
+composer.lock
+
+###> liip/imagine-bundle ###
+/public/media/cache/
+###< liip/imagine-bundle ###

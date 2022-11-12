@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityRepository;
 // use Symfony\Component\Form\AbstractType;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -36,6 +37,14 @@ class BookType extends GenericType
 					return $book->getTitle();
 				},
 			])
+			->add('fpImageFile', VichImageType::class, [
+				'label' => 'Image de couverture',
+				'required' => false,
+				'allow_delete' => true,
+				'download_label' => static function (Book $book) {
+					return $book->getFpImageFileName();
+				},
+            ])
 
             // ->add('odtBookName')
             // ->add('odtBookSize')

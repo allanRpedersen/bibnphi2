@@ -1,17 +1,29 @@
-<div class="card book-card mb-3">
+<div class="card book-card m-3 p-1">
+    {% if book.fpImageFileName %}
+    <img src="{{ vich_uploader_asset(book, 'fpImageFile') | imagine_filter('fp_crop')}}" alt="front page" width="100%">
+    {% else %}
+    <img src="{{ '/couvpardefaut.jpeg' | imagine_filter('fp_crop')}}" alt="default front page" width="100%">
+    {% endif %}
     <div class="card-body">
-        <p class="card-text">
+        <div class="card-title" style="text-align: center; font-size: 0.75rem;">
             {% if author.firstName is empty %}
             {% set fullName = author.lastName %}
             {% else %}
             {% set fullName = author.lastName ~ ', ' ~ author.firstName %}
             {% endif %}
             <a href="{{ path('author_show', { 'slug' : author.slug }) }}">{{ fullName }}</a>
+
+        </div>
+        <div class="card-text" style="text-align: center;">
+
+            <a href="{{ path('book_show', { 'slug' : book.slug }) }}">{{ book.title }}</a>
+        </div>
+
+        {# <p style="text-align: center;">
         </p>
-        <p class="card-title">
-            <a href="{{ path('book_show', { 'slug' : book.slug }) }}">
-            {{ book.title }}
-            </a>
-        </p>
+        <p style="text-align: center; color: brown">~~~</p>
+        <p style="text-align: center;">
+        </p> #}
+
     </div>
 </div>

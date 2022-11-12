@@ -1,0 +1,47 @@
+# Documentation on how to configure the bundle can be found at: https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html
+liip_imagine:
+    # valid drivers options include "gd" or "gmagick" or "imagick"
+    driver: "gd"
+
+    filter_sets:
+        thumb:
+            quality: 75
+            filters:
+                thumbnail:
+                    size:   [240,120]
+                    mode:   outbound
+                    # mode: inset
+        pict_scale:
+            quality: 75
+            filters:
+                scale:
+                    dim: [150,150]
+
+
+        pict_crop:
+            quality: 75
+            filters:
+                crop:
+                    size:   [240,120]
+                    start:  [50, 100]
+
+        fp_minithumb:
+            quality: 75
+            filters:
+                scale:
+                    dim: [32,32]
+
+        fp_thumb:
+            quality: 75
+            filters:
+                scale:
+                    dim: [150,150]
+
+        fp_crop:
+            quality: 75
+            filters:
+                crop:
+                    size:   [240,180]
+                    start:  [0, 50]
+        
+

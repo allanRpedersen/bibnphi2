@@ -3,49 +3,44 @@
 {% block title %}{{ author.lastName }}{% endblock %}
 
 {% block body %}
-    <h1>{{ author.firstName }} {{ author.lastName }}</h1>
+<div class="container">
+    <h1 style="display: inline-block">{{ author.firstName }} {{ author.lastName }}</h1>
+    <p style="display: inline">({{ author.birthYear }} / {{ author.deathYear }})</p>
+    <p class="my-3" style="font-weight: bold">{{ author.summary }}</p>
+    <div class="row">
+        <div class="col-md-8 mx-2 p-justify">
+            {{ author.content | raw }}
+        </div>
+        <div class="col-md-3">
+            <img src="/images/author/{{ author.pictureFileName }}" alt="" height="300px" style="text-align: center;">
+        </div>
+    </div>
+    
+    <h4>Ses oeuvres référencées ...</h4>
+    {% for book in author.books %}
+    {# <div class="col-md-3">
+        <div class="card-body">
+            <p class="card-title">
+                <a href="{{ path('book_show', { 'slug' : book.slug }) }}">
+                    {{ book.title }}
+                </a>
+            </p>
+        </div>
+    </div> #}
+    <div style="display: inline;">
+        {% include 'book/_book.html.twig' %}
+    </div>
 
-    <table class="table">
-        <tbody>
-            {# <tr>
-                <th>Id</th>
-                <td>{{ author.id }}</td>
-            </tr> #}
-            {# <tr>
-                <th>FirstName</th>
-                <td>{{ author.firstName }}</td>
-            </tr>
-            <tr>
-                <th>LastName</th>
-                <td>{{ author.lastName }}</td>
-            </tr> #}
-            <tr>
-                <th>Né en</th>
-                <td>{{ author.birthYear }}</td>
-            </tr>
-            <tr>
-                <th>Mort en </th>
-                <td>{{ author.deathYear }}</td>
-            </tr>
-            <tr>
-                <th>Résumé</th>
-                <td>{{ author.summary }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ author.content | raw }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-	<h3>Ses oeuvres ...</h3>
-	{% for book in author.books %}
-		<h5><a href="{{ path('book_show', {'slug': book.slug}) }}">{{ book.title }}</a></h5>
-	{% endfor %}
-
-    <a href="{{ path('author_index') }}">back to list</a>
-
-    <a href="{{ path('author_edit', {'slug': author.slug}) }}">edit</a>
-
-    {{ include('author/_delete_form.html.twig') }}
+        
+    {# <div><a href="{{ path('book_show', {'slug': book.slug}) }}">{{ book.title }}</a></div> #}
+    {% endfor %}
+    
+    <div style="display: flex;">
+        <a  type="button" class="btn btn-info mt-2"href="{{ path('author_index') }}">back to list</a>
+        <a  type="button" class="btn btn-info mt-2"href="{{ path('author_edit', {'slug': author.slug}) }}">edit</a>
+        {{ include('author/_delete_form.html.twig') }}
+    </div>
+        
+        
+</div>
 {% endblock %}

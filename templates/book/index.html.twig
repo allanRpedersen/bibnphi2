@@ -10,6 +10,7 @@
     <table class="table mt-3">
         <thead>
             <tr>
+                <th></th>
                 <th>Titre</th>
 				<th>Auteur(e)</th>
                 <th>Résumé/Intro</th>
@@ -23,6 +24,14 @@
         <tbody>
         {% for book in books %}
             <tr>
+                <td>
+                    {% if book.fpImageFileName %}
+                    <img src="{{ vich_uploader_asset(book, 'fpImageFile') | imagine_filter('fp_minithumb')}}" alt="front page">
+                    {% else %}
+                    <img src="{{ '/couvpardefaut.jpeg' | imagine_filter('fp_minithumb')}}" alt="default front page"">
+                    {% endif %}
+                </td>
+            
                 <td><a href="{{ path('book_show', {'slug': book.slug}) }}">{{ book.title }}</a></td>
 				<td>{{ book.author.lastName}}</td>
                 <td>{{ book.summary }}</td>

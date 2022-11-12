@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 
 /**
@@ -86,13 +87,6 @@ class Book
      */
     private $odtBookSize;
 
-    /**
-     * @ORM\Column(type="datetime")
-     *
-     * @var \DateTimeInterface|null
-     */
-    private $updatedAt;
-
 	/**
 	 * Undocumented variable
 	 *
@@ -131,9 +125,48 @@ class Book
     private $bookNotes;
 
     /**
+     * F R O N T P A G E aka fp
+     */
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $frontPage;
+    #[ORM\Column(type: 'string', length: '255', nullable: true)]
+    private ?string $fpImageFileName = null;
+
+    private $fpImageFileSize;
+    private $fpMimeType;
+    private $fpOriginalName;
+    private $fpImageDimensions;
+
+    
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     *
+     * @var \DateTimeInterface|null
+     */
+    private $updatedAt;
+
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     * 
+	 * @Assert\Image(mimeTypes = {"image/jpeg", "image/gif", "image/png"},
+     *               mimeTypesMessage = "Format d'image invalide (jpeg, gif, png)")
+     * 
+     * @Vich\UploadableField(mapping="book_fp",
+	 * 						fileNameProperty="fpImageFileName",
+	 * 						size="fpImageFileSize",
+	 * 						mimeType="fpMimeType",
+     *                      originalName="fpOriginalName",
+     *                      dimensions="fpImageDimensions")
+     * 
+     * @var File|null
+     */
+    private ?File $fpImageFile = null;
+
+
+
 
 
     public function __construct()
@@ -392,18 +425,6 @@ class Book
         return $this;
     }
 
-    public function getFrontPage(): ?string
-    {
-        return $this->frontPage;
-    }
-
-    public function setFrontPage(?string $frontPage): self
-    {
-        $this->frontPage = $frontPage;
-
-        return $this;
-    }
-    
 
     /**
      * Get the value of xmlFileSize
@@ -424,5 +445,113 @@ class Book
 
         return $this;
     }
+
+    /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setFpImageFile(?File $fpImageFile = null): void
+    {
+        $this->fpImageFile = $fpImageFile;
+
+        if (null !== $fpImageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getFpImageFile(): ?File
+    {
+        return $this->fpImageFile;
+    }
+
+    public function setFpImageFileName(?string $fpImageFileName): void
+    {
+        $this->fpImageFileName = $fpImageFileName;
+    }
+
+    public function getFpImageFileName(): ?string
+    {
+        return $this->fpImageFileName;
+    }
+
+    public function setFpImageFileSize(?int $fpImageFileSize): void
+    {
+        $this->fpImageFileSize = $fpImageFileSize;
+    }
+
+    public function getFpImageFileSize(): ?int
+    {
+        return $this->fpImageFileSize;
+    }
+
+
+
+    /**
+     * Get the value of fpMimeType
+     */ 
+    public function getFpMimeType(): ?string
+    {
+        return $this->fpMimeType;
+    }
+
+    /**
+     * Set the value of fpMimeType
+     *
+     * @return  self
+     */ 
+    public function setFpMimeType(?string $fpMimeType)
+    {
+        $this->fpMimeType = $fpMimeType;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of fpOriginalName
+     */ 
+    public function getFpOriginalName(): ?string
+    {
+        return $this->fpOriginalName;
+    }
+
+    /**
+     * Set the value of fpOriginalName
+     *
+     * @return  self
+     */ 
+    public function setFpOriginalName($fpOriginalName)
+    {
+        $this->fpOriginalName = $fpOriginalName;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of fpImageDimensions
+     */ 
+    public function getFpImageDimensions()
+    {
+        return $this->fpImageDimensions;
+    }
+
+    /**
+     * Set the value of fpImageDimensions
+     *
+     * @return  self
+     */ 
+    public function setFpImageDimensions($fpImageDimensions)
+    {
+        $this->fpImageDimensions = $fpImageDimensions;
+
+        return $this;
+    }
+
 
 }

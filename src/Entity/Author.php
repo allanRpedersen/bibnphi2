@@ -7,12 +7,20 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=AuthorRepository::class)
  * @ORM\HasLifecycleCallbacks
+ * @Vich\Uploadable
  */
 class Author
 {
@@ -66,7 +74,39 @@ class Author
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $picture;
+    #[ORM\Column(type: 'string', length: '255', nullable: true)]
+    private ?string $pictureFileName = null;
+
+    private $pictureFileSize;
+    private $mimeType;
+    private $originalName;
+    private $pictureDimensions;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     *
+     * @var \DateTimeInterface|null
+     */
+    private $updatedAt;
+
+
+    /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     * 
+	 * @Assert\Image(mimeTypes = {"image/jpeg", "image/gif", "image/png"},
+     *               mimeTypesMessage = "Format d'image invalide (jpeg, gif, png)")
+     * 
+     * @Vich\UploadableField(mapping="author_images",
+	 * 						fileNameProperty="pictureFileName",
+	 * 						size="pictureFileSize",
+	 * 						mimeType="mimeType",
+     *                      originalName="originalName",
+     *                      dimensions="pictureDimensions")
+     * 
+     * @var File|null
+     */
+    private ?File $pictureFile = null;
+
 
 	//
 	//
@@ -91,8 +131,6 @@ class Author
         // 'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r',
     );
    
-
-
     //
     //
     
@@ -115,7 +153,7 @@ class Author
 
             // }
     }
-
+	
     public function __construct()
     {
         $this->books = new ArrayCollection();
@@ -274,17 +312,110 @@ class Author
         return $this;
     }
 
-    public function getPicture(): ?string
+    /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setPictureFile(?File $pictureFile = null): void
     {
-        return $this->picture;
+        $this->pictureFile = $pictureFile;
+
+        if (null !== $pictureFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
-    public function setPicture(?string $picture): self
+    public function getPictureFile(): ?File
     {
-        $this->picture = $picture;
+        return $this->pictureFile;
+    }
+
+    public function setPictureFileName(?string $pictureFileName): void
+    {
+        $this->pictureFileName = $pictureFileName;
+    }
+
+    public function getPictureFileName(): ?string
+    {
+        return $this->pictureFileName;
+    }
+
+    public function setPictureFileSize(?int $pictureFileSize): void
+    {
+        $this->pictureFileSize = $pictureFileSize;
+    }
+
+    public function getPictureFileSize(): ?int
+    {
+        return $this->pictureFileSize;
+    }
+
+
+
+    /**
+     * Get the value of mimeType
+     */ 
+    public function getMimeType(): ?string
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * Set the value of mimeType
+     *
+     * @return  self
+     */ 
+    public function setMimeType(?string $mimeType)
+    {
+        $this->mimeType = $mimeType;
 
         return $this;
     }
 
+    /**
+     * Get the value of originalName
+     */ 
+    public function getOriginalName(): ?string
+    {
+        return $this->originalName;
+    }
 
+    /**
+     * Set the value of originalName
+     *
+     * @return  self
+     */ 
+    public function setOriginalName($originalName)
+    {
+        $this->originalName = $originalName;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of pictureDimensions
+     */ 
+    public function getPictureDimensions()
+    {
+        return $this->pictureDimensions;
+    }
+
+    /**
+     * Set the value of pictureDimensions
+     *
+     * @return  self
+     */ 
+    public function setPictureDimensions($pictureDimensions)
+    {
+        $this->pictureDimensions = $pictureDimensions;
+
+        return $this;
+    }
 }

@@ -1,4 +1,9 @@
 <div class="card author-card mb-3">
+    {% if author.pictureFileName %}
+    <img src="{{ vich_uploader_asset(author, 'pictureFile') | imagine_filter('thumb') }}" alt="" width="100%" heigth="auto">
+    {% else %}
+    <img src="{{ '/lepenseur-1.jpeg' | imagine_filter('thumb') }}" alt="" width="100%" heigth="auto">
+    {% endif %}
     <div class="card-body">
         <p class="card-title">
             <a href="{{ path('author_show', {'slug': author.slug}) }}">{{ author.lastName }}</a>
