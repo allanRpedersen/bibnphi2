@@ -6,27 +6,24 @@
 
 			<div class="collapse navbar-collapse" id="navbarColor02">
 				<ul class="navbar-nav mr-auto" style="align-items:center;">
-					<li class="nav-item active">
-						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('front') }}">Accueil <span class="sr-only">(current)</span></a>
-					</li>
 					<li class="nav-item">
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">Les philosophes</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('book_index') }}">Les oeuvres</a>
 					</li>
-
-					{# {% if book is defined %}
-					<h4 class="mx-2 my-0 py-2" style="color:rgb(190, 218, 165); text-align:center;">{{ book.title }}</h4>	
-					{% else %}
+					{% if form is defined %}
+					<li class="nav-item active">
+						<button class="btn btn-outline-primary mx-1" id="sentence-search-button">Rechercher un mot/une phrase</button>
+					</li>
 					{% endif %}
- #}
+
 					{% if is_granted('ROLE_USER') %}
 					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 
 					{% else %}
 					<li class="nav-item">
-						<a class="nav-link btn btn-outline-primary mx-1" href="#">A propos</a>
+						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">A propos</a>
 					</li>
 					{% endif %}
 				</ul>

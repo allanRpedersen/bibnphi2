@@ -186,7 +186,6 @@ $(function () {
 	console.log('href: ' + href);
 	console.log('protocol_host: ' + protocol_host);
 
-
 	// Form/SentenceSearchType init
 	$('#sentence_search_books').select2({
 		width: '100%',
@@ -197,9 +196,19 @@ $(function () {
 		placeholder: 'parmi les auteurs ...',
 	});
 
+
 	$('#user_userRoles').select2({
 		width: '17%',
 	});
+
+
+
+	$('#sentence-search-button').on('click', function(event){
+
+		$('#frontpage-searchform').toggle();
+	})
+
+
 	
 	$('.button-new-update').on('click', function(event) {
 		event.stopPropagation();
@@ -256,6 +265,7 @@ $(function () {
 
 	});
 
+	$('#frontpage-searchform').css({ "display": "none" });
 	console.log('Document Ready !!');
 	// alert();
 });

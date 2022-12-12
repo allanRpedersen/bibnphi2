@@ -4,6 +4,8 @@
 
 {% block body %}
 	<div class="container">
+		{% include 'partials/_search_form.html.twig' %}
+
 		<div id="searching-result-content">
 			<div id="searching-result-leftside">
 				{% if nbFoundStrings > 0 %}

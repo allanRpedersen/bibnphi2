@@ -6,6 +6,10 @@
 <div class="container">
 	<div id="book-display-content">
 		<div id="book-display-leftside">
+			{% if book.fpImageFileName %}
+			<img src="{{ vich_uploader_asset(book, 'fpImageFile') }}" alt="front page" width="80%" style="text-align: center">
+			{% endif %}
+		
 			<h2>{{ book.title }}</h2>
 			<h6><a href="{{ path('author_show', {'slug': book.author.slug}) }}" title="{{book.author.lastName}}">{{book.author.lastName}}</a></h6>
 			<p>{{ book.summary }}</p>
@@ -13,8 +17,10 @@
 				<div style="display: flex;">
 					<a class="btn btn-outline-dark" style="margin-right: 5px;" href="/books/{{ book.odtBookName }}">Télécharger</a>
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-					<a class="btn btn-outline-info" title="modifier" href="{{ path('book_edit', {'slug': book.slug}) }}">
+					<a class="btn btn-outline-info" title="modify" href="{{ path('book_edit', {'slug': book.slug}) }}">
 						<i class="fas fa-edit"></i></a>
+					<a class="btn btn-outline-warning" title="misprint" href="#">
+						<i class="fas fa-bolt"></i></a>
 					<form method="post"
 						action="{{ path('book_delete', {'slug': book.slug}) }}"
 						onsubmit="return confirm('Voulez vous vraiment supprimer cette entrée ?');">

@@ -23,7 +23,7 @@ body {
     // border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
     // width: 19.5%;
 
-    width: 14.5%;
+    width: 11%; //14.5%;
     display: inline-block;
     vertical-align: top;
 }
@@ -132,7 +132,7 @@ a {
  
 }
 #frontpage-leftside {
-    width: 85%;
+    width: 100%; //90%;
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 3px;
@@ -141,8 +141,9 @@ a {
 
 }
 #frontpage-rightside {
+    display: none;
     float: right;
-    width: 15%;
+    width: 0%;
     // height: 100vh;
     height: calc(100vh - 91px);
     overflow-y: auto;

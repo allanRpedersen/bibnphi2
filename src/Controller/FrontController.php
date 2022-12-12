@@ -164,6 +164,7 @@ class FrontController extends AbstractController
 			}
 
 			return $this->render('front/search.html.twig', [
+				'form'				=> $form->createView(),
 				'string'			=> $stringToSearch,
 				'bookList'			=> $bookList,
 				'matchingBookList'	=> $matchingBookList,
@@ -186,4 +187,14 @@ class FrontController extends AbstractController
 			'form' => $form->createView(),
         ]);
     }
+
+    /**
+     * @Route("/about", name="about")
+	 * @return Response
+     */
+	
+	public function about(Request $request): Response
+	{
+		return $this->render('front/about.html.twig');
+	}
 }
