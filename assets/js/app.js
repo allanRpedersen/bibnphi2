@@ -46,14 +46,14 @@ import 'select2';
   // console.log( process.env.DATABASE_URL );  undefined !!-/
   //
   
-  
-  function showSpinner(){
 
-	console.log('showSpinner !waouh');
-	// $('body').css({ 'cursor': 'url("/public/surfer.gif"), wait, progress' });
-	$('body').css({ 'cursor': 'wait' });
+//   function showSpinner(){
 
-}
+// 	console.log('showSpinner !waouh');
+// 	// $('body').css({ 'cursor': 'url("/public/surfer.gif"), wait, progress' });
+// 	$('body').css({ 'cursor': 'wait' });
+
+// }
 
 function setProgressBar(){
 
@@ -186,16 +186,6 @@ $(function () {
 	console.log('href: ' + href);
 	console.log('protocol_host: ' + protocol_host);
 
-	// Form/SentenceSearchType init
-	$('#sentence_search_books').select2({
-		width: '100%',
-		placeholder: 'parmi les oeuvres ...',
-	});
-	$('#sentence_search_authors').select2({
-		width: '100%',
-		placeholder: 'parmi les auteurs ...',
-	});
-
 
 	$('#user_userRoles').select2({
 		width: '17%',
@@ -205,9 +195,49 @@ $(function () {
 
 	$('#sentence-search-button').on('click', function(event){
 
-		$('#frontpage-searchform').toggle();
+
+		// $('#frontpage-searchform').toggle();
+		if ($('#frontpage-searchform').css('display') === 'none'){
+
+			$('#frontpage-leftside').css('width', '85%');
+			$('#frontpage-rightside').css('width', '15%');
+
+			$('#frontpage-rightside').css('display', 'block');
+			$('#frontpage-searchform').css('display', 'block');
+
+			// Form/SentenceSearchType init
+			$('#sentence_search_books').select2({
+				width: '100%',
+				placeholder: 'parmi les oeuvres ...',
+			});
+			$('#sentence_search_authors').select2({
+				width: '100%',
+				placeholder: 'parmi les auteurs ...',
+			});
+		}
+		else {
+			$('#frontpage-rightside').css('width', '0%');
+			$('#frontpage-leftside').css('width', '100%');
+
+			$('#frontpage-searchform').css('display', 'none');
+			$('#frontpage-rightside').css('display', 'none');
+
+		}
+
 	})
 
+	//
+	$('#search_button').on('click', function(event){
+		console.log('click on .search-button !!')
+
+		// showSpinner();
+		let el = document.getElementById("search_button");
+		el.innerHTML = 'En cours ';
+		el.innerHTML += '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+		el.innerHTML += '<span class="sr-only">Rechercher...</span>';
+		//
+		$('body').css('cursor', 'wait');
+	})
 
 	
 	$('.button-new-update').on('click', function(event) {
@@ -265,7 +295,8 @@ $(function () {
 
 	});
 
-	$('#frontpage-searchform').css({ "display": "none" });
+	// $('#frontpage-searchform').css({ "display": "none" });
+	// showSpinner();
 	console.log('Document Ready !!');
 	// alert();
 });

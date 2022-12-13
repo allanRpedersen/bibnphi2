@@ -1,16 +1,11 @@
-<div id="frontpage-searchform" class="mb-2">
-    <h5 class="mt-3 text-center" style="display:inline;">Recherche d'un mot ou d'une phrase dans la bibliothèque</h5>
-    {% if nbBooks is defined %}
-    <p style="display:inline;">({{nbBooks}} ouvrages)</p>
-    {% endif %}
+<div id="frontpage-searchform" style="display:none;" class="my-5">
+    <h5 class="mt-3 text-center">Recherche d'un mot ou d'une phrase</h5>
     {{ form_start(form) }}
-    <div  class="row">
-        <div class="col-md-4">{{ form_widget(form.stringToSearch)}}</div>
-        <div class="col-md-3">{{ form_widget(form.authors)}}</div>
-        <div class="col-md-3">{{ form_widget(form.books)}}</div>
-        <div class="col-md-2">
-            <button id="search_button" class="btn btn-primary" onclick="showSpinner()">Rechercher</button>
-        </div>
+    {{ form_widget(form.stringToSearch)}}
+    {{ form_widget(form.authors)}}
+    {{ form_widget(form.books)}}
+    <div class="mt-2" style="text-align:center;">
+        <button id="search_button" class="btn btn-primary">Rechercher</button>
     </div>
     {{ form_end(form) }}	
 </div>

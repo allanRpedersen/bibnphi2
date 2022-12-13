@@ -1,0 +1,13 @@
+<div id="frontpage-searchform" style="display:none;" class="mb-2">
+    <h5 class="mt-3 text-center" style="display:inline;">Recherche d'un mot ou d'une phrase dans la bibliothèque</h5>
+    {{ form_start(form) }}
+    <div  class="row">
+        <div class="col-md-4">{{ form_widget(form.stringToSearch)}}</div>
+        <div class="col-md-3">{{ form_widget(form.authors)}}</div>
+        <div class="col-md-3">{{ form_widget(form.books)}}</div>
+        <div class="col-md-2">
+            <button id="search_button" class="btn btn-primary">Rechercher</button>
+        </div>
+    </div>
+    {{ form_end(form) }}	
+</div>

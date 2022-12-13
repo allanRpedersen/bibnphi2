@@ -18,12 +18,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class FrontController extends AbstractController
 {
-	private $br, $ar; 
+	private $br, $ar;
+
+	private $authors;
+	private $nbAuthors, $nbBooks;
 
 	public function __construct( AuthorRepository $ar, BookRepository $br ){
 
 		$this->br = $br;
 		$this->ar = $ar;
+
+		$this->nbBooks = count($this->br->findAll());
+		$this->authors = $this->ar->findByLastName();
+		$this->nbAuthors = count($this->authors);
+
 
 	}
 
@@ -51,7 +59,7 @@ class FrontController extends AbstractController
 
 
 		//
-		$nbBooksInLibrary = count($this->br->findAll());
+		// $nbBooksInLibrary = count($this->br->findAll());
 
 		//
 		// the search form
@@ -177,14 +185,15 @@ class FrontController extends AbstractController
 		}
 
         return $this->render('front/index.html.twig', [
-			'authors' => $this->ar->findByLastName(),
+			'authors' => $this->authors,
 			// 'authors' => $paginator->paginate(
 			// 			$this->ar->findByLastNameQuery(),
 			// 			$request->query->getInt('page', 1),
 			// 			3
 			// ),
-			'nbBooks' => $nbBooksInLibrary,
-			'form' => $form->createView(),
+			'nbAuthors'	=> $this->nbAuthors,
+			'nbBooks'	=> $this->nbBooks,
+			'form'		=> $form->createView(),
         ]);
     }
 

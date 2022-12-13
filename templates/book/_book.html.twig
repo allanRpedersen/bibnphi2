@@ -6,12 +6,12 @@
     {% endif %}
     <div class="card-body">
         <div class="card-title" style="text-align: center; font-size: 0.75rem;">
-            {% if author.firstName is empty %}
+            {# {% if author.firstName is empty %}
             {% set fullName = author.lastName %}
             {% else %}
             {% set fullName = author.lastName ~ ', ' ~ author.firstName %}
-            {% endif %}
-            <a href="{{ path('author_show', { 'slug' : author.slug }) }}">{{ fullName }}</a>
+            {% endif %} #}
+            <a href="{{ path('author_show', { 'slug' : author.slug }) }}">{{ author.lastName }}</a>
 
         </div>
         <div class="card-text" style="text-align: center;">

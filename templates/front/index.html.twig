@@ -5,8 +5,8 @@
 {% block body %}
 
 <div id="frontpage-content">
-	{% include 'partials/_search_form.html.twig' %}
 	<div id="frontpage-rightside">
+		{% include 'partials/_search_form.html.twig' %}
 		{# <p class="text-center mt-5">
 			<img src="/handala.png" alt="handala .. when will you turn round ?" title="handala .. quand te retourneras-tu ?">
 		</p> #}
@@ -67,14 +67,6 @@
 
 {% block javascripts %}
 <script>
-	function showSpinner(){
-
-		el = document.getElementById("search_button");
-		el.innerHTML = 'En cours ';
-		el.innerHTML += '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-		el.innerHTML += '<span class="sr-only">Rechercher...</span>';
-
-	}
 </script>
 {% endblock %}
 

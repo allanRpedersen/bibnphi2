@@ -6,7 +6,7 @@
     {% endif %}
     <div class="card-body">
         <p class="card-title">
-            <a href="{{ path('author_show', {'slug': author.slug}) }}">{{ author.lastName }}</a>
+            <a href="{{ path('author_show', {'slug': author.slug}) }}">{{author.firstName}} {{ author.lastName }}</a>
         </p>
         {# <p class="card-text">{{ author.summary }}, {{ author.content | raw }} </p> #}
         {# <a href="{{ path('author_edit', {'slug': author.slug}) }}">modifier</a> #}

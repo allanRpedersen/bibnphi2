@@ -5,7 +5,9 @@
 {% block body %}
 <div class="container mt-1">
     <h1>Les philosophes référencés</h1>
-    <a type ="button" class="btn btn-info" href="{{ path('author_new') }}">Ajouter un philosophe</a>
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <a type ="button" class="btn btn-info" href="{{ path('author_new') }}">Ajouter un philosophe</a>
+    {% endif %}
 
     <div class="row mt-3">
         {% for author in authors %}
