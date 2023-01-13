@@ -115,6 +115,7 @@ class XmlParser {
 	 *	 
 	 * 
 	 */
+	private $firstImage;
 
 	private $isSvgTitle;
 	private $svgTitle ='';

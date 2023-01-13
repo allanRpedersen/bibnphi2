@@ -6,7 +6,11 @@
 <div class="container mt-3">
 
     <h1>Les oeuvres référencées</h1>
+    
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
     <a type ="button" class="btn btn-info" href="{{ path('book_new') }}">Ajouter une oeuvre</a>
+    {% endif %}
+
     <table class="table mt-3">
         <thead>
             <tr>

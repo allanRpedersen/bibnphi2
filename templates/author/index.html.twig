@@ -3,7 +3,7 @@
 {% block title %}Les philosophes{% endblock %}
 
 {% block body %}
-<div class="container mt-1">
+<div class="container" style="padding-top: 55px; overflow: scroll;">
     <h1>Les philosophes référencés</h1>
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         <a type ="button" class="btn btn-info" href="{{ path('author_new') }}">Ajouter un philosophe</a>

@@ -11,7 +11,7 @@
             {% else %}
             {% set fullName = author.lastName ~ ', ' ~ author.firstName %}
             {% endif %} #}
-            <a href="{{ path('author_show', { 'slug' : author.slug }) }}">{{ author.lastName }}</a>
+            <a href="{{ path('author_show', { 'slug' : book.author.slug }) }}">{{ book.author.lastName }}</a>
 
         </div>
         <div class="card-text" style="text-align: center;">

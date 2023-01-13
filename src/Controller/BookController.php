@@ -32,6 +32,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class BookController extends AbstractController
 {
+	//
+	//
+	private $xmlParser;
+	private $book;
+	
+	// const READ_BUFFER_SIZE = 65536; // 64kb
+	// private $insideNote,
+	// 		$insideAnnotation,
+	// 		$counter,
+	// 		$text,
+	// 		$isNoteBody,
+	// 		$isNoteCitation,
+	// 		$noteBody,
+	// 		$noteCitation,
+	// 		$noteCollection;
+	// private $nbBookWords,
+	// 		$nbBookSentences,
+	// 		$nbBookParagraphs,
+	// 		$xmlFileSize,
+	// 		$iCurrentBuffer;
+
+	private $uploaderHelper;
+	private $logger;
+	private $projectDir;
+	private $em;
+	// 
+	private $fDev; 
+	//
+	//
+
 
 	public function __construct(KernelInterface $kernel, EntityManagerInterface $em, UploaderHelper $uploaderHelper)
 	{
@@ -200,13 +230,13 @@ class BookController extends AbstractController
 				$fileBufferSize = $this->getParameter('app.parsing_buffer_size_l');
 
 				$xmlParser = new XmlParser(
-											$book, 
-											$workingDir, 
-											$this->getParameter('kernel.project_dir'), 
-											$fileBufferSize, 
-											$this->em,
-											/// "dev"
-										);
+									$book, 
+									$workingDir, 
+									$this->getParameter('kernel.project_dir'), 
+									$fileBufferSize, 
+									$this->em,
+									/// "dev"
+									);
 
 				$this->xmlParser = $xmlParser;
 				

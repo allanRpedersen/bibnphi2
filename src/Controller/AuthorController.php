@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Author;
 use App\Form\AuthorType;
 use App\Repository\AuthorRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,6 +17,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class AuthorController extends AbstractController
 {
+
+    private $em; // Entity manager
+
+
+    /**
+     * 
+     */
+    public function __construct( EntityManagerInterface $em ){
+
+        $this->em = $em;
+
+		// $this->authors = $this->ar->findByLastName();
+		// $this->nbAuthors = count($this->authors);
+    }	
+
     /**
      * @Route("/", name="author_index", methods={"GET"})
      */
@@ -37,9 +53,9 @@ class AuthorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($author);
-            $entityManager->flush();
+
+            $this->em->persist($author);
+            $this->em->flush();
 
             return $this->redirectToRoute('author_index');
         }
@@ -70,7 +86,7 @@ class AuthorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->em->flush();
 
             return $this->redirectToRoute('author_index');
         }
@@ -88,9 +104,9 @@ class AuthorController extends AbstractController
     public function delete(Request $request, Author $author): Response
     {
         if ($this->isCsrfTokenValid('delete'.$author->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($author);
-            $entityManager->flush();
+
+            $this->em->remove($author);
+            $this->em->flush();
         }
 
         return $this->redirectToRoute('author_index');

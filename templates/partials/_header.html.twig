@@ -1,4 +1,4 @@
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+		<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
 			<a class="navbar-brand active" style="color:darkorange" href="{{ path('front') }}">Bib'n'Phi II</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -8,18 +8,23 @@
 				<ul class="navbar-nav mr-auto" style="align-items:center;">
 					<li class="nav-item">
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">
-							Les philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
+							Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
 					</li>
+					
+					{% if bookSelectForm is defined %}{% endif %}
 					<li class="nav-item">
+						<button class="nav-link btn btn-outline-primary mx-1" id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
+					</li>
+					{# <li class="nav-item">
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('book_index') }}">
 							Les oeuvres {% if nbBooks is defined %}({{ nbBooks }}){% endif %}</a>
-					</li>
+					</li> #}
+
 					{% if form is defined %}
 					<li class="nav-item">
-						<button class="nav-link btn btn-outline-primary mx-1" id="sentence-search-button">Rechercher un mot/une phrase</button>
+						<button class="nav-link btn btn-outline-primary mx-1" id="sentence-search-button" title="dans la bibliothèque">Rechercher un mot/une phrase</button>
 					</li>
 					{% endif %}
-
 					{% if is_granted('ROLE_USER') %}
 					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 
@@ -29,11 +34,6 @@
 					</li>
 					{% endif %}
 				</ul>
-
-				{# <form class="form-inline my-2 my-lg-0">
-					<input class="form-control mr-sm-2" type="text" placeholder="Search">
-					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-				</form> #}
 
 				<ul class="navbar-nav ml-auto">
 				{% if is_granted('ROLE_ADMIN') %}
@@ -70,4 +70,11 @@
 			</div>
 		</nav>
 
-		<div class="container mt-1" style="padding-top: 55px">{{ include('partials/_flash_messages.html.twig') }}</div>
+		{% if bookSelectForm is defined %}
+		<div class="container" style="padding-top: 55px">
+			{{ include('partials/_book_select_form.html.twig') }}
+		</div>
+		{% endif %}
+		<div class="container mt-1">
+			{{ include('partials/_flash_messages.html.twig') }}
+		</div>

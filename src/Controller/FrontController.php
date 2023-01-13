@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Service\SortMgr;
+use App\Entity\BookSelect;
+use App\Form\BookSelectType;
 use App\Entity\SentenceSearch;
 use App\Form\SentenceSearchType;
 use App\Repository\BookRepository;
@@ -21,17 +24,18 @@ class FrontController extends AbstractController
 	private $br, $ar;
 
 	private $authors;
+	private $books;
 	private $nbAuthors, $nbBooks;
 
 	public function __construct( AuthorRepository $ar, BookRepository $br ){
 
-		$this->br = $br;
 		$this->ar = $ar;
-
-		$this->nbBooks = count($this->br->findAll());
 		$this->authors = $this->ar->findByLastName();
 		$this->nbAuthors = count($this->authors);
-
+		
+		$this->br = $br;
+		$this->books = $this->br->findAll();
+		$this->nbBooks = count($this->books);
 
 	}
 
@@ -57,27 +61,55 @@ class FrontController extends AbstractController
 			'needles'	=> [],
 		];
 
-
+		$bookList= [];
 		//
-		// $nbBooksInLibrary = count($this->br->findAll());
+		// the Book search form
+		$bookSelect = new BookSelect();
+		$bookSelectForm = $this->createForm(BookSelectType::class, $bookSelect);
+		$bookSelectForm->handleRequest($request);
 
-		//
-		// the search form
-		$search = new SentenceSearch();
-		$form = $this->createForm(SentenceSearchType::class, $search);
-		$form->handleRequest($request);
-
-		if ($form->isSubmitted() && $form->isValid())
+		if ($bookSelectForm->isSubmitted() && $bookSelectForm->isValid())
 		{
-			$stringToSearch = $search->getStringToSearch();
+			if (!$bookSelect->getAuthors()->isEmpty()){
+				// search in all the books wrote by the given author list ..
+				$authors = $bookSelect->getAuthors();
+				foreach($authors as $author){
+					$books = $this->br->findByAuthor($author);
+					foreach($books as $book) $bookList[] = $book;
+				}
+				
+			}
+			if (!$bookSelect->getBooks()->isEmpty()){
+				$books = $bookSelect->getBooks();
+				foreach($books as $book){
+					$bookList[] = $book;
+				}
+			}
+		}
 
-			if ($search->getBooks()->isEmpty()){
+		if (!$bookList){ $bookList = $this->books; }
 
-				if ($search->getAuthors()->isEmpty()){
+		$sm = new SortMgr;
+		$bookList = $sm->sortByAuthor($bookList);
+
+
+		//
+		// the Sentence search form
+		$sentenceSearch = new SentenceSearch();
+		$sentenceSearchForm = $this->createForm(SentenceSearchType::class, $sentenceSearch);
+		$sentenceSearchForm->handleRequest($request);
+
+		if ($sentenceSearchForm->isSubmitted() && $sentenceSearchForm->isValid())
+		{
+			$stringToSearch = $sentenceSearch->getStringToSearch();
+
+			if ($sentenceSearch->getBooks()->isEmpty()){
+
+				if ($sentenceSearch->getAuthors()->isEmpty()){
 
 					// search in all the library .. huge !-|
 					// echo "<script>alert(\"(Vous allez effectuer une recherche sur toute la bibliothèque ??-)\")</script>";
-					$bookList = $this->br->findAll();
+					$bookList = $this->books;
 
 								// ===================================+
 								// std execution time is 30 sec.      |
@@ -92,7 +124,7 @@ class FrontController extends AbstractController
 				else {
 
 					// search in all the books wrote by the given author list ..
-					$authors = $search->getAuthors();
+					$authors = $sentenceSearch->getAuthors();
 					foreach($authors as $author){
 						$books = $this->br->findByAuthor($author);
 						foreach($books as $book) $bookList[] = $book;
@@ -104,7 +136,7 @@ class FrontController extends AbstractController
 			else {
 				
 				// search through a list of books ..
-				$bookList = $search->getBooks();
+				$bookList = $sentenceSearch->getBooks();
 				
 			}
 			
@@ -172,7 +204,7 @@ class FrontController extends AbstractController
 			}
 
 			return $this->render('front/search.html.twig', [
-				'form'				=> $form->createView(),
+				'form'				=> $sentenceSearchForm->createView(),
 				'string'			=> $stringToSearch,
 				'bookList'			=> $bookList,
 				'matchingBookList'	=> $matchingBookList,
@@ -191,9 +223,11 @@ class FrontController extends AbstractController
 			// 			$request->query->getInt('page', 1),
 			// 			3
 			// ),
+			'books'		=> $bookList,
 			'nbAuthors'	=> $this->nbAuthors,
 			'nbBooks'	=> $this->nbBooks,
-			'form'		=> $form->createView(),
+			'form'		=> $sentenceSearchForm->createView(),
+			'bookSelectForm'=> $bookSelectForm->createView(),
         ]);
     }
 

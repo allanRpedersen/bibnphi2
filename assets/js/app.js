@@ -24,6 +24,9 @@ import 'bootstrap';
 import 'select2';
 
 //
+// import './select_liste_deroulante.js';
+
+//
 //
 // const fs = require('fs')
 
@@ -191,7 +194,25 @@ $(function () {
 		width: '17%',
 	});
 
+	$('#book-search-button').on('click', function(event){
+		if ($('#book-selectform').css('display') === 'none'){
 
+			$('#book-selectform').css('display', 'block');
+
+			// Form/BookSelectType init
+			$('#book_select_authors').select2({
+				width: '100%',
+				placeholder: 'du ou des philosophes ...',
+			});
+			$('#book_select_books').select2({
+				width: '100%',
+				placeholder: 'dans la liste des ouvrages ...',
+			})
+		}
+		else {
+			$('#book-selectform').css('display', 'none');
+		}
+	})
 
 	$('#sentence-search-button').on('click', function(event){
 
@@ -236,6 +257,11 @@ $(function () {
 		el.innerHTML += '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 		el.innerHTML += '<span class="sr-only">Rechercher...</span>';
 		//
+		$('body').css('cursor', 'wait');
+	})
+
+	$('#author_search_button').on('click', function(event){
+		console.log('click on author-search-button !!')
 		$('body').css('cursor', 'wait');
 	})
 
@@ -295,8 +321,8 @@ $(function () {
 
 	});
 
-	// $('#frontpage-searchform').css({ "display": "none" });
-	// showSpinner();
+	//
+	//
 	console.log('Document Ready !!');
 	// alert();
 });

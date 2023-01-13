@@ -2,18 +2,19 @@
 
 namespace App\Entity;
 
+use App\Service\SortMgr;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AuthorRepository;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
@@ -196,9 +197,9 @@ class Author
     }
 
 	public function getSlug(): ?string
-                      {
-                          return $this->slug;
-                      }
+    {
+        return $this->slug;
+    }
 
     public function setSlug(string $slug): self
     {
@@ -263,30 +264,33 @@ class Author
     public function getBooks(): Collection
     {
         $books = $this->books;
+        $sm = new SortMgr;
 
-        $sortedBooks = new ArrayCollection;
-        $titles = [];
+        return $sm->sortByTitle($books);
+
+        // $sortedBooks = new ArrayCollection;
+        // $titles = [];
 
 
-        // ascendant sort on title
-        foreach ($books as $book){
-            $title = $book->getTitle();
-            $titles[] = strtr($title, $this->table);
-        }
+        // // ascendant sort on title
+        // foreach ($books as $book){
+        //     $title = $book->getTitle();
+        //     $titles[] = strtr($title, $this->table);
+        // }
 
-        if (sizeof($titles) > 1){
+        // if (sizeof($titles) > 1){
 
-            asort($titles);
+        //     asort($titles);
 
-            foreach( $titles as $key => $val){
-                $sortedBooks[] = $books[$key];
-            }
+        //     foreach( $titles as $key => $val){
+        //         $sortedBooks[] = $books[$key];
+        //     }
 
-            return $sortedBooks;
+        //     return $sortedBooks;
 
-        }
+        // }
         
-        return $books;
+        // return $books;
     }
 
     public function addBook(Book $book): self

@@ -13,15 +13,21 @@
 	</div>
 	<div id="frontpage-leftside">
 		{# <div class="row"> #}
-			{% for author in authors %}
-				{% for book in author.books %}
-					{# <div class="col-md-2"> #}
-						<div style="display: inline;">
-							{% include 'book/_book.html.twig' %}
-						</div>
-					{# </div> #}
+				{% for book in books %}
+					<div style="display: inline;">
+						{% include 'book/_book.html.twig' %}
+					</div>
 				{% endfor %}
-			{% endfor %}
+			{# {% if books %}
+			{% else %}
+				{% for author in authors %}
+					{% for book in author.books %}
+							<div style="display: inline;">
+								{% include 'book/_book.html.twig' %}
+							</div>
+					{% endfor %}
+				{% endfor %}
+			{% endif %} #}
 		{# </div> #}
 
 	</div>
