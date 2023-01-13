@@ -11,10 +11,12 @@
 							Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
 					</li>
 					
-					{% if bookSelectForm is defined %}{% endif %}
+					{% if bookSelectForm is defined %}
 					<li class="nav-item">
 						<button class="nav-link btn btn-outline-primary mx-1" id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
 					</li>
+					{% endif %}
+
 					{# <li class="nav-item">
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('book_index') }}">
 							Les oeuvres {% if nbBooks is defined %}({{ nbBooks }}){% endif %}</a>
@@ -25,6 +27,7 @@
 						<button class="nav-link btn btn-outline-primary mx-1" id="sentence-search-button" title="dans la bibliothèque">Rechercher un mot/une phrase</button>
 					</li>
 					{% endif %}
+					
 					{% if is_granted('ROLE_USER') %}
 					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 
