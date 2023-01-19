@@ -30,9 +30,8 @@ npm-debug.log
 yarn-error.log
 /composer.lock
 /package-lock.json
+/symfony.lock
 ###< symfony/webpack-encore-bundle ###
-package-lock.json
-composer.lock
 
 ###> liip/imagine-bundle ###
 /public/media/cache/
