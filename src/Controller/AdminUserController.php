@@ -7,14 +7,16 @@ use App\Form\UserType;
 use App\Entity\PasswordUpdate;
 use App\Form\PasswordUpdateType;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+// use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/admin/user")
@@ -22,6 +24,15 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class AdminUserController extends AbstractController
 {
+    private $em;
+    private $uRepo;
+
+    public function __construct( EntityManagerInterface $em, UserRepository $uRepo){
+
+        $this->em = $em;
+        $this->uRepo = $uRepo;
+    }
+
     /**
      * @Route("/", name="admin_user_index", methods={"GET"})
      */
@@ -43,9 +54,8 @@ class AdminUserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->em->persist($user);
+            $this->em->flush();
 
             return $this->redirectToRoute('admin_user_index');
         }
@@ -71,7 +81,7 @@ class AdminUserController extends AbstractController
      * @Route("/{id}/edit", name="admin_user_edit", methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function edit(Request $request, User $user, EntityManagerInterface $em): Response
+    public function edit(Request $request, User $user): Response
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
@@ -79,16 +89,15 @@ class AdminUserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $userRoles = $user->getUserRoles();
+
             foreach($userRoles as $userRole){
                 $userRole->addUser($user);
-                $em->persist($userRole);
+                $this->em->persist($userRole);
             }
 
-            $em->persist($user);
-            $em->flush();
+            $this->em->persist($user);
+            $this->em->flush();
             
-            // $this->getDoctrine()->getManager()->flush();
-
             return $this->redirectToRoute('admin_user_index');
         }
 
@@ -99,15 +108,14 @@ class AdminUserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="admin_user_delete", methods={"DELETE"})
+     * @Route("/{id}", name="admin_user_delete", methods={"DELETE", "POST"})
      * @IsGranted("ROLE_ADMIN")
      */
     public function delete(Request $request, User $user): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($user);
-            $entityManager->flush();
+            $this->em->remove($user);
+            $this->em->flush();
         }
 
         return $this->redirectToRoute('admin_user_index');
@@ -120,7 +128,9 @@ class AdminUserController extends AbstractController
 	 * 
 	 * @return Response
 	 */
-	public function update_password(Request $request, UserPasswordEncoderInterface $encoder){
+	public function update_password(Request $request, UserPasswordHasherInterface $userPwdHash, PasswordHasherInterface $pwdHasher){
+
+        //, UserPasswordEncoderInterface $encoder
 
 		$passwordUpdate = new PasswordUpdate();
 		$user = $this->getUser();
@@ -134,7 +144,8 @@ class AdminUserController extends AbstractController
 
 			// 1- vérif de l'ancien mot de passe
 
-			$isPwdValid = $encoder->isPasswordValid($user, $passwordUpdate->getOldPassword());
+			$isPwdValid = $userPwdHash->isPasswordValid($user, $passwordUpdate->getOldPassword());
+            //$isPwdValid = $pwdHasher->verify($user->getPassword(), $passwordUpdate->getOldPassword());
 
 			if ( ! $isPwdValid ){
 			
@@ -148,12 +159,12 @@ class AdminUserController extends AbstractController
 			else {
 				$newPassword = $passwordUpdate->getNewPassword();
 
-				$hash = $encoder->encodePassword($user, $newPassword);
-				$user->setPassword($hash);
+				//$hash = $encoder->encodePassword($user, $newPassword);
+                $hash = $userPwdHash->hashPassword($newPassword);
+				//$user->setPassword($hash);
 
-				$entityManager = $this->getDoctrine()->getManager();
-				$entityManager->persist($user);
-				$entityManager->flush();
+				$this->em->persist($user);
+				$this->em->flush();
 	
 				$this->addFlash(
 					"success",

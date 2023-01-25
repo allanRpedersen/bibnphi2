@@ -21,6 +21,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminBookController extends AbstractController
 {
+    private $em;
+    private $projectDir;
+    private $uploaderHelper;
+    private $logger;
+    
     public function __construct(KernelInterface $kernel, EntityManagerInterface $em, UploaderHelper $uploaderHelper)
 	{
 		$this->projectDir = $kernel->getProjectDir();

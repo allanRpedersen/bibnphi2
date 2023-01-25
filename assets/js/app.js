@@ -203,7 +203,11 @@ $(function () {
 			$('#book_select_authors').select2({
 				width: '100%',
 				placeholder: 'du ou des philosophes ...',
+
 			});
+			$('#book_select_authors').select2('focus');
+
+
 			$('#book_select_books').select2({
 				width: '100%',
 				placeholder: 'dans la liste des ouvrages ...',
