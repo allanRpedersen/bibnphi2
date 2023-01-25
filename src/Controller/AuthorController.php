@@ -98,7 +98,7 @@ class AuthorController extends AbstractController
     }
 
     /**
-     * @Route("/{slug}", name="author_delete", methods={"DELETE"})
+     * @Route("/{slug}", name="author_delete", methods={"DELETE", "POST"})
 	 * @IsGranted("ROLE_USER")
      */
     public function delete(Request $request, Author $author): Response

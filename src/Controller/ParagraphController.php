@@ -21,6 +21,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class ParagraphController extends AbstractController
 {
+    private $em; // entity mgr
+    private $pRepo; // paragraph repository
+
     public function __construct(EntityManagerInterface $em, BookParagraphRepository $pRepo){
         
         $this->em = $em;
@@ -88,16 +91,15 @@ class ParagraphController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="paragraph_delete", methods={"DELETE"})
+     * @Route("/{id}", name="paragraph_delete", methods={"DELETE", "POST"})
      */
     public function delete(Request $request, $id): Response
     {
         $paragraph = $this->pRepo->findOneById($id);
         
         if ($this->isCsrfTokenValid('delete'.$paragraph->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($paragraph);
-            $entityManager->flush();
+            $this->em->remove($paragraph);
+            $this->em->flush();
         }
 
         return $this->redirectToRoute('paragraph_index');

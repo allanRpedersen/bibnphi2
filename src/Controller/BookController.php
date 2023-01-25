@@ -37,23 +37,7 @@ class BookController extends AbstractController
 	private $xmlParser;
 	private $book;
 	
-	// const READ_BUFFER_SIZE = 65536; // 64kb
-	// private $insideNote,
-	// 		$insideAnnotation,
-	// 		$counter,
-	// 		$text,
-	// 		$isNoteBody,
-	// 		$isNoteCitation,
-	// 		$noteBody,
-	// 		$noteCitation,
-	// 		$noteCollection;
-	// private $nbBookWords,
-	// 		$nbBookSentences,
-	// 		$nbBookParagraphs,
-	// 		$xmlFileSize,
-	// 		$iCurrentBuffer;
-
-	private $uploaderHelper;
+		private $uploaderHelper;
 	private $logger;
 	private $projectDir;
 	private $em;
@@ -567,7 +551,7 @@ class BookController extends AbstractController
     }
 
     /**
-     * @Route("/{slug}", name="book_delete", methods={"DELETE"})
+     * @Route("/{slug}", name="book_delete", methods={"DELETE", "POST"})
 	 * @IsGranted("ROLE_USER")
      */
     public function delete(Request $request, Book $book): Response
