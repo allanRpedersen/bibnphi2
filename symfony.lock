@@ -109,9 +109,6 @@
     "egulias/email-validator": {
         "version": "2.1.23"
     },
-    "ensepar/html2pdf-bundle": {
-        "version": "v4.1.0"
-    },
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.3"
     },
@@ -208,9 +205,6 @@
         "files": [
             "config/packages/sensio_framework_extra.yaml"
         ]
-    },
-    "spipu/html2pdf": {
-        "version": "v5.2.5"
     },
     "symfony/amqp-messenger": {
         "version": "v5.1.8"
@@ -607,9 +601,6 @@
     },
     "symfonycasts/verify-email-bundle": {
         "version": "v1.10.0"
-    },
-    "tecnickcom/tcpdf": {
-        "version": "6.4.4"
     },
     "twig/extra-bundle": {
         "version": "v3.1.1"

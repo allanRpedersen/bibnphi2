@@ -12,15 +12,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-// use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/admin/user")
- * @IsGranted("ROLE_ADMIN")
  */
 class AdminUserController extends AbstractController
 {
@@ -35,11 +33,12 @@ class AdminUserController extends AbstractController
 
     /**
      * @Route("/", name="admin_user_index", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
      */
-    public function index(UserRepository $userRepository): Response
+    public function index(): Response
     {
         return $this->render('admin/user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $this->uRepo->findAll(),
         ]);
     }
 
@@ -47,13 +46,22 @@ class AdminUserController extends AbstractController
      * @Route("/new", name="admin_user_new", methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
     */
-    public function new(Request $request): Response
+    public function new(Request $request, UserPasswordHasherInterface $hasher): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+
+            // PlaintextPasswordHasher ?? !!
+            // add a default password : user
+            $plainTextPassword = 'user';
+
+            $hash = $hasher->hashPassword($user, $plainTextPassword);
+            $user->setPassword($hash);
+
             $this->em->persist($user);
             $this->em->flush();
 
@@ -67,27 +75,22 @@ class AdminUserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="admin_user_show", methods={"GET"})
-     * @IsGranted("ROLE_ADMIN")
-     */
-    public function show(User $user): Response
-    {
-        return $this->render('admin/user/show.html.twig', [
-            'user' => $user,
-        ]);
-    }
-
-    /**
      * @Route("/{id}/edit", name="admin_user_edit", methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
     public function edit(Request $request, User $user): Response
     {
+        //
+
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            //
+
+            //
+            //
             $userRoles = $user->getUserRoles();
 
             foreach($userRoles as $userRole){
@@ -124,18 +127,17 @@ class AdminUserController extends AbstractController
 	/**
 	 * Mise à jour du mot de passe
 	 * 
-	 * @Route ("/user/updatepwd", name="user_updatepwd")
-	 * 
+	 * @Route ("/updatepwd/{id}", name="user_updatepwd")
+	 * @IsGranted("ROLE_USER")
+     * 
 	 * @return Response
 	 */
-	public function update_password(Request $request, UserPasswordHasherInterface $userPwdHash, PasswordHasherInterface $pwdHasher){
-
-        //, UserPasswordEncoderInterface $encoder
+	public function update_password(Request $request, User $user, UserPasswordHasherInterface $userPwdHash){
 
 		$passwordUpdate = new PasswordUpdate();
-		$user = $this->getUser();
+		// $user = $this->getUser();
 
-		
+
 		$form = $this->createForm(PasswordUpdateType::class, $passwordUpdate );
 		
 		$form->handleRequest($request);
@@ -145,13 +147,8 @@ class AdminUserController extends AbstractController
 			// 1- vérif de l'ancien mot de passe
 
 			$isPwdValid = $userPwdHash->isPasswordValid($user, $passwordUpdate->getOldPassword());
-            //$isPwdValid = $pwdHasher->verify($user->getPassword(), $passwordUpdate->getOldPassword());
-
 			if ( ! $isPwdValid ){
 			
-				// if (!password_verify($passwordUpdate->getOldPassword(), $user->getPassword())){
-				// return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
-
 				// gérer l'erreur
 				$form->get('oldPassword')->addError(new FormError("Vous n'avez pas saisi correctement votre mot de passe actuel !"));
 
@@ -159,9 +156,8 @@ class AdminUserController extends AbstractController
 			else {
 				$newPassword = $passwordUpdate->getNewPassword();
 
-				//$hash = $encoder->encodePassword($user, $newPassword);
-                $hash = $userPwdHash->hashPassword($newPassword);
-				//$user->setPassword($hash);
+                $hash = $userPwdHash->hashPassword($user, $newPassword); // $user->setPassword($hash)
+                $user->setPassword($hash);
 
 				$this->em->persist($user);
 				$this->em->flush();
@@ -176,7 +172,6 @@ class AdminUserController extends AbstractController
 					// 'id' => $user->getId()
 					]);
 					
-				dd($user);
 			}
 
 		}

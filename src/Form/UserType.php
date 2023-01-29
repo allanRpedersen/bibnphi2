@@ -27,7 +27,7 @@ class UserType extends AbstractType
                 'multiple' => true,
                 // 'label' => false,
 			])
-            // ->add('password')
+            ->add('password')
         ;
     }
 

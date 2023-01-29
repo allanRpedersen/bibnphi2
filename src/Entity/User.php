@@ -47,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	public $passwordConfirm;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Role", mappedBy="users")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Role", inversedBy="users")
      */
     private $userRoles;
 
@@ -113,12 +113,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
+    // public function setRoles(array $roles): self
+    // {
+    //     $this->roles = $roles;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @see PasswordAuthenticatedUserInterface
@@ -168,7 +168,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->userRoles->contains($userRole)) {
 			$this->userRoles[] = $userRole;
 			
-            $userRole->addUser($this);
+            // $userRole->addUser($this);
         }
 
         return $this;
@@ -178,7 +178,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->userRoles->contains($userRole)) {
             $this->userRoles->removeElement($userRole);
-            $userRole->removeUser($this);
+
+            // $userRole->removeUser($this);
         }
 
         return $this;

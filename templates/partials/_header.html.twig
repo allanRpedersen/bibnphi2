@@ -28,7 +28,7 @@
 					</li>
 					{% endif %}
 					
-					{% if is_granted('ROLE_USER') %}
+					{% if is_granted('ROLE_LIBRARIAN') %}
 					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 
 					{% else %}
@@ -57,7 +57,7 @@
 						{# <a class="dropdown-item" href="{{ path('user_show', { slug: app.user.slug, id: app.user.id }) }}"><i class="fas fa-user"></i> Mes informations</a>
 						<a class="dropdown-item" href="{{ path('admin_account_dashboard') }}"><i class="fas fa-chess" aria-hidden="true"></i> Admin dashboard</a> #}
 						<a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
-						<a class="dropdown-item" href="{{ path('user_updatepwd') }}"><i class="fas fa-user-lock"></i> Modif mot de passe</a>
+						<a class="dropdown-item" href="{{ path('user_updatepwd', { id: app.user.id }) }}"><i class="fas fa-user-lock"></i> Modif mot de passe</a>
 					</div>
 				</li>
 

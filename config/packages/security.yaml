@@ -48,12 +48,6 @@ security:
                 
                 # where to redirect after logout
        
-            # anonymous: true
-            # provider: app_user_provider
-        # main:
-        #     lazy: true
-        #     provider: users_in_memory
-
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -63,6 +57,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/admin/user/updatepwd, roles: ROLE_USER}
         - { path: ^/admin/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
