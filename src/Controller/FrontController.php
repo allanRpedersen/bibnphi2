@@ -48,8 +48,11 @@ class FrontController extends AbstractController
     {
 		// init
 		//
+		$sm = new SortMgr();
+
 		$authors = [];
-		$bookList = [];
+		$bookList = $sm->sortByAuthor($this->books);
+		$authorSelected = false;
 
 		$session = $request->getSession();
 
@@ -61,18 +64,26 @@ class FrontController extends AbstractController
 			'needles'	=> [],
 		];
 
-		$bookList= [];
+		/** any user authenticated ?
+		 ** 
+		 ** @var \App\Entity\User $user
+		**/
+		$user = $this->getUser();
+		
 		//
 		// the Book search form
 		$bookSelect = new BookSelect();
 		$bookSelectForm = $this->createForm(BookSelectType::class, $bookSelect);
 		$bookSelectForm->handleRequest($request);
-
+		
 		if ($bookSelectForm->isSubmitted() && $bookSelectForm->isValid())
 		{
+			$bookList = [];
+
 			if (!$bookSelect->getAuthors()->isEmpty()){
 				// search in all the books wrote by the given author list ..
 				$authors = $bookSelect->getAuthors();
+				$authorSelected = true;
 				foreach($authors as $author){
 					$books = $this->br->findByAuthor($author);
 					foreach($books as $book) $bookList[] = $book;
@@ -85,14 +96,37 @@ class FrontController extends AbstractController
 					$bookList[] = $book;
 				}
 			}
+
+			if (!$bookList && !$authorSelected){
+				
+				// ??????????????
+				$bookList = $this->books;
+				dd($bookList);
+			}
+
+			$bookList = $sm->sortByAuthor($bookList);
+
+			$bookSelectionIds = [];
+			foreach( $bookList as $book ){
+				$bookSelectionIds[] = $book->getId();
+			}
+
+			$session->set('currentBookSelectionIds', $bookSelectionIds);
 		}
+		
+		//
+		//
+		$currentBookSelectionIds = $session->get('currentBookSelectionIds');
+		if ($currentBookSelectionIds){
 
-		if (!$bookList){ $bookList = $this->books; }
+			$bookList = [];
+			foreach($currentBookSelectionIds as $id){
+				$bookList[] = $this->br->findOneById($id);
+				$bookList = $sm->sortByAuthor($bookList);
+			}
 
-		$sm = new SortMgr;
-		$bookList = $sm->sortByAuthor($bookList);
-
-
+		}
+		
 		//
 		// the Sentence search form
 		$sentenceSearch = new SentenceSearch();
@@ -103,44 +137,7 @@ class FrontController extends AbstractController
 		{
 			$stringToSearch = $sentenceSearch->getStringToSearch();
 
-			if ($sentenceSearch->getBooks()->isEmpty()){
-
-				if ($sentenceSearch->getAuthors()->isEmpty()){
-
-					// search in all the library .. huge !-|
-					// echo "<script>alert(\"(Vous allez effectuer une recherche sur toute la bibliothèque ??-)\")</script>";
-					$bookList = $this->books;
-
-								// ===================================+
-								// std execution time is 30 sec.      |
-								// set execution time to infinite !!  |
-								//                                    |
-								ini_set('max_execution_time', '0'); //|
-								//                                    |
-								// ===================================+
-
-				}
-				
-				else {
-
-					// search in all the books wrote by the given author list ..
-					$authors = $sentenceSearch->getAuthors();
-					foreach($authors as $author){
-						$books = $this->br->findByAuthor($author);
-						foreach($books as $book) $bookList[] = $book;
-					}
-					
-				}
-
-			}
-			else {
-				
-				// search through a list of books ..
-				$bookList = $sentenceSearch->getBooks();
-				
-			}
-			
-			//
+			// Get the book list, begin words search process..
 			//
 			$matchingParagraphs = [];
 			$matchingNotes = [];
@@ -149,6 +146,7 @@ class FrontController extends AbstractController
 
 			$hlContents = [];
 
+			$bookList = $sm->sortByTitle($bookList);
 			foreach($bookList as $book){
 
 				$paragraphs = $book->getBookParagraphs();
@@ -200,6 +198,8 @@ class FrontController extends AbstractController
 				if ($nbFoundStrings){
 					$session->set('hlString', $stringToSearch);
 					$session->set('hlContents', $hlContents);
+
+					// $matchingBookList = $sm->sortByTitle($matchingBookList);
 				}
 			}
 
@@ -228,6 +228,7 @@ class FrontController extends AbstractController
 			'nbBooks'	=> $this->nbBooks,
 			'form'		=> $sentenceSearchForm->createView(),
 			'bookSelectForm'=> $bookSelectForm->createView(),
+			'isSelectedList'=> $currentBookSelectionIds,
         ]);
     }
 
@@ -239,5 +240,16 @@ class FrontController extends AbstractController
 	public function about(Request $request): Response
 	{
 		return $this->render('front/about.html.twig');
+	}
+
+	/**
+	 * @Route("/resetSelection", name="reset_selection")
+	 */
+	public function resetBookList(Request $request): Response
+	{
+		$session = $request->getSession();
+		$session->set('currentBookSelectionIds', NULL);
+
+		return $this->redirectToRoute('front');
 	}
 }

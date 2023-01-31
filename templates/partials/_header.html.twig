@@ -1,5 +1,5 @@
 		<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-			<a class="navbar-brand" style="color:darkorange" href="{{ path('front') }}">Bib'n'Phi II</a>
+			<a class="navbar-brand" style="color:darkorange" title="(la bibliothèque !!)" href="{{ path('reset_selection') }}">Bib'n'Phi II</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -15,6 +15,11 @@
 					<li class="nav-item">
 						<button class="nav-link btn btn-outline-primary mx-1" id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
 					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
+						id="cancel-selection-button" title="la sélection" href="{{ path('reset_selection') }}">Annuler</a>
+			
+					</li>
 					{% endif %}
 
 					{# <li class="nav-item">
@@ -24,7 +29,8 @@
 
 					{% if form is defined %}
 					<li class="nav-item">
-						<button class="nav-link btn btn-outline-primary mx-1" id="sentence-search-button" title="dans la bibliothèque">Rechercher un mot/une phrase</button>
+						<button class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
+						id="sentence-search-button" title="dans la sélection">Rechercher un mot/une phrase</button>
 					</li>
 					{% endif %}
 					

@@ -5,7 +5,6 @@ forget me not !!!!!
 
 1.  
 2.  Modif d'un paragraphe dans la base non répercutée dans le doc d'origine !!
-3.  Suppression de rôle dans le user !!
 4.  Ya un truc qui coince dans la modification/prise en compte du document odt originel.
 
 5.  Prise en compte de la balise xml <TABLE> ..... 
@@ -14,7 +13,7 @@ forget me not !!!!!
 
 1. 
 2. La possibilité d'exporter une œuvre en PDF en plus d'ODT. ------------>>>>>>>>>>>>>>>       odt2pdf () unoconv
-3. La possibilité d'exporter en ODT et en PDF la liste des résultats d'une requête.
+3. La possibilité d'exporter en ODT et en PDF la liste des résultats d'une requête. <<<<<<<<<<<<<    html2pdf 
 
 4. Il faudra prévoir au moins deux nouvelles pages :
 - Un formulaire de contact (par exemple pour signaler une coquille dans un texte).
@@ -26,5 +25,6 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 - de surligner / souligner des passages de ces œuvres sélectionnées de différentes couleurs (une dizaines proposées) et de retrouver ces modifications d'une session à l'autre.
 - de faire des annotations au texte, dans une "marge" ou quelque chose comme ça.
 
-6. Sélection/recherche par auteurs/titres
-7. Gestion des utilisateurs !!!!!
+6. Sélection/recherche par auteurs/titres <DONE>
+7. Gestion des utilisateurs !!!!! <<<<<<<<<<<<<<<<<< Espace perso. surlignage/annotations !!!
+3. Suppression de rôle dans le user !! <DONE:->

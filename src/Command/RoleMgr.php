@@ -58,10 +58,10 @@ class RoleMgr extends Command
 
         $io->note('Processing ... ');
 
-        $newRole = new Role();
-        $newRole->setTitle('ROLE_LIBRARIAN');
-        $this->em->persist($newRole);
-        $this->em->flush();
+        // $newRole = new Role();
+        // $newRole->setTitle('ROLE_LIBRARIAN');
+        // $this->em->persist($newRole);
+        // $this->em->flush();
 
 
         $roles = $this->rr->findAll();
@@ -78,9 +78,9 @@ class RoleMgr extends Command
 
         // return Command::SUCCESS;
 
-        $role = new Role();
-        $role->setTitle('ROLE_ADMIN');
-        $this->em->persist($role);
+        $role = $this->rr->findOneByTitle('ROLE_ADMIN'); // new Role();
+        // $role->setTitle('ROLE_ADMIN');
+        // $this->em->persist($role);
 
         $adminMail = "elisee.reclus@webcoop.fr";
         $adminUser = $this->ur->findOneByEmail($adminMail);

@@ -26,28 +26,28 @@ class SentenceSearchType extends AbstractType
 					'placeholder' => 'chaîne à rechercher ...',
 				],
 			] )
-            ->add('books', EntityType::class, [
-				'class' => Book::class,
-				'choice_label' => 'title',
-				'query_builder' => function (EntityRepository $br){
-					return $br->createQueryBuilder('u')
-							->orderBy('u.title', 'ASC');
-				},
-				'required' => false,
-				'multiple' => true,
-				'label' => false,
-			] )
-            ->add('authors', EntityType::class, [
-				'class' => Author::class,
-				'choice_label' => 'lastName',
-				'query_builder' => function (EntityRepository $ar){
-					return $ar->createQueryBuilder('u')
-							->orderBy('u.lastName', 'ASC');
-				},
-				'required' => false,
-				'multiple' => true,
-				'label' => false,
-			] )
+            // ->add('books', EntityType::class, [
+			// 	'class' => Book::class,
+			// 	'choice_label' => 'title',
+			// 	'query_builder' => function (EntityRepository $br){
+			// 		return $br->createQueryBuilder('u')
+			// 				->orderBy('u.title', 'ASC');
+			// 	},
+			// 	'required' => false,
+			// 	'multiple' => true,
+			// 	'label' => false,
+			// ] )
+            // ->add('authors', EntityType::class, [
+			// 	'class' => Author::class,
+			// 	'choice_label' => 'lastName',
+			// 	'query_builder' => function (EntityRepository $ar){
+			// 		return $ar->createQueryBuilder('u')
+			// 				->orderBy('u.lastName', 'ASC');
+			// 	},
+			// 	'required' => false,
+			// 	'multiple' => true,
+			// 	'label' => false,
+			// ] )
         ;
     }
 

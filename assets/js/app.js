@@ -210,7 +210,7 @@ $(function () {
 
 			$('#book_select_books').select2({
 				width: '100%',
-				placeholder: 'dans la liste des ouvrages ...',
+				placeholder: 'et/ou par titre ...',
 			})
 		}
 		else {

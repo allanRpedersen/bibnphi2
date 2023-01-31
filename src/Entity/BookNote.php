@@ -29,7 +29,7 @@ class BookNote
     private $book;
 
     /**
-     * @ORM\ManyToOne(targetEntity=BookParagraph::class, inversedBy="Notes")
+     * @ORM\ManyToOne(targetEntity=BookParagraph::class, inversedBy="notes")
      * @ORM\JoinColumn(nullable=false)
      */
     private $bookParagraph;
@@ -66,6 +66,7 @@ class BookNote
     private $foundStringIndexes = [];
     private $searchedString = '';
     private $nextOccurence;
+    private $highlightedContent;
 
     public function __construct()
     {

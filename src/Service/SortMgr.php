@@ -36,7 +36,7 @@ class SortMgr
      * @param Collection|Book[] $originalList
      * @return Collection|Book[]
      */
-    public function sortByTitle($originalList, $direction="ASC"): Collection
+    public function sortByTitle($originalList, $direction="ASC"): ArrayCollection
     {
 
         $sortedBooks = new ArrayCollection;
@@ -51,7 +51,8 @@ class SortMgr
         asort($titles);
 
         foreach( $titles as $key => $val){
-            $sortedBooks[] = $originalList[$key];
+            $book = $originalList[$key];
+            if (!$sortedBooks->contains($book)) $sortedBooks[] = $book;
         }
 
         return $sortedBooks;
