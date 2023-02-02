@@ -224,28 +224,31 @@ $(function () {
 		// $('#frontpage-searchform').toggle();
 		if ($('#frontpage-searchform').css('display') === 'none'){
 
-			$('#frontpage-leftside').css('width', '85%');
-			$('#frontpage-rightside').css('width', '15%');
+			// $('#frontpage-leftside').css('width', '85%');
+			// $('#frontpage-rightside').css('width', '15%');
+			// $('#frontpage-rightside').css('display', 'block');
 
-			$('#frontpage-rightside').css('display', 'block');
 			$('#frontpage-searchform').css('display', 'block');
+			$('#sentence-search-button').css('display', 'none');
+
+			$('#sentence_search_stringToSearch').trigger('focus');
 
 			// Form/SentenceSearchType init
-			$('#sentence_search_books').select2({
-				width: '100%',
-				placeholder: 'parmi les oeuvres ...',
-			});
-			$('#sentence_search_authors').select2({
-				width: '100%',
-				placeholder: 'parmi les auteurs ...',
-			});
+			// $('#sentence_search_books').select2({
+			// 	width: '100%',
+			// 	placeholder: 'parmi les oeuvres ...',
+			// });
+			// $('#sentence_search_authors').select2({
+			// 	width: '100%',
+			// 	placeholder: 'parmi les auteurs ...',
+			// });
 		}
 		else {
-			$('#frontpage-rightside').css('width', '0%');
-			$('#frontpage-leftside').css('width', '100%');
+			// $('#frontpage-rightside').css('width', '0%');
+			// $('#frontpage-leftside').css('width', '100%');
+			// $('#frontpage-rightside').css('display', 'none');
 
 			$('#frontpage-searchform').css('display', 'none');
-			$('#frontpage-rightside').css('display', 'none');
 
 		}
 

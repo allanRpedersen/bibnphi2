@@ -118,13 +118,11 @@ class FrontController extends AbstractController
 		//
 		$currentBookSelectionIds = $session->get('currentBookSelectionIds');
 		if ($currentBookSelectionIds){
-
 			$bookList = [];
 			foreach($currentBookSelectionIds as $id){
 				$bookList[] = $this->br->findOneById($id);
-				$bookList = $sm->sortByAuthor($bookList);
 			}
-
+			$bookList = $sm->sortByAuthor($bookList);
 		}
 		
 		//
@@ -139,11 +137,11 @@ class FrontController extends AbstractController
 
 			// Get the book list, begin words search process..
 			//
-			$matchingParagraphs = [];
-			$matchingNotes = [];
-			$matchingBookList = [];
-			$nbFoundStrings = 0;
 
+			$matchingParagraphs = [];
+			$matchingBookList = [];
+			$matchingNotes = [];
+			$nbFoundStrings = 0;
 			$hlContents = [];
 
 			$bookList = $sm->sortByTitle($bookList);
@@ -214,6 +212,24 @@ class FrontController extends AbstractController
 
 			]);
 
+		}
+
+		if ($currentBookSelectionIds){
+			return $this->render('front/selected_index.html.twig', [
+				'authors' => $this->authors,
+				// 'authors' => $paginator->paginate(
+				// 			$this->ar->findByLastNameQuery(),
+				// 			$request->query->getInt('page', 1),
+				// 			3
+				// ),
+				'books'		=> $bookList,
+				'nbAuthors'	=> $this->nbAuthors,
+				'nbBooks'	=> $this->nbBooks,
+				'form'		=> $sentenceSearchForm->createView(),
+				'bookSelectForm'=> $bookSelectForm->createView(),
+				'isSelectedList'=> $currentBookSelectionIds,
+			]);
+	
 		}
 
         return $this->render('front/index.html.twig', [

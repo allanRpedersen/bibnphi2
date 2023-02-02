@@ -7,7 +7,6 @@ use App\Entity\Book;
 use App\Entity\Author;
 use App\Form\BookType;
 use App\Service\XmlParser;
-use App\Service\ContentMgr;
 use App\Repository\BookRepository;
 use Monolog\Handler\StreamHandler;
 use App\Repository\BookNoteRepository;
@@ -37,7 +36,7 @@ class BookController extends AbstractController
 	private $xmlParser;
 	private $book;
 	
-		private $uploaderHelper;
+	private $uploaderHelper;
 	private $logger;
 	private $projectDir;
 	private $em;
@@ -291,7 +290,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/new", name="book_new", methods={"GET","POST"})
-	 * @IsGranted("ROLE_USER")
+	 * @IsGranted("ROLE_LIBRARIAN")
      */
 	public function new( Request $request ): Response
     {
@@ -436,7 +435,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/{slug}/edit", name="book_edit", methods={"GET","POST"})
-	 * @IsGranted("ROLE_USER")
+	 * @IsGranted("ROLE_LIBRARIAN")
      */
     public function edit(Request $request, Book $book, UploaderHelper $uploaderHelper): Response
     {
@@ -552,7 +551,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/{slug}", name="book_delete", methods={"DELETE", "POST"})
-	 * @IsGranted("ROLE_USER")
+	 * @IsGranted("ROLE_LIBRARIAN")
      */
     public function delete(Request $request, Book $book): Response
     {

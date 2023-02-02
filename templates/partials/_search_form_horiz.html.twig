@@ -1,11 +1,14 @@
-<div id="frontpage-searchform" style="display:none;" class="mb-2">
-    <h5 class="mt-3 text-center" style="display:inline;">Recherche d'un mot ou d'une phrase dans la bibliothèque</h5>
+<div id="frontpage-searchform" style="display:none;" >
+    {# <h5 class="mt-3 text-center" style="display:inline;">Recherche d'un mot ou d'une phrase dans la bibliothèque</h5> #}
     {{ form_start(form) }}
-    <div  class="row">
-        <div class="col-md-6">{{ form_widget(form.stringToSearch)}}</div>
-        <div class="col-md-2">
-            <button id="search_button" class="btn btn-primary">Rechercher</button>
-        </div>
+    <div style="display:inline-block">
+        {{ form_widget(form.stringToSearch)}}
     </div>
+        <button id="search_button" class="btn btn-primary"><i class="fa fa-search"></i></button>
+        {# <div  class="row">
+            <div class="col-md-10">{{ form_widget(form.stringToSearch)}}</div>
+            <button id="search_button" class="btn btn-primary"><i class="fa fa-search"></i></button>
+        </div> #}
     {{ form_end(form) }}	
+    
 </div>

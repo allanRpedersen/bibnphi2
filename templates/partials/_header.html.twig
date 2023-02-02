@@ -1,5 +1,5 @@
 		<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-			<a class="navbar-brand" style="color:darkorange" title="(la bibliothèque !!)" href="{{ path('reset_selection') }}">Bib'n'Phi II</a>
+			<a class="navbar-brand" style="color:darkorange" title="(la bibliothèque !!)" href="{{ path('reset_selection') }}">Bib'n'Phi</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -32,6 +32,12 @@
 						<button class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
 						id="sentence-search-button" title="dans la sélection">Rechercher un mot/une phrase</button>
 					</li>
+					<li class="nav-item">
+						<div class="nav-link mx-1" >
+							{{ include ('partials/_search_form_horiz.html.twig') }}
+						</div>
+					</li>
+
 					{% endif %}
 					
 					{% if is_granted('ROLE_LIBRARIAN') %}
