@@ -22,12 +22,7 @@
 					</li>
 					{% endif %}
 
-					{# <li class="nav-item">
-						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('book_index') }}">
-							Les oeuvres {% if nbBooks is defined %}({{ nbBooks }}){% endif %}</a>
-					</li> #}
-
-					{% if form is defined %}
+					{% if sentenceSearchform is defined %}
 					<li class="nav-item">
 						<button class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
 						id="sentence-search-button" title="dans la sélection">Rechercher un mot/une phrase</button>
@@ -37,7 +32,6 @@
 							{{ include ('partials/_search_form_horiz.html.twig') }}
 						</div>
 					</li>
-
 					{% endif %}
 					
 					{% if is_granted('ROLE_LIBRARIAN') %}
@@ -85,11 +79,11 @@
 			</div>
 		</nav>
 
-		{% if bookSelectForm is defined %}
 		<div class="container" style="padding-top: 55px">
+			{% if bookSelectForm is defined %}
 			{{ include('partials/_book_select_form.html.twig') }}
+			{% endif %}
 		</div>
-		{% endif %}
 		<div class="container mt-1">
 			{{ include('partials/_flash_messages.html.twig') }}
 		</div>

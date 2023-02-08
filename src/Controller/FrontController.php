@@ -144,6 +144,8 @@ class FrontController extends AbstractController
 			$nbFoundStrings = 0;
 			$hlContents = [];
 
+			// Word/Sentence search process
+			//
 			$bookList = $sm->sortByTitle($bookList);
 			foreach($bookList as $book){
 
@@ -216,18 +218,19 @@ class FrontController extends AbstractController
 
 		if ($currentBookSelectionIds){
 			return $this->render('front/selected_index.html.twig', [
-				'authors' => $this->authors,
+				//'authors' => $this->authors,
 				// 'authors' => $paginator->paginate(
 				// 			$this->ar->findByLastNameQuery(),
 				// 			$request->query->getInt('page', 1),
 				// 			3
 				// ),
 				'books'		=> $bookList,
-				'nbAuthors'	=> $this->nbAuthors,
-				'nbBooks'	=> $this->nbBooks,
-				'form'		=> $sentenceSearchForm->createView(),
-				'bookSelectForm'=> $bookSelectForm->createView(),
-				'isSelectedList'=> $currentBookSelectionIds,
+				'openBook'	=> $bookList[0],
+				// 'nbAuthors'	=> $this->nbAuthors,
+				// 'nbBooks'	=> $this->nbBooks,
+				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
+				'bookSelectForm'		=> $bookSelectForm->createView(),
+				'isSelectedList'		=> $currentBookSelectionIds,
 			]);
 	
 		}
@@ -242,9 +245,9 @@ class FrontController extends AbstractController
 			'books'		=> $bookList,
 			'nbAuthors'	=> $this->nbAuthors,
 			'nbBooks'	=> $this->nbBooks,
-			'form'		=> $sentenceSearchForm->createView(),
-			'bookSelectForm'=> $bookSelectForm->createView(),
-			'isSelectedList'=> $currentBookSelectionIds,
+			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
+			'bookSelectForm'		=> $bookSelectForm->createView(),
+			'isSelectedList'		=> $currentBookSelectionIds,
         ]);
     }
 
