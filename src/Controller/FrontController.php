@@ -101,7 +101,7 @@ class FrontController extends AbstractController
 				
 				// ??????????????
 				$bookList = $this->books;
-				dd($bookList);
+				// dd($bookList);
 			}
 
 			$bookList = $sm->sortByAuthor($bookList);
@@ -118,9 +118,12 @@ class FrontController extends AbstractController
 		//
 		$currentBookSelectionIds = $session->get('currentBookSelectionIds');
 		if ($currentBookSelectionIds){
+
 			$bookList = [];
 			foreach($currentBookSelectionIds as $id){
-				$bookList[] = $this->br->findOneById($id);
+				//
+				// 
+				if ($book = $this->br->findOneById($id)) $bookList[] = $book;
 			}
 			$bookList = $sm->sortByAuthor($bookList);
 		}
@@ -216,18 +219,11 @@ class FrontController extends AbstractController
 
 		}
 
-		if ($currentBookSelectionIds){
+		if ($currentBookSelectionIds && $bookList){
+
 			return $this->render('front/selected_index.html.twig', [
-				//'authors' => $this->authors,
-				// 'authors' => $paginator->paginate(
-				// 			$this->ar->findByLastNameQuery(),
-				// 			$request->query->getInt('page', 1),
-				// 			3
-				// ),
-				'books'		=> $bookList,
-				'openBook'	=> $bookList[0],
-				// 'nbAuthors'	=> $this->nbAuthors,
-				// 'nbBooks'	=> $this->nbBooks,
+				'books'					=> $bookList,
+				'openBook'				=> $bookList[0],
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
 				'isSelectedList'		=> $currentBookSelectionIds,

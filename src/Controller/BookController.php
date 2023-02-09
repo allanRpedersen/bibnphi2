@@ -560,6 +560,7 @@ class BookController extends AbstractController
 			foreach( $book->getBookParagraphs() as $paragraph ){
 				$book->removeBookParagraph($paragraph);
 			}
+			
 
 			//
 			// unix cmd
@@ -570,10 +571,25 @@ class BookController extends AbstractController
 			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
 			$this->logger->info('Was parsed in : ' . $book->getParsingTime() . 'sec.');
 
-			// remove .whatever to get directory name << buggy !-(
+			// remove .whatever to get directory name from odt file name << buggy !-(
 			$dirName = substr($dirName, 0, strpos($dirName, '.'));
 			// then delete associated directory recursive
 			passthru('rm -v -r books/' . $dirName . ' > /dev/null 2>&1', $errCode );
+
+			//
+			// clear the array 'currentBookSelectionIds' in the session if any, and if deleted book is part of it
+			$session = $request->getSession();
+			$currentBookSelectionIds = $session->get('currentBookSelectionIds');
+			if ($currentBookSelectionIds){
+
+				if (in_array( $book->getId(), $currentBookSelectionIds)){
+	
+					$i = array_search($book->getId(), $currentBookSelectionIds);
+					$splice = array_splice($currentBookSelectionIds, $i, 1 );
+
+					$session->set('currentBookSelectionIds', $currentBookSelectionIds);
+				}
+			}
 
 			//
 			//

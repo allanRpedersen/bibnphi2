@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur 405 - 405 Method Not Allowed" {% endblock %}
+ 
+ {% block body %}
+	<div class="container">
+		<h1 class="alert alert-danger">Vous ne pouvez accéder à cette méthode !</h1>
+		<p>Vous pouvez revenir à l'accueil ..</p>
+		<a href="{{ path('reset_selection') }}" class="btn btn-primary">Accueil</a>
+	</div>	 
+ {% endblock %}

@@ -5,7 +5,7 @@
 {% block body %}
 
 <div id="selected-list-content">
-	{% set book = books[0] %}
+	{% set book = openBook %}
 	{# {% set openBook = book %} #}
 	<div id="selected-list-rightside">
 		{# {% set openedBook = books[0] %}
@@ -16,10 +16,6 @@
 		<div class="container">	
 			{% include 'book/_book_content.html.twig' %}
 		</div>
-		{# <p class="text-center mt-5">
-			<img src="/handala.png" alt="handala .. when will you turn round ?" title="handala .. quand te retourneras-tu ?">
-		</p> #}
-
 	</div>
 	<div id="selected-list-leftside">
 		<h2>ma sélection</h2>

@@ -44,8 +44,10 @@ class SortMgr
 
         // ascendant sort on title
         foreach ($originalList as $book){
-            $title = $book->getTitle();
-            $titles[] = strtr($title, $this->table);
+            if ($book){
+                $title = $book->getTitle();
+                $titles[] = strtr($title, $this->table);
+            }
         }
 
         asort($titles);
@@ -67,7 +69,7 @@ class SortMgr
     public function sortByAuthor($originalList, $direction="ASC"): Collection
     {
         $sortedByAuthor = New ArrayCollection;
-        $sortedByTitle = $this->sortByTitle($originalList);
+        $sortedByTitle = $this->sortByTitle($originalList, $direction);
     
         $authors = [];
         $authorsNames = [];

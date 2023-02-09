@@ -1,14 +1,14 @@
 {% for paragraph in book.bookParagraphs %}
-{% if paragraph.paragraphStyles %}
-<p {{ paragraph.paragraphStyles|raw }} id="_{{ paragraph.id }}">
-{% else %}
-<p class="p-justify"  id="_{{ paragraph.id }}">
-{% endif %}
-    {% if is_granted('ROLE_ADMIN')%}
-    <a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
+    {% if paragraph.paragraphStyles %}
+    <p {{ paragraph.paragraphStyles|raw }} id="_{{ paragraph.id }}">
+    {% else %}
+    <p class="p-justify"  id="_{{ paragraph.id }}">
     {% endif %}
+        {% if is_granted('ROLE_ADMIN')%}
+        <a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
+        {% endif %}
     {{ paragraph.FormattedContent | raw }}
-</p>
+    </p>
 {% endfor %}
 
 {% for note in book.bookNotes %}
