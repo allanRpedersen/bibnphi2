@@ -46,6 +46,7 @@ class XmlParser {
 
 	private $insideNote,
 			$insideAnnotation,
+			$insideMasterStyles,
 			$insideDrawFrame,
 			$isNoteBody,
 			$isNoteCitation,
@@ -383,6 +384,10 @@ class XmlParser {
 				// dd($element);
 				break;
 
+			case "OFFICE:MASTER-STYLES":
+				$this->insideMasterStyles = true;
+				break;
+
 			case "STYLE:STYLE":
 				$this->styleProperty['name'] = $attribs['STYLE:NAME'];
 
@@ -569,25 +574,29 @@ class XmlParser {
 				// $this->logger->info("</$element>" );
 				break;
 
-			case "STYLE:STYLE":
-				if( $this->styleProperty['font-weight']		!= 'normal'		||
-					$this->styleProperty['font-style']		!= 'normal'		||
-					$this->styleProperty['text-align']		!= 'justify'	||
-					$this->styleProperty['text-position']	!= 'normal'		)
-				{
-					$name = $this->styleProperty['name'];
-					$this->abnormalStyles[$name] = $this->styleProperty;
-				}
+			case "OFFICE:MASTER-STYLES":
+				$this->insideMasterStyles = false;
+				break;
 
-				// reset style
-				$this->styleProperty = [
-					'name'			=> '',
-					'family'		=> '',
-					'text-align'	=> 'justify',
-					'font-style' 	=> 'normal',
-					'font-weight'	=> 'normal',
-					'text-position'	=> 'normal',
-				];
+			case "STYLE:STYLE":
+			if( $this->styleProperty['font-weight']		!= 'normal'		||
+				$this->styleProperty['font-style']		!= 'normal'		||
+				$this->styleProperty['text-align']		!= 'justify'	||
+				$this->styleProperty['text-position']	!= 'normal'		)
+			{
+				$name = $this->styleProperty['name'];
+				$this->abnormalStyles[$name] = $this->styleProperty;
+			}
+
+			// reset style
+			$this->styleProperty = [
+				'name'			=> '',
+				'family'		=> '',
+				'text-align'	=> 'justify',
+				'font-style' 	=> 'normal',
+				'font-weight'	=> 'normal',
+				'text-position'	=> 'normal',
+			];
 				break;
 			
 			case "SVG:TITLE":
@@ -648,6 +657,9 @@ class XmlParser {
 			case "TEXT:P":
 				if (!$this->insideNote){
 
+
+					// dd($this->text, $this->noteCollection, $this->illustrations, $this->spans);
+
 					// handle paragraph content, notes, alterations, illustrations
 					//
 					$this->handleBookParagraph($this->text, $this->noteCollection); 
@@ -707,7 +719,9 @@ class XmlParser {
 									// 		else $this->text .= $data;
 									// }
 
-		if (!$this->insideAnnotation){
+		if ( !$this->insideAnnotation &&
+			 !$this->insideMasterStyles )
+		{
 			//
 			//
 			if ( $this->isSvgTitle ) $this->svgTitle = $data;
@@ -752,7 +766,6 @@ class XmlParser {
 			// 	foreach ($sentences as $sentence ){
 			// 	}
 			// }
-
 
 
 		if ($rawParagraph != '' || $illustrations){

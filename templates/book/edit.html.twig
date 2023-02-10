@@ -8,7 +8,7 @@
 
     {{ include('book/_form.html.twig', {'button_label': 'Mise à jour'}) }}
 
-    <a href="{{ path('book_index') }}">back to list</a>
+    <a type ="button" style="display:inline-block;" class="btn btn-info mt-1" href="{{ path('book_index') }}">Retour</a>
 
     {{ include('book/_delete_form.html.twig') }}
 </div>

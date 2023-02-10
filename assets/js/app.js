@@ -194,6 +194,10 @@ $(function () {
 		width: '17%',
 	});
 
+	$('#book_author').select2({
+		width: '100%',
+	});
+
 	$('#book-search-button').on('click', function(event){
 		if ($('#book-selectform').css('display') === 'none'){
 
@@ -279,7 +283,8 @@ $(function () {
 
 		console.log('click on button-new-update');
 
-		showSpinner();
+		$('body').css({ 'cursor': 'wait' });
+		$('.button-new-update').css({ 'cursor': 'wait' });
 		console.log('click on ajout, protocol_host: ' + protocol_host);
 		// setTimeout(setProgressBar, 1000);
 		setProgressBar();

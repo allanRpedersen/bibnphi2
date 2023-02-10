@@ -1,6 +1,39 @@
 
 {{ form_start(form) }}
-{{ form_row(form.title, {'label': 'titre'}) }}
+<div class="row mt-3">
+	<div class="col-md-8 mx-1">
+		{{ form_label(form.title, 'Titre')}}
+		{{ form_widget(form.title) }}
+
+	</div>
+	<div class="col-md-3 mx-1">
+		{{ form_label(form.author, 'Auteur.e')}}
+		{{ form_widget(form.author) }}
+
+	</div>
+</div>
+<div class="row mt-3">
+	<div class="col-md-6 mx-1">
+		{{ form_label(form.odtBookFile, 'Document ODT') }}
+		{{ form_widget(form.odtBookFile) }}
+
+	</div>
+</div>
+<div class="row mt-3">
+	<div class="col-md-2 mx-1">
+		{{ form_label(form.publishedYear, 'Année de publication') }}
+		{{ form_widget(form.publishedYear) }}
+	</div>
+	<div class="col mx-1">
+		{{ form_label(form.summary, 'Résumé') }}
+		{{ form_widget(form.summary) }}
+
+	</div>
+</div>
+
+
+
+{# {{ form_row(form.title, {'label': 'titre'}) }}
 <div class="row">
 	<div class="col-md-4">
 		{{ form_row(form.author, {'label': 'auteur.e'}) }}
@@ -11,11 +44,12 @@
 	<div class="col-md-5">
 		{{ form_row(form.odtBookFile) }}
 	</div>
-</div>
-{{ form_row(form.summary, {'label': 'résumé'}) }}
+</div> #}
+
+
 
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-6 mx-1">
 		{{ form_row(form.fpImageFile) }}
 	</div>
 	<div class="col-md-2"></div>
@@ -29,7 +63,7 @@
 	</div>
 </div>
 
-{{ form_widget(form) }}
+{# {{ form_widget(form) }} #}
 
 <button class="button-new-update btn btn-info ">
 	{{ button_label|default('Ajout') }}

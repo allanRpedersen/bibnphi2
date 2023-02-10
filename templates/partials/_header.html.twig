@@ -81,9 +81,9 @@
 
 		<div class="container" style="padding-top: 55px">
 			{% if bookSelectForm is defined %}
-			{{ include('partials/_book_select_form.html.twig') }}
+			{% include ('partials/_book_select_form.html.twig') %}
 			{% endif %}
 		</div>
 		<div class="container mt-1">
-			{{ include('partials/_flash_messages.html.twig') }}
+			{% include ('partials/_flash_messages.html.twig') %}
 		</div>
