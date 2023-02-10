@@ -8,7 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AuthorRepository;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiResource;
+// use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
@@ -18,7 +19,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass=AuthorRepository::class)
  * @ORM\HasLifecycleCallbacks
  * @Vich\Uploadable

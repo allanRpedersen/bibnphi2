@@ -29,4 +29,10 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 7. Gestion des utilisateurs !!!!! <<<<<<<<<<<<<<<<<< Espace perso. surlignage/annotations !!!
 3. Suppression de rôle dans le user !! <DONE:->
 
-8. Relook des formulaires 
+8. Relook des formulaires
+
+9. FormController.php, selected_index.html.twig, affichage de l'ouvrage selectionné dans la partie droite
+10. bandeau de navigation, ça va pas.
+        - dissocier un bandeau générique et un bandeau session / utilisateur connecté.
+        - 
+11. si utilisateur connecté (ROLE_USER), bouton de sauvegarde de la sélection

@@ -5,14 +5,8 @@
 {% block body %}
 
 <div id="selected-list-content">
-	{% set book = openBook %}
-	{# {% set openBook = book %} #}
 	<div id="selected-list-rightside">
-		{# {% set openedBook = books[0] %}
-		{% set bookCount = books|length %}
-		<h1>{{ openedBook.title }}</h1>
-		<p> {{ bookCount }} books selected </p> #}
-
+		{% set book = openBook %}
 		<div class="container">	
 			{% include 'book/_book_content.html.twig' %}
 		</div>
@@ -20,7 +14,7 @@
 	<div id="selected-list-leftside">
 		<h2>ma sélection</h2>
 		{% for book in books %}
-			<a href="{{ path('book_show', {'slug': book.slug}) }}">
+			<a href="{{ path('show_selected', {'id': book.id}) }}">
 				<div class="row{% if book == openBook %} open-book-row{% endif %} mt-3 mx-0">
 					<div class="col-md-4">
 						{{ book.author.lastName }}

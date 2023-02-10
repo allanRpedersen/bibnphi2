@@ -112,6 +112,7 @@ class FrontController extends AbstractController
 			}
 
 			$session->set('currentBookSelectionIds', $bookSelectionIds);
+			$session->set('openBookId', NULL);
 		}
 		
 		//
@@ -126,6 +127,7 @@ class FrontController extends AbstractController
 				if ($book = $this->br->findOneById($id)) $bookList[] = $book;
 			}
 			$bookList = $sm->sortByAuthor($bookList);
+
 		}
 		
 		//
@@ -221,9 +223,12 @@ class FrontController extends AbstractController
 
 		if ($currentBookSelectionIds && $bookList){
 
+			$openBookId = $session->get('openBookId');
+			$openBook = $openBookId ? $this->br->findOneById($openBookId) : $bookList[0];
+
 			return $this->render('front/selected_index.html.twig', [
 				'books'					=> $bookList,
-				'openBook'				=> $bookList[0],
+				'openBook'				=> $openBook,
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
 				'isSelectedList'		=> $currentBookSelectionIds,
@@ -264,7 +269,18 @@ class FrontController extends AbstractController
 	{
 		$session = $request->getSession();
 		$session->set('currentBookSelectionIds', NULL);
+		$session->set('openBookId', NULL);
 
 		return $this->redirectToRoute('front');
 	}
+
+	/**
+	 * @Route("/showSelected/{id}", name="show_selected")
+	 */
+	public function showSelected(Request $request, $id): Response
+	{
+		$request->getSession()->set('openBookId', $id);
+		return $this->redirectToRoute('front');
+	}
+
 }

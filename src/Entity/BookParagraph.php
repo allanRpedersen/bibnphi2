@@ -6,11 +6,12 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookParagraphRepository;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiResource;
+// use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass=BookParagraphRepository::class)
  */
 class BookParagraph
