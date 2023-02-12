@@ -15,7 +15,7 @@
 		<h2>ma sélection</h2>
 		{% for book in books %}
 			<a href="{{ path('show_selected', {'id': book.id}) }}">
-				<div class="row{% if book == openBook %} open-book-row{% endif %} mt-3 mx-0">
+				<div id="book_{{book.id}}" class="row book-row{% if book == openBook %} open-book-row{% endif %} mt-3 mx-0">
 					<div class="col-md-4">
 						{{ book.author.lastName }}
 					</div>

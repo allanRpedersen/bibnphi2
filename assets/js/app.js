@@ -189,6 +189,12 @@ $(function () {
 	console.log('href: ' + href);
 	console.log('protocol_host: ' + protocol_host);
 
+	$('.book-row').on('click', function(event){
+		$('body').css('cursor', 'wait');
+		$('button').css('cursor', 'wait');
+		$('.book-row').css('cursor', 'wait');
+	});
+
 
 	$('#user_userRoles').select2({
 		width: '17%',
