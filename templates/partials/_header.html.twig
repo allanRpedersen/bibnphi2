@@ -7,6 +7,10 @@
 			<div class="collapse navbar-collapse" id="navbarColor02">
 				<ul class="navbar-nav mr-auto" style="align-items:center;">
 					<li class="nav-item">
+						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">A propos</a>
+					</li>
+
+					<li class="nav-item">
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">
 							Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
 					</li>
@@ -22,10 +26,10 @@
 					</li>
 					{% endif %}
 
-					{% if sentenceSearchform is defined %}
+					{% if sentenceSearchForm is defined %}
 					<li class="nav-item">
 						<button class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
-						id="sentence-search-button" title="dans la sélection">Rechercher un mot/une phrase</button>
+						id="sentence-search-button" title="dans les oeuvres sélectionnées">Rechercher un mot/une phrase</button>
 					</li>
 					<li class="nav-item">
 						<div class="nav-link mx-1" >
@@ -38,9 +42,6 @@
 					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 
 					{% else %}
-					<li class="nav-item">
-						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">A propos</a>
-					</li>
 					{% endif %}
 				</ul>
 
