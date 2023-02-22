@@ -7,8 +7,8 @@ use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookRepository;
 use Doctrine\Common\Collections\Collection;
-// use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Core\Annotation\ApiResource;
+// use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -20,6 +20,7 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
  * @ORM\Entity(repositoryClass=BookRepository::class)
  * @ORM\HasLifecycleCallbacks
  * @Vich\Uploadable
+ * @ApiResource()
  */
 class Book
 {

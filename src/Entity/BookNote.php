@@ -7,12 +7,13 @@ use Doctrine\Common\Collections\Collection;
 // use App\Service\ContentMgr;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookNoteRepository;
-// use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Core\Annotation\ApiResource;
+// use ApiPlatform\Metadata\ApiResource;
 
 
 /**
  *  @ORM\Entity(repositoryClass=BookNoteRepository::class)
+ *  @ApiResource()
  */
 class BookNote
 {

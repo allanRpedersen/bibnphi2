@@ -153,10 +153,10 @@
         "version": "2.1.1"
     },
     "nelmio/cors-bundle": {
-        "version": "1.5",
+        "version": "2.3",
         "recipe": {
             "repo": "github.com/symfony/recipes",
-            "branch": "master",
+            "branch": "main",
             "version": "1.5",
             "ref": "6bea22e6c564fba3a1391615cada1437d0bde39c"
         },
@@ -625,8 +625,5 @@
     },
     "webonyx/graphql-php": {
         "version": "v14.11.5"
-    },
-    "willdurand/negotiation": {
-        "version": "3.0.0"
     }
 }

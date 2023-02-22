@@ -1,10 +1,10 @@
 api_platform:
-    title: 'bibnphi REST API'
-    description: 'A Symfony API to manage books in a library.'
-    version: '1.0.0'
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
     patch_formats:
         json: ['application/merge-patch+json']
     swagger:
         versions: [3]
+    title: 'bibnphi REST API'
+    description: 'A Symfony API to manage books and authors in a philosophy books library.'
+    version: 2.0.0'
