@@ -16,7 +16,7 @@
 			<p></p>
 				<div style="display: flex;">
 					<a class="btn btn-outline-dark" style="margin-right: 5px;" href="/books/{{ book.odtBookName }}">Télécharger</a>
-			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+			{% if is_granted('ROLE_LIBRARIAN') %}
 					<a class="btn btn-outline-info" title="modify" href="{{ path('book_edit', {'slug': book.slug}) }}">
 						<i class="fas fa-edit"></i></a>
 					<a class="btn btn-outline-warning" title="misprint" href="#">
