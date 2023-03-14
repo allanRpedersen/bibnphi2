@@ -269,29 +269,6 @@ class Author
 
         return $sm->sortByTitle($books);
 
-        // $sortedBooks = new ArrayCollection;
-        // $titles = [];
-
-
-        // // ascendant sort on title
-        // foreach ($books as $book){
-        //     $title = $book->getTitle();
-        //     $titles[] = strtr($title, $this->table);
-        // }
-
-        // if (sizeof($titles) > 1){
-
-        //     asort($titles);
-
-        //     foreach( $titles as $key => $val){
-        //         $sortedBooks[] = $books[$key];
-        //     }
-
-        //     return $sortedBooks;
-
-        // }
-        
-        // return $books;
     }
 
     public function addBook(Book $book): self

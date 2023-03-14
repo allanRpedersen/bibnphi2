@@ -267,6 +267,7 @@ class BookParagraph
                 if ($mimeType){
 
                     $str = '<img src="'
+                            . 'https://bibnphi2.webcoop.fr'
                             . $illustration->getFileName()
                             . '" alt="'
                             . $illustration->getName()
