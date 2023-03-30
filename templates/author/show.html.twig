@@ -7,32 +7,22 @@
     <h1 style="display: inline-block">{{ author.firstName }} {{ author.lastName }}</h1>
     <p style="display: inline">({{ author.birthYear }} / {{ author.deathYear }})</p>
     <p class="my-3" style="font-weight: bold">{{ author.summary }}</p>
-    <div class="row">
-        <div class="col-md-8 mx-2 p-justify">
-            {{ author.content | raw }}
-        </div>
+    <div class="row my-5">
         <div class="col-md-3">
-            <img src="/images/author/{{ author.pictureFileName }}" alt="" height="300px" style="text-align: center;">
+            <img src="/images/author/{{ author.pictureFileName }}" alt="" width="100%" style="text-align: center;">
+        </div>
+        <div class="col-md-8 mx-2 p-justify" style="height: 400px;">
+            {% if author.wikipediaLink %}
+            <iframe src="{{author.wikipediaLink}}" frameborder="0" style="border:2px solid darkblue;box-shadow: 5px 5px 5px darkblue;" width="100%" height="100%"></iframe>
+            {% endif %}
         </div>
     </div>
     
     <h4>Ses oeuvres référencées ...</h4>
     {% for book in author.books %}
-    {# <div class="col-md-3">
-        <div class="card-body">
-            <p class="card-title">
-                <a href="{{ path('book_show', { 'slug' : book.slug }) }}">
-                    {{ book.title }}
-                </a>
-            </p>
-        </div>
-    </div> #}
     <div style="display: inline;">
         {% include 'book/_book.html.twig' %}
-    </div>
-
-        
-    {# <div><a href="{{ path('book_show', {'slug': book.slug}) }}">{{ book.title }}</a></div> #}
+    </div>        
     {% endfor %}
     
     <div style="display: flex;">

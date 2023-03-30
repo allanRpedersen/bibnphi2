@@ -64,9 +64,9 @@ class Author
     private $summary;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $content;
+    private $wikipediaLink;
 
     /**
      * @ORM\OneToMany(targetEntity=Book::class, mappedBy="author", orphanRemoval=true)
@@ -246,19 +246,6 @@ class Author
         return $this;
     }
 
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
-
-    public function setContent(?string $content): self
-    {
-        $this->content = $content;
-
-        return $this;
-    }
-
-
     /**
      * @return Collection|Book[]
      */
@@ -397,6 +384,26 @@ class Author
     public function setPictureDimensions($pictureDimensions)
     {
         $this->pictureDimensions = $pictureDimensions;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of wikipediaLink
+     */ 
+    public function getWikipediaLink()
+    {
+        return $this->wikipediaLink;
+    }
+
+    /**
+     * Set the value of wikipediaLink
+     *
+     * @return  self
+     */ 
+    public function setWikipediaLink($wikipediaLink)
+    {
+        $this->wikipediaLink = $wikipediaLink;
 
         return $this;
     }

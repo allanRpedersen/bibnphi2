@@ -21,28 +21,29 @@ class AuthorType extends GenericType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-			->add('lastName',    TextType::class,      $this->mkBasics("nom / nom d'usage", "son nom ou nom d'usage"))
-            ->add('firstName',   TextType::class,      $this->mkBasics("prénom", "son prénom (facultatif)", false))
-            ->add('birthYear',   TextType::class,      $this->mkBasics("naissance","année de naissance (facultatif)", false))
-            ->add('deathYear',   TextType::class,      $this->mkBasics("mort","année de mort (facultatif)", false))
-            ->add('summary',     TextType::class,      $this->mkBasics("présentation", "Une phrase de présentation (facultatif)", false))
-            ->add('pictureFile', VichImageType::class, $this->mkBasics( "photo/portrait",
+			->add('lastName',       TextType::class,        $this->mkBasics("nom / nom d'usage", "son nom ou nom d'usage"))
+            ->add('firstName',      TextType::class,        $this->mkBasics("prénom", "son prénom (facultatif)", false))
+            ->add('birthYear',      TextType::class,        $this->mkBasics("naissance","année de naissance (facultatif)", false))
+            ->add('deathYear',      TextType::class,        $this->mkBasics("mort","année de mort (facultatif)", false))
+            ->add('summary',        TextType::class,        $this->mkBasics("présentation", "Une phrase de présentation (facultatif)", false))
+            ->add('wikipediaLink',  TextType::class,        $this->mkBasics("lien wikipedia","lien wikipedia"))
+            ->add('pictureFile',    VichImageType::class,   $this->mkBasics( "photo/portrait",
                                                                         "Un portrait (facultatif)",
                                                                         false,
                                                                         [
                                                                             'imagine_pattern' => 'fp_thumb'
                                                                         ]))
-            ->add('content',     CKEditorType::class,  $this->mkBasics( "description", 
-                                                                        "(facultatif)",
-                                                                  false,
-                                                                  //
-                                                                  // CKEditor config
-                                                                  [
-                                                                    'config' => [
-                                                                        'uiColor' => '#0000FF', // blue !!
-                                                                        'editorplaceholder' => "Une description détaillée de l'auteur (facultatif)"
-                                                                        ]
-                                                                  ]))
+            // ->add('content',     CKEditorType::class,    $this->mkBasics( "description", 
+            //                                                             "(facultatif)",
+            //                                                       false,
+            //                                                       //
+            //                                                       // CKEditor config
+            //                                                       [
+            //                                                         'config' => [
+            //                                                             'uiColor' => '#0000FF', // blue !!
+            //                                                             'editorplaceholder' => "Une description détaillée de l'auteur (facultatif)"
+            //                                                             ]
+            //                                                       ]))
         ;
     }
 

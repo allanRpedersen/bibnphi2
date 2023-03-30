@@ -57,7 +57,7 @@ class AuthorController extends AbstractController
             $this->em->persist($author);
             $this->em->flush();
 
-            return $this->redirectToRoute('author_index');
+            return $this->redirectToRoute('author_show', ['slug' => $author->getSlug()]);
         }
 
         return $this->render('author/new.html.twig', [
@@ -88,7 +88,7 @@ class AuthorController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em->flush();
 
-            return $this->redirectToRoute('author_index');
+            return $this->redirectToRoute('author_show', ['slug' => $author->getSlug()]);
         }
 
         return $this->render('author/edit.html.twig', [

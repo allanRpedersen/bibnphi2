@@ -2,6 +2,7 @@
 {{ form_start(form) }}
 
 {{form_row(form.lastName)}}
+{{form_row(form.wikipediaLink)}}
 
 <div class="row">
     <div class="col-md-6">{{ form_row(form.firstName)}}</div>
@@ -10,14 +11,12 @@
 </div>
 
 {{form_row(form.summary)}}
-<div class="row">
-    <div class="col-md-2">
-        {{form_row(form.pictureFile)}}
-    </div>
-    <div class="col-md-10">
-        {{ form_widget(form) }}
-    </div>    
-</div>
+{{form_row(form.pictureFile)}}
+
+{# <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-8"></div>    
+</div> #}
 
 <button class="btn btn-info mt-2 mb-2">{{ button_label|default('Ajout') }}</button>
 {{ form_end(form) }}
