@@ -364,7 +364,7 @@ class BookParagraph
      *
      * @return  self
      */ 
-    public function setSearchedString($searchedString)
+    public function setSearchedString($searchedString): self
     {
         $this->searchedString = $searchedString;
 
@@ -376,7 +376,7 @@ class BookParagraph
      *
      * @return  self
      */ 
-    public function setNextOccurence($nextOccurence)
+    public function setNextOccurence($nextOccurence): self
     {
         $this->nextOccurence = $nextOccurence;
 

@@ -377,7 +377,6 @@ class BookController extends AbstractController
 		$hlNotes = [];
 
 		$s = sizeof($hlContents);
-
 		for($i=0; $i < $s; $i++){
 
 			if($i < $s-1){
@@ -397,9 +396,10 @@ class BookController extends AbstractController
 					
 					$paragraph = $pRepo->findOneById($hlContent['origId']);
 					
-					$paragraph->setFoundStringIndexes($hlContent['needles']);
-					$paragraph->setSearchedString($hlString);
-					$paragraph->setNextOccurence($navLinks[$key]);
+					$paragraph
+						->setFoundStringIndexes($hlContent['needles'])
+						->setSearchedString($hlString)
+						->setNextOccurence($navLinks[$key]);
 
 					$hlParagraphs[] = $paragraph;
 				break;

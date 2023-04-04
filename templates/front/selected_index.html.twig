@@ -19,7 +19,7 @@
 					<div class="col-md-4">
 						{{ book.author.lastName }}
 					</div>
-					<div class="col-md-8">
+					<div class="col-md-6">
 						{{ book.title }}
 					</div>
 				</div>
@@ -35,8 +35,12 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
+{% if scrollTo is defined %}
+<script type="text/javascript">
+	paragraph = document.getElementById("{{ scrollTo }}");
+	paragraph.scrollIntoView();
 </script>
+{% endif %}
 {% endblock %}
 
 

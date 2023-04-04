@@ -38,27 +38,13 @@ class SortMgr
      */
     public function sortByTitle($originalList, $direction="ASC"): ArrayCollection
     {
-
         $sortedBooks = new ArrayCollection;
         $titles = [];
 
-        // ascendant sort on title
-        foreach ($originalList as $book){
-            if ($book){
-                $title = $book->getTitle();
-                $titles[] = strtr($title, $this->table);
-            }
-        }
-
-        asort($titles);
-
-        foreach( $titles as $key => $val){
-            $book = $originalList[$key];
-            if (!$sortedBooks->contains($book)) $sortedBooks[] = $book;
-        }
-
+        foreach ($originalList as $book) $titles[] = strtr($book->getTitle(), $this->table);
+        $direction == "ASC" ? asort($titles) : arsort($titles);
+        foreach( $titles as $key => $val) $sortedBooks[] = $originalList[$key];
         return $sortedBooks;
-
     }
 
     /**
@@ -68,26 +54,16 @@ class SortMgr
      */
     public function sortByAuthor($originalList, $direction="ASC"): Collection
     {
-        $sortedByAuthor = New ArrayCollection;
-        $sortedByTitle = $this->sortByTitle($originalList, $direction);
-    
-        $authors = [];
-        $authorsNames = [];
-
-        foreach( $sortedByTitle as $book ){
-
-            $author = $book->getAuthor();
-            $authors[] = $author;
-            $authorsNames[] = strtr($author->getLastName(), $this->table);
-
+        $sortedByAuthor = new ArrayCollection();
+        $books = [];
+        foreach( $originalList as $book ){
+            $books[]= [
+                "author"    => strtr($book->getAuthor()->getLastName(), $this->table),
+                "title"     => strtr($book->getTitle(), $this->table),
+            ];
         }
-
-        asort($authorsNames);
-
-        foreach( $authorsNames as $key => $val){
-            $sortedByAuthor[] = $sortedByTitle[$key];
-        }
-
+        $direction == "ASC" ? asort($books) : arsort($books);
+        foreach( $books as $key => $val) $sortedByAuthor[] = $originalList[$key];
         return $sortedByAuthor;
     }
 }

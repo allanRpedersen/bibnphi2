@@ -68,7 +68,6 @@ class BookNote
     private $foundStringIndexes = [];
     private $searchedString = '';
     private $nextOccurence;
-    private $highlightedContent;
 
     public function __construct()
     {
@@ -108,7 +107,7 @@ class BookNote
     public function getContent(): ?string
     {
         return $this->content;
-        }
+    }
 
     public function setContent(string $content): self
     {
@@ -278,7 +277,6 @@ class BookNote
         
         $fromIndex = 0;
         $indexFound = 0;
-        $this->highlightedContent = '';
         $this->foundStringIndexes = [];
         $this->searchedString = $stringToSearch;
         $strLength = mb_strlen($this->searchedString);
@@ -291,22 +289,6 @@ class BookNote
             $fromIndex = $indexFound + $strLength;
 
         }
-
-        // if ($this->foundStringIndexes){
-        
-        //     $contentMgr = new ContentMgr();
-        //     $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
-        //                 . $this->book->getSlug()
-        //                 . '/jumpTo/note_'
-        //                 . $this->id
-        //                 . '"><mark>';
-        //     $endTag = '</mark></a>';
-    
-        //     $this->highlightedContent = $contentMgr
-        //                                     ->setOriginalContent($this->content)
-        //                                     ->addTags($this->foundStringIndexes, $strLength, $beginTag, $endTag);
-    
-        // }
 
         // false if empty !!
         return ($this->foundStringIndexes);
@@ -328,7 +310,7 @@ class BookNote
      *
      * @return  self
      */ 
-    public function setFoundStringIndexes($foundStringIndexes)
+    public function setFoundStringIndexes($foundStringIndexes): self
     {
         $this->foundStringIndexes = $foundStringIndexes;
 
@@ -340,7 +322,7 @@ class BookNote
      *
      * @return  self
      */ 
-    public function setNextOccurence($nextOccurence)
+    public function setNextOccurence($nextOccurence): self
     {
         $this->nextOccurence = $nextOccurence;
 
@@ -352,7 +334,7 @@ class BookNote
      *
      * @return  self
      */ 
-    public function setSearchedString($searchedString)
+    public function setSearchedString($searchedString): self
     {
         $this->searchedString = $searchedString;
 

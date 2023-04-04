@@ -166,8 +166,12 @@ class Book
      */
     private ?File $fpImageFile = null;
 
-
-
+    /**
+     * Nombre d'occurrences dans le livre
+     * 
+     * dans le cas de la recherche d'une chaîne de caractères
+     */
+    private int $nbFoundStrings = 0;
 
 
     public function __construct()
@@ -555,4 +559,24 @@ class Book
     }
 
 
+
+    /**
+     * Get nombre d'occurrences dans le livre
+     */ 
+    public function getNbFoundStrings(): ?int
+    {
+        return $this->nbFoundStrings;
+    }
+
+    /**
+     * Set nombre d'occurrences dans le livre
+     *
+     * @return  self
+     */ 
+    public function setNbFoundStrings($nbFoundStrings): self
+    {
+        $this->nbFoundStrings = $nbFoundStrings;
+
+        return $this;
+    }
 }

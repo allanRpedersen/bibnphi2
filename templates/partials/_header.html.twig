@@ -14,6 +14,18 @@
 						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">
 							Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
 					</li>
+
+					{% if sentenceSearchForm is defined %}
+					<li class="nav-item">
+						<button class="nav-link btn btn-outline-primary mx-1"
+						id="sentence-search-button" title="dans les oeuvres sélectionnées"><i class="fa fa-search"></i></button>
+					</li>
+					<li class="nav-item">
+							{{ include ('partials/_search_form_horiz.html.twig') }}
+						{# <div class="nav-link mx-1" >
+						</div> #}
+					</li>
+					{% endif %}
 					
 					{% if bookSelectForm is defined %}
 					<li class="nav-item">
@@ -26,18 +38,6 @@
 					</li>
 					{% endif %}
 
-					{% if sentenceSearchForm is defined %}
-					<li class="nav-item">
-						<button class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
-						id="sentence-search-button" title="dans les oeuvres sélectionnées">Rechercher un mot/une phrase</button>
-					</li>
-					<li class="nav-item">
-						<div class="nav-link mx-1" >
-							{{ include ('partials/_search_form_horiz.html.twig') }}
-						</div>
-					</li>
-					{% endif %}
-					
 					{% if is_granted('ROLE_LIBRARIAN') %}
 					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 

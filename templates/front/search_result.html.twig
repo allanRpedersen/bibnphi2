@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résultat d'une recherche{% endblock %}
+
+{% block body %}
+	<div id="searching-result-content">
+		<div id="searching-result-leftside">
+			{% if nbFoundStrings > 0 %}
+				<h5 class="mb-3">{{ nbFoundStrings }} occurrence{% if nbFoundStrings > 1 %}s{% endif %} de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+			{% else %}
+				<h5 class="mb-3">Désolé, aucune occurrence de <span class="found-content">{{ string }}</span> n'a été trouvée dans la liste demandée !-/</h5>
+			{% endif %}
+			{% for book in matchingBookList %}
+				<a href="{{ path('show_selected', {'id': book.id}) }}">
+					<div id="book_{{book.id}}" class="row book-row{% if book == openBook %} open-book-row{% endif %} mt-3 mx-0">
+						<div class="col-md-4">
+							{{ book.author.lastName }}
+						</div>
+						<div class="col-md-7">
+							{{ book.title }}
+						</div>
+						<div class="col">
+							{{ book.nbFoundStrings }}
+						</div>
+					</div>
+				</a>
+
+			{% endfor %}
+		</div>
+		<div id="searching-result-rightside">
+			{% if openBook is not null %} 
+			{% set book = openBook %}
+			<div class="container">	
+				{% include 'book/_book_content.html.twig' %}
+			</div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+{% if scrollTo is defined %}
+<script type="text/javascript">
+	paragraph = document.getElementById("{{ scrollTo }}");
+	paragraph.scrollIntoView();
+</script>
+{% endif %}
+{% endblock %}

@@ -9,7 +9,8 @@ use App\Entity\SentenceSearch;
 use App\Form\SentenceSearchType;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\BookNoteRepository;
+use App\Repository\BookParagraphRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,13 +22,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class FrontController extends AbstractController
 {
-	private $br, $ar;
+	private $ar, $br, $nr, $pr;
 
 	private $authors;
 	private $books;
 	private $nbAuthors, $nbBooks;
 
-	public function __construct( AuthorRepository $ar, BookRepository $br ){
+	public function __construct( AuthorRepository $ar, BookRepository $br, BookParagraphRepository $pr, BookNoteRepository $nr )
+	{
 
 		$this->ar = $ar;
 		$this->authors = $this->ar->findByLastName();
@@ -36,6 +38,9 @@ class FrontController extends AbstractController
 		$this->br = $br;
 		$this->books = $this->br->findAll();
 		$this->nbBooks = count($this->books);
+
+		$this->pr = $pr;
+		$this->nr = $nr;
 
 	}
 
@@ -51,18 +56,19 @@ class FrontController extends AbstractController
 		$sm = new SortMgr();
 
 		$authors = [];
-		$bookList = $sm->sortByAuthor($this->books);
 		$authorSelected = false;
 
-		$session = $request->getSession();
-
-		$hlContents = [];
 		$hlContent = [
 			'bookId' => 0,
 			'contentType' => 'p',
 			'origId'	=> 0,
 			'needles'	=> [],
 		];
+
+		$session = $request->getSession();
+		$hlContents = $session->get('hlContents', []);
+		$stringToSearch = $session->get('hlString', '');
+
 
 		/** any user authenticated ?
 		 ** 
@@ -129,6 +135,8 @@ class FrontController extends AbstractController
 			$bookList = $sm->sortByAuthor($bookList);
 
 		}
+		else $bookList = $sm->sortByAuthor($this->books);
+
 		
 		//
 		// the Sentence search form
@@ -154,9 +162,9 @@ class FrontController extends AbstractController
 			$bookList = $sm->sortByTitle($bookList);
 			foreach($bookList as $book){
 
-				$paragraphs = $book->getBookParagraphs();
-				$notes = $book->getBookNotes();
+				$nbFoundStringsOrig = $nbFoundStrings;
 
+				$paragraphs = $book->getBookParagraphs();
 				foreach($paragraphs as $paragraph){
 
 					if ( $paragraph->isContentMatching($stringToSearch)){
@@ -179,6 +187,7 @@ class FrontController extends AbstractController
 
 				}
 
+				$notes = $book->getBookNotes();
 				foreach($notes as $note){
 
 					if ( $note->isContentMatching($stringToSearch)){
@@ -200,31 +209,82 @@ class FrontController extends AbstractController
 					}
 				}
 
-				if ($nbFoundStrings){
-					$session->set('hlString', $stringToSearch);
-					$session->set('hlContents', $hlContents);
+				$book->setNbFoundStrings($nbFoundStrings - $nbFoundStringsOrig);
+			}
 
-					// $matchingBookList = $sm->sortByTitle($matchingBookList);
+			if ($nbFoundStrings){
+				$session->set('hlString', $stringToSearch);
+				$session->set('hlContents', $hlContents);
+			}
+
+			$scrollTo = null;
+			$openBook = $matchingBookList ? $matchingBookList[0] : null ;
+
+			if ($hlContents){
+
+				$openBookHlContents = [];
+				foreach( $hlContents as $hlContent )
+					{ if($hlContent['bookId'] == $openBook->getId()) $openBookHlContents[] = $hlContent; }
+
+				$navLinks = [];
+				$s = sizeof($openBookHlContents);
+				for($i=0; $i < $s; $i++){
+					if($i < $s-1){
+						$navLinks[] = ( 'p' == $openBookHlContents[$i+1]['contentType'] ? '_' : 'note_' ) . $openBookHlContents[$i+1]['origId'];
+					}
+					else {
+						$navLinks[] = ( 'p' == $openBookHlContents[0]['contentType'] ? '_' : 'note_' ) . $openBookHlContents[0]['origId'];
+					}
+				}
+				if ($navLinks) $scrollTo = $navLinks[sizeof($navLinks)-1];
+			
+				foreach( $openBookHlContents as $key => $hlContent ){
+
+					switch ($hlContent['contentType']){
+				
+						case 'p' : // paragraph
+							$paragraph = $this->pr->findOneById($hlContent['origId']);
+							$paragraph
+								->setFoundStringIndexes($hlContent['needles'])
+								->setSearchedString($stringToSearch)
+								->setNextOccurence($navLinks[$key]);
+								;
+						break;
+		
+						case 'n' : // note
+							$note = $this->nr->findOneById($hlContent['origId']);
+							$note
+								->setFoundStringIndexes($hlContent['needles'])
+								->setSearchedString($stringToSearch)
+								->setNextOccurence($navLinks[$key])
+								;
+						break;
+		
+						default :
+							//error
+					}
 				}
 			}
 
-			return $this->render('front/search.html.twig', [
+
+			return $this->render('front/search_result.html.twig', [
 				'form'				=> $sentenceSearchForm->createView(),
 				'string'			=> $stringToSearch,
-				'bookList'			=> $bookList,
+				// 'bookList'			=> $bookList,
 				'matchingBookList'	=> $matchingBookList,
-				'paragraphs'		=> $matchingParagraphs,
-				'notes'				=> $matchingNotes,
-				'nbFoundStrings'	=> $nbFoundStrings
-
+				// 'paragraphs'		=> $matchingParagraphs,
+				// 'notes'				=> $matchingNotes,
+				'nbFoundStrings'	=> $nbFoundStrings,
+				'openBook'			=> $openBook,
+				'scrollTo'			=> $scrollTo,
 			]);
-
 		}
 
-		if ($currentBookSelectionIds && $bookList){
+		if (( $currentBookSelectionIds ) && $bookList){
 
+			$scrollTo = null;
 			$openBookId = $session->get('openBookId');
-			$openBook = $openBookId ? $this->br->findOneById($openBookId) : $bookList[0];
+			$openBook = $openBookId ? $this->br->findOneById($openBookId) : $bookList[0]; //
 
 			return $this->render('front/selected_index.html.twig', [
 				'books'					=> $bookList,
@@ -232,6 +292,7 @@ class FrontController extends AbstractController
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
 				'isSelectedList'		=> $currentBookSelectionIds,
+				'scrollTo'				=> $scrollTo,
 			]);
 	
 		}
