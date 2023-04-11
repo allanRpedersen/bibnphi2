@@ -35,6 +35,12 @@
 {% endblock %}
 
 {% block javascripts %}
+{% if openBook is not null %}
+<script>
+	openBookRow = document.getElementById("book_{{ openBook.id }}")
+	openBookRow.scrollIntoView();
+</script>
+{% endif %}
 {% if scrollTo is defined %}
 <script type="text/javascript">
 	paragraph = document.getElementById("{{ scrollTo }}");
