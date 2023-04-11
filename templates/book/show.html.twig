@@ -16,21 +16,20 @@
 			<p></p>
 				<div style="display: flex;">
 					<a class="btn btn-outline-dark" style="margin-right: 5px;" href="/books/{{ book.odtBookName }}">Télécharger</a>
-			{% if is_granted('ROLE_LIBRARIAN') %}
-					<a class="btn btn-outline-info" title="modify" href="{{ path('book_edit', {'slug': book.slug}) }}">
-						<i class="fas fa-edit"></i></a>
-					<a class="btn btn-outline-warning" title="misprint" href="#">
-						<i class="fas fa-bolt"></i></a>
-					<form method="post"
-						action="{{ path('book_delete', {'slug': book.slug}) }}"
-						onsubmit="return confirm('Voulez vous vraiment supprimer cette entrée ?');">
-						<input type="hidden" name="_method" value="DELETE">
-						<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ book.id) }}">
-						<button class="btn btn-outline-danger" title="supprimer"><i class="fas fa-trash"></i></button>
-					</form>
-			{% endif %}
+					{% if is_granted('ROLE_LIBRARIAN') %}
+						<a class="btn btn-outline-info" title="modify" href="{{ path('book_edit', {'slug': book.slug}) }}">
+							<i class="fas fa-edit"></i></a>
+						<a class="btn btn-outline-warning" title="misprint" href="#">
+							<i class="fas fa-bolt"></i></a>
+						<form method="post"
+							action="{{ path('book_delete', {'slug': book.slug}) }}"
+							onsubmit="return confirm('Voulez vous vraiment supprimer cette entrée ?');">
+							<input type="hidden" name="_method" value="DELETE">
+							<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ book.id) }}">
+							<button class="btn btn-outline-danger" title="supprimer"><i class="fas fa-trash"></i></button>
+						</form>
+					{% endif %}
 				</div>	
-				{# {{ include('book/_delete_form.html.twig') }} #}
 
 		</div>
 		<div id="book-display-rightside">
@@ -38,7 +37,6 @@
 		</div>
 	</div>
 </div>
-
 {% endblock %}
 
 {% block javascripts %}

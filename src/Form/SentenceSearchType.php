@@ -19,7 +19,7 @@ class SentenceSearchType extends AbstractType
     {
         $builder
             ->add('stringToSearch', TextType::class, [
-				'required' => true,
+				'required' => false,
 				'label' => false,
 				'attr' => [
 					'style' => 'width: 100%',

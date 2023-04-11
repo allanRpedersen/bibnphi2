@@ -82,7 +82,7 @@ a {
 }
 
 .book-row {
-    width: 95%;
+    width: 97%;
 }
 
 .open-book-row {
@@ -109,28 +109,26 @@ a {
 //     margin: 0;qq
 // }
 
-#searching-result-content, #book-display-content {
+#book-display-content {
     height: calc(100vh - 91px);
     padding: 3px 33px;
 
 }
 
-#searching-result-leftside, #book-display-leftside {
+#book-display-leftside {
     float: left;
     width: 23%;
-    // height: 100vh;
     height: calc(100vh - 91px);
     overflow-y: scroll;
     padding: 0px 3px;
 }
 
-#searching-result-rightside, #book-display-rightside {
+#book-display-rightside {
     width: 77%;
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 5px;
     background-image: url('/public/papier.jpg');
-    //  olor: $bibnphi-background;
 
     border:rgb(11, 131, 31) solid 1px;
 
@@ -157,19 +155,18 @@ a {
 }
 
 // book selection display
-#selected-list-content {
+#searching-result-content, #selected-list-content {
     height: calc(100vh - 91px);
     padding: 3px 33px;
 
 }
-#selected-list-leftside {
+#searching-result-leftside, #selected-list-leftside {
     width: 30%;
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 3px;
 }
-#selected-list-rightside {
-    // display: none;
+#searching-result-rightside, #selected-list-rightside {
     float: right;
     width: 60%;
     height: calc(100vh - 91px);

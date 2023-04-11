@@ -71,9 +71,11 @@ class BookParagraph
 
     // Recherche de chaîne de cararactères dans le paragraphe.
     //
-    private $foundStringIndexes = [];   // Les indices des occurences de la chaine recherchée dans le paragraphe
-    private $searchedString = '';       // La chaîne recherchée
-    private $nextOccurence;             // la prochaine occurence dans le livre (paragraphe ou note)
+    private $foundStringIndexes = [];       // Les indices des occurences de la chaine recherchée dans le paragraphe
+    private $searchedString = '';           // La chaîne recherchée
+    private $nextOccurence;                 // la prochaine occurence dans le livre (paragraphe ou note)
+    private $nbOccurrencesInBook;           // le 
+    private $firstOccurrenceInParagraph;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
 
 
     public function __construct()
@@ -81,7 +83,6 @@ class BookParagraph
         $this->notes = new ArrayCollection();
         $this->alterations = new ArrayCollection();
         $this->illustrations = new ArrayCollection();
-
     }
 
     public function getId(): ?int
@@ -205,37 +206,30 @@ class BookParagraph
         }
 
         // sous-chaîne(s) à afficher en surbrillance du fait d'une recherche
-        if (count($this->foundStringIndexes)){
+        $nbOccurencesInParagraph = count($this->foundStringIndexes);
+        if ($nbOccurencesInParagraph){
 
-            // $beginTag = '<mark>';
-            // $endTag = '</mark>';
+            // use <mark></mark> to highlight an occurrence of a found string
 
-            if ($this->nextOccurence){
-
-                $beginTag = '<a title="Aller à la prochaine occurrence" href="#'
-                . $this->nextOccurence
-                . '"><mark>';
-            }
-            else
-            {   
-                $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
-                . $this->book->getSlug()
-                . '/jumpTo/_'
-                . $this->id
-                . '"><mark>';
-            }
-	    	
-            $endTag = '</mark></a>';
-
+            $endTag = '</a></mark>';
             $strLength = mb_strlen($this->searchedString);
+
+            $currentOccurrenceInBook = $this->firstOccurrenceInParagraph;
 
             foreach($this->foundStringIndexes as $foundStringIndex){
 
-                    $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
-                    $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+                $nextOccurrenceInBook = ($currentOccurrenceInBook == $this->nbOccurrencesInBook) ? 1 : $currentOccurrenceInBook+1;
 
-            }
-    
+                $beginTag = '<mark id="occurrence_' . $currentOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">'
+                            . '<a title="aller à la prochaine occurrence"'
+                            . ' href="#occurrence_'
+                            . $nextOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">';
+
+                $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
+                $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+
+                $currentOccurrenceInBook++;
+            }    
         }
 
         // citations des notes et contenu en title
@@ -323,7 +317,6 @@ class BookParagraph
             $currentIndex = 0;
             $insertIndex = 0;
             for($i=0; $i<count($htmlToInsert); $i++){
-
                 $insertIndex = $htmlToInsert[$i]['index'];
                 $formattedContent .= mb_substr($this->content, $currentIndex, $insertIndex-$currentIndex);
                 $formattedContent .= $htmlToInsert[$i]['string'];
@@ -451,6 +444,46 @@ class BookParagraph
                 $illustration->setBookParagraph(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nbOccurrencesInBook
+     */ 
+    public function getNbOccurrencesInBook()
+    {
+        return $this->nbOccurrencesInBook;
+    }
+
+    /**
+     * Set the value of nbOccurrencesInBook
+     *
+     * @return  self
+     */ 
+    public function setNbOccurrencesInBook($nbOccurrencesInBook): self
+    {
+        $this->nbOccurrencesInBook = $nbOccurrencesInBook;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of firstOccurrenceInParagraph
+     */ 
+    public function getFirstOccurrenceInParagraph()
+    {
+        return $this->firstOccurrenceInParagraph;
+    }
+
+    /**
+     * Set the value of firstOccurrenceInParagraph
+     *
+     * @return  self
+     */ 
+    public function setFirstOccurrenceInParagraph($firstOccurrenceInParagraph): self
+    {
+        $this->firstOccurrenceInParagraph = $firstOccurrenceInParagraph;
 
         return $this;
     }

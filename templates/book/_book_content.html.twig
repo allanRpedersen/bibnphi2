@@ -1,3 +1,6 @@
+<div class="mt-1">
+    <!-- un peu d'air avant le début du texte -->
+</div>
 {% for paragraph in book.bookParagraphs %}
     {% if paragraph.paragraphStyles %}
     <p {{ paragraph.paragraphStyles|raw }} id="_{{ paragraph.id }}">

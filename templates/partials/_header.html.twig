@@ -1,90 +1,88 @@
-		<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-			<a class="navbar-brand" style="color:darkorange" title="Afficher la sélection.. sinon la bibliothèque" href="{{ path('front') }}">Bib'n'Phi</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+	<a class="navbar-brand" style="color:darkorange" title="Afficher la sélection.. sinon la bibliothèque" href="{{ path('reset_search') }}">Bib'n'Phi</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
 
-			<div class="collapse navbar-collapse" id="navbarColor02">
-				<ul class="navbar-nav mr-auto" style="align-items:center;">
-					<li class="nav-item">
-						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">A propos</a>
-					</li>
+	<div class="collapse navbar-collapse" id="navbarColor02">
+		<ul class="navbar-nav mr-auto" style="align-items:center;">
+			<li class="nav-item">
+				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">A propos</a>
+			</li>
 
-					<li class="nav-item">
-						<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">
-							Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
-					</li>
+			<li class="nav-item">
+				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">
+					Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
+			</li>
 
-					{% if sentenceSearchForm is defined %}
-					<li class="nav-item">
-						<button class="nav-link btn btn-outline-primary mx-1"
-						id="sentence-search-button" title="dans les oeuvres sélectionnées"><i class="fa fa-search"></i></button>
-					</li>
-					<li class="nav-item">
-							{{ include ('partials/_search_form_horiz.html.twig') }}
-						{# <div class="nav-link mx-1" >
-						</div> #}
-					</li>
-					{% endif %}
-					
-					{% if bookSelectForm is defined %}
-					<li class="nav-item">
-						<button class="nav-link btn btn-outline-primary mx-1" id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link btn btn-outline-primary mx-1{% if isSelectedList is defined and not isSelectedList %} disabled{% endif %}"
-						id="cancel-selection-button" title="la sélection" href="{{ path('reset_selection') }}">Annuler</a>
-			
-					</li>
-					{% endif %}
-
-					{% if is_granted('ROLE_LIBRARIAN') %}
-					<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
-
-					{% else %}
-					{% endif %}
-				</ul>
-
-				<ul class="navbar-nav ml-auto">
-				{% if is_granted('ROLE_ADMIN') %}
-				<li class="nav-item">
-					<a class="nav-link" href="{{ path('admin_book_index',{sortBy: 'Title'}) }}">
-						<i class="fas fa-wrench"></i>
-						Admin
-					</a>
-				</li>
-				{% endif %}
-				{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-				<li class="nav-item dropdown active" {# style="float:right;"  #}>
-					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						{{ app.user.email }}
-						{# <img src="{{ vich_uploader_asset(app.user, 'imageFile')}}" alt="avatar" style="width: 30px; height:auto;"> #}
-					</a>
-					<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-						{# <a class="dropdown-item" href="{{ path('user_show', { slug: app.user.slug, id: app.user.id }) }}"><i class="fas fa-user"></i> Mes informations</a>
-						<a class="dropdown-item" href="{{ path('admin_account_dashboard') }}"><i class="fas fa-chess" aria-hidden="true"></i> Admin dashboard</a> #}
-						<a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
-						<a class="dropdown-item" href="{{ path('user_updatepwd', { id: app.user.id }) }}"><i class="fas fa-user-lock"></i> Modif mot de passe</a>
-					</div>
-				</li>
-
-				{% else %}
-				<li class="nav-item">
-					<a href="{{ path('app_login') }}" title="connexion.." class="nav-link btn" role="button" aria-haspopup="true" aria-expanded="false">
-						<i class="fas fa-sign-in-alt"></i></a>
-				</li>
-				{% endif %}
-
-				</ul>
-
-			</div>
-		</nav>
-
-		<div class="container" style="padding-top: 55px">
-			{% if bookSelectForm is defined %}
-			{% include ('partials/_book_select_form.html.twig') %}
+			{% if sentenceSearchForm is defined %}
+			<li class="nav-item">
+				<button class="nav-link btn btn-outline-primary mx-1"
+				id="sentence-search-button" title="Recherche dans les oeuvres sélectionnées ou la bibliothèque"><i class="fa fa-search"></i></button>
+			</li>
+			<li class="nav-item">
+					{{ include ('partials/_search_form_horiz.html.twig') }}
+			</li>
 			{% endif %}
-		</div>
-		<div class="container mt-1">
-			{% include ('partials/_flash_messages.html.twig') %}
-		</div>
+			
+			{% if bookSelectForm is defined %}
+			<li class="nav-item">
+				<button class="nav-link btn btn-outline-primary mx-1" id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
+			</li>
+			{% endif %}
+			<li class="nav-item">
+				<a class="nav-link btn btn-outline-primary mx-1"
+				id="cancel-selection-button" title="la sélection" href="{{ path('reset_selection') }}">Annuler</a>
+
+			</li>
+
+			{% if is_granted('ROLE_LIBRARIAN') %}
+			<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
+
+			{% else %}
+			{% endif %}
+		</ul>
+
+		<ul class="navbar-nav ml-auto">
+		{% if is_granted('ROLE_ADMIN') %}
+		<li class="nav-item">
+			<a class="nav-link" href="{{ path('admin_book_index',{sortBy: 'Title'}) }}">
+				<i class="fas fa-wrench"></i>
+				Admin
+			</a>
+		</li>
+		{% endif %}
+		{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<li class="nav-item dropdown active" {# style="float:right;"  #}>
+			<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				{{ app.user.email }}
+				{# <img src="{{ vich_uploader_asset(app.user, 'imageFile')}}" alt="avatar" style="width: 30px; height:auto;"> #}
+			</a>
+			<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+				{# <a class="dropdown-item" href="{{ path('user_show', { slug: app.user.slug, id: app.user.id }) }}"><i class="fas fa-user"></i> Mes informations</a>
+				<a class="dropdown-item" href="{{ path('admin_account_dashboard') }}"><i class="fas fa-chess" aria-hidden="true"></i> Admin dashboard</a> #}
+				<a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+				<a class="dropdown-item" href="{{ path('user_updatepwd', { id: app.user.id }) }}"><i class="fas fa-user-lock"></i> Modif mot de passe</a>
+			</div>
+		</li>
+
+		{% else %}
+		<li class="nav-item">
+			<a href="{{ path('app_login') }}" title="connexion.." class="nav-link btn" role="button" aria-haspopup="true" aria-expanded="false">
+				<i class="fas fa-sign-in-alt"></i></a>
+		</li>
+		{% endif %}
+
+		</ul>
+
+	</div>
+</nav>
+
+<div class="container" style="padding-top: 55px">
+	{% if bookSelectForm is defined %}
+	{% include ('partials/_book_select_form.html.twig') %}
+	{% endif %}
+</div>
+<div class="container mt-1">
+	{% include ('partials/_flash_messages.html.twig') %}
+</div>

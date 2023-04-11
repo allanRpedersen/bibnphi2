@@ -68,6 +68,9 @@ class BookNote
     private $foundStringIndexes = [];
     private $searchedString = '';
     private $nextOccurence;
+    private $nbOccurrencesInBook = 0;  // le 
+    private $firstOccurrenceInNote;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+
 
     public function __construct()
     {
@@ -159,36 +162,65 @@ class BookNote
         }
 
         // les index des sous-chaîne(s) à afficher en surbrillance
-        if (count($this->foundStringIndexes)){
 
-            if ($this->nextOccurence){
+        $nbOccurencesInNote = count($this->foundStringIndexes);
+        if ($nbOccurencesInNote){
 
-                $beginTag = '<a title="Aller à la prochaine occurrence" href="#'
-                . $this->nextOccurence
-                . '"><mark>';
-            }
-            else
-            {   
-                $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
-                . $this->book->getSlug()
-                . '/jumpTo/note_'
-                . $this->id
-                . '"><mark>';
-            }
-	    	
-            $endTag = '</mark></a>';
+            // use <mark></mark> to highlight an occurrence of a found string
 
+            $endTag = '</a></mark>';
             $strLength = mb_strlen($this->searchedString);
+
+            $currentOccurrenceInBook = $this->firstOccurrenceInNote;
 
             foreach($this->foundStringIndexes as $foundStringIndex){
 
-                    $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
-                    $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+                $nextOccurrenceInBook = $currentOccurrenceInBook == $this->nbOccurrencesInBook ? 1 : $currentOccurrenceInBook+1;
 
-            }
+                $beginTag = '<mark id="occurrence_' . $currentOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">'
+                            . '<a title="aller à la prochaine occurrence"'
+                            . ' href="#occurrence_'
+                            . $nextOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">';
 
+                $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
+                $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+
+                $currentOccurrenceInBook++;
+            }    
         }
-        
+
+        // if (count($this->foundStringIndexes)){
+
+        //     if ($this->nextOccurence){
+
+        //         $beginTag = '<a title="Aller à la prochaine occurrence" href="#'
+        //         . $this->nextOccurence
+        //         . '"><mark>';
+        //     }
+        //     else
+        //     {   
+        //         $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
+        //         . $this->book->getSlug()
+        //         . '/jumpTo/note_'
+        //         . $this->id
+        //         . '"><mark>';
+        //     }
+	    	
+        //     $endTag = '</mark></a>';
+
+        //     $strLength = mb_strlen($this->searchedString);
+
+        //     foreach($this->foundStringIndexes as $foundStringIndex){
+
+        //             $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
+        //             $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+
+        //     }
+
+        // }
+
+
+
         // illustrations
         if (count($this->illustrations)){
 
@@ -397,6 +429,46 @@ class BookNote
                 $illustration->setBookNote(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nbOccurrencesInBook
+     */ 
+    public function getNbOccurrencesInBook()
+    {
+        return $this->nbOccurrencesInBook;
+    }
+
+    /**
+     * Set the value of nbOccurrencesInBook
+     *
+     * @return  self
+     */ 
+    public function setNbOccurrencesInBook($nbOccurrencesInBook)
+    {
+        $this->nbOccurrencesInBook = $nbOccurrencesInBook;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of firstOccurrenceInNote
+     */ 
+    public function getFirstOccurrenceInNote()
+    {
+        return $this->firstOccurrenceInNote;
+    }
+
+    /**
+     * Set the value of firstOccurrenceInNote
+     *
+     * @return  self
+     */ 
+    public function setFirstOccurrenceInNote($firstOccurrenceInNote)
+    {
+        $this->firstOccurrenceInNote = $firstOccurrenceInNote;
 
         return $this;
     }
