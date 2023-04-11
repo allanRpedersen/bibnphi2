@@ -231,7 +231,6 @@ class FrontController extends AbstractController
 			$nbFoundStrings = $session->get('nbFoundStrings');
 			$nbFoundInBooks = $session->get('nbFoundInBooks');
 
-			dump($hlContents);
 			foreach($hlContents as $hlContent) $matchingBookIds[] = $hlContent['bookId'];
 
 			$matchingBookIds = array_values(array_unique($matchingBookIds));
