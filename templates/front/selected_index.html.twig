@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma sélection{% endblock %}
+{% block title %}Sélection courante{% endblock %}
 
 {% block body %}
 
@@ -12,7 +12,7 @@
 		</div>
 	</div>
 	<div id="selected-list-leftside">
-		<h2>ma sélection</h2>
+		<h2>Sélection courante</h2>
 		{% for book in books %}
 			<a href="{{ path('show_selected', {'id': book.id}) }}">
 				<div id="book_{{book.id}}" class="row book-row{% if book == openBook %} open-book-row{% endif %} mt-3 mx-0">

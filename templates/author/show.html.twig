@@ -8,8 +8,8 @@
     <p style="display: inline">({{ author.birthYear }} / {{ author.deathYear }})</p>
     <p class="my-3" style="font-weight: bold">{{ author.summary }}</p>
     <div class="row my-5">
-        <div class="col-md-3">
-            <img src="/images/author/{{ author.pictureFileName }}" alt="" width="100%" style="text-align: center;">
+        <div class="col-md-3 d-flex flex-wrap align-items-center">
+            <img src="/images/author/{{ author.pictureFileName }}" alt="" width="100%">
         </div>
         <div class="col-md-8 mx-2 p-justify" style="height: 400px;">
             {% if author.wikipediaLink %}
