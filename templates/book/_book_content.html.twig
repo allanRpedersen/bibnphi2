@@ -13,7 +13,6 @@
     {{ paragraph.FormattedContent | raw }}
     </p>
 {% endfor %}
-
 {% for note in book.bookNotes %}
 <p class="p-justify" id="note_{{ note.id }}">
     <sup><a href="#citation_{{ note.citation }}">{{ note.citation }}</a></sup> {{ note.formattedContent | raw }}

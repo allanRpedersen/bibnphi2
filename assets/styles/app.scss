@@ -37,6 +37,11 @@ body {
     vertical-align: top;
 }
 
+.book-card:hover {
+    box-shadow: 6px 6px 6px rgb(233, 192, 11);
+
+}
+
 .found-content {
     padding: 2px;
     color: rgb(207, 200, 101);
