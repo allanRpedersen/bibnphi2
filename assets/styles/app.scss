@@ -28,18 +28,19 @@ body {
     background-color: rgb(200, 201, 212);
     //background-color: rgb(223, 158, 37);
     border: 1px solid darkblue;
-    box-shadow: 5px 5px 5px darkblue;
+    box-shadow: 3px 3px 2px darkblue;
     // border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
     // width: 19.5%;
 
-    width: 11%; //14.5%;
+    // width: 11%; //14.5%;
     display: inline-block;
     vertical-align: top;
 }
 
 .book-card:hover {
-    box-shadow: 6px 6px 6px rgb(233, 192, 11);
-
+    // box-shadow: inset 3px 3px 2px darkorange;
+    box-shadow:  3px 3px 3px yellow;
+    border: 1px solid yellow;
 }
 
 .found-content {
@@ -143,12 +144,13 @@ a {
 #frontpage-content {
     height: calc(100vh - 91px);
     padding: 3px 33px;
+    overflow: auto;
 }
 #frontpage-leftside {
     width: 100%;
     height: calc(100vh - 91px);
     overflow: auto;
-    padding: 0 3px;
+    padding: 0px 3px;
 }
 #frontpage-rightside {
     display: none;

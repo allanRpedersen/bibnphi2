@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Monolog\Logger;
 use App\Entity\Book;
+use App\Entity\Bookmark;
 use App\Entity\BookNote;
 use App\Entity\BookParagraph;
 use App\Entity\Illustration;
@@ -22,7 +23,7 @@ class XmlParser {
 	/**
 	 * 
 	 */
-	private $book; // the book being parsed
+	private Book $book; // the book being parsed
 	
     private $nbWords;
     private $nbSentences;
@@ -57,13 +58,13 @@ class XmlParser {
 			// $drawFrameWithObject,
 			$text;
 
-	private $style = [
-		'name'			=> '',
-		'family'		=> '', // "text"
-		'fontStyle'		=> '', // "normal" | "italic" ..
-		'fontWeight'	=> '', // "bold" ..
-		'text-position'	=> 'normal',
-	];
+	// private $style = [
+	// 	'name'			=> '',
+	// 	'family'		=> '', // "text"
+	// 	'fontStyle'		=> '', // "normal" | "italic" ..
+	// 	'fontWeight'	=> '', // "bold" ..
+	// 	'text-position'	=> 'normal',
+	// ];
 
 	private $styleProperty = [
 		'name'			=> '',
@@ -132,6 +133,8 @@ class XmlParser {
 	private $illustrations = [];
 	private $noteIllustrations = [];
 
+	// Le texte du signet
+	private $bookmarkName = '';
 
 	private $logger;
 	private $em;
@@ -426,12 +429,17 @@ class XmlParser {
 				$this->svgTitle = '';
 				break;
 
+			case "TEXT:BOOKMARK":
+				$this->bookmarkName = $attribs['TEXT:NAME'];
+				break;
+			
 			case "TEXT:LINE-BREAK":
 				// $this->logger->info("!!!!! <$element> " . json_encode($attribs));
 				break;
+
 			case "TEXT:NOTE":
 				//
-				// strlen, number of bytes and some characters may be multi-bytes ...
+				// strlen, number of bytes, but some characters may be multi-bytes ...
 				// iconv_strlen, number of characters
 				//
 				// index from the beginning of the paragraph !!
@@ -604,6 +612,9 @@ class XmlParser {
 				$this->isSvgTitle = false;
 				break;
 
+			case "TEXT-BOOKMARK":
+				break;
+			
 			case "TEXT:LINE-BREAK":
 				// Cette balise est traitée comme un span, une altération du texte.
 				// Un style spécifique est ajouté à la liste des styles pris en compte
@@ -645,7 +656,6 @@ class XmlParser {
 				break;
 
 			case "TEXT:NOTE-BODY":
-				// 
 				$this->isNoteBody = false;
 				break;
 			
@@ -657,9 +667,6 @@ class XmlParser {
 			case "TEXT:P":
 				if (!$this->insideNote){
 
-
-					// dd($this->text, $this->noteCollection, $this->illustrations, $this->spans);
-
 					// handle paragraph content, notes, alterations, illustrations
 					//
 					$this->handleBookParagraph($this->text, $this->noteCollection); 
@@ -669,7 +676,7 @@ class XmlParser {
 					$this->noteCollection = [];
 					$this->spans = [];
 					$this->illustrations = [];
-
+					$this->bookmarkName = '';
 				}
 				break;
 
@@ -746,6 +753,7 @@ class XmlParser {
 	{
 		$bookParagraph = NULL;
 		$illustrations = $this->illustrations;
+		$isBookmark = ($this->bookmarkName != '');
 
 		$rawParagraph = ltrim($rawParagraph);
 
@@ -768,7 +776,7 @@ class XmlParser {
 			// }
 
 
-		if ($rawParagraph != '' || $illustrations){
+		if ($rawParagraph != '' || $illustrations || $isBookmark){
 
 			$bookParagraph = new BookParagraph();
 			$bookParagraph->setBook($this->book);
@@ -904,6 +912,19 @@ class XmlParser {
 					$this->logger->info("style de paragraphes : $this->currentStyleName, $styleStr");
 
 				
+			}
+			//
+			// this paragraph may be a bookmark even if there is no content !!
+			if ($isBookmark){
+				$bookmark =  new Bookmark();
+
+				// $bookmark->setBook($this->book);
+				$bookmark->setParagraph($bookParagraph);
+				$bookmark->setName($this->bookmarkName);
+
+				$this->em->persist($bookmark);
+				$this->book->addBookmark($bookmark);
+				// $this->em->persist($this->book);
 			}
 
 			//

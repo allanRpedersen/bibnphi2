@@ -302,14 +302,18 @@ class FrontController extends AbstractController
 	
 		}
 
+		//
+		// $bookList = $sm->sortByAuthor($this->br->findByDate());
+		$bookList = $this->br->findByDate();
         return $this->render('front/index.html.twig', [
-			'authors' => $this->authors,
+			// 'authors' => $this->authors,
 			// 'authors' => $paginator->paginate(
 			// 			$this->ar->findByLastNameQuery(),
 			// 			$request->query->getInt('page', 1),
 			// 			3
 			// ),
 			'books'		=> $bookList,
+			// 'books'		=> $this->br->findByDate(),
 			'nbAuthors'	=> $this->nbAuthors,
 			'nbBooks'	=> $this->nbBooks,
 			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),

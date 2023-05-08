@@ -126,6 +126,24 @@ class BookRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+	 * findByDate
+	 * 
+	 * @param Date $author
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByDate($orderBy='DESC') : array
+    {
+        return $this->createQueryBuilder('t')
+            // ->andWhere('t.author = :id')
+            // ->setParameter('id', $author->getid())
+            ->orderBy('t.updatedAt', $orderBy)
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 
     // /**
     //  * @return Book[] Returns an array of Book objects

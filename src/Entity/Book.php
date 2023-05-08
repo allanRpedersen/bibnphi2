@@ -173,11 +173,17 @@ class Book
      */
     private int $nbFoundStrings = 0;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Bookmark::class, mappedBy="Book", orphanRemoval=true)
+     */
+    private $bookmarks;
+
 
     public function __construct()
     {
         $this->bookParagraphs = new ArrayCollection();
         $this->bookNotes = new ArrayCollection();
+        $this->bookmarks = new ArrayCollection();
     }
 	//
 	//
@@ -193,13 +199,13 @@ class Book
 	 * @return void
 	 */
 	public function InitializeSlug()
-    {
-        // if ( empty($this->slug) ){}
-    
-        // le slug est systèmatiquement recalculé ..
-        $slugify = new Slugify();
-        $this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
-    }
+                   {
+                       // if ( empty($this->slug) ){}
+                   
+                       // le slug est systèmatiquement recalculé ..
+                       $slugify = new Slugify();
+                       $this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
+                   }
 
 
     public function getId(): ?int
@@ -315,9 +321,9 @@ class Book
     }
 
 	public function setBookMimeType(?string $bookMimeType): void
-    {
-        $this->bookMimeType = $bookMimeType;
-    }
+                   {
+                       $this->bookMimeType = $bookMimeType;
+                   }
 
     public function getBookMimeType(): ?string
     {
@@ -325,9 +331,9 @@ class Book
     }
 
 	public function setOdtOriginalName(?string $odtOriginalName): void
-    {
-        $this->odtOriginalName = $odtOriginalName;
-    }
+                   {
+                       $this->odtOriginalName = $odtOriginalName;
+                   }
 
     public function getOdtOriginalName(): ?string
     {
@@ -576,6 +582,36 @@ class Book
     public function setNbFoundStrings($nbFoundStrings): self
     {
         $this->nbFoundStrings = $nbFoundStrings;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Bookmark>
+     */
+    public function getBookmarks(): Collection
+    {
+        return $this->bookmarks;
+    }
+
+    public function addBookmark(Bookmark $bookmark): self
+    {
+        if (!$this->bookmarks->contains($bookmark)) {
+            $this->bookmarks[] = $bookmark;
+            $bookmark->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookmark(Bookmark $bookmark): self
+    {
+        if ($this->bookmarks->removeElement($bookmark)) {
+            // set the owning side to null (unless already changed)
+            if ($bookmark->getBook() === $this) {
+                $bookmark->setBook(null);
+            }
+        }
 
         return $this;
     }

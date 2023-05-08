@@ -359,8 +359,6 @@ class BookController extends AbstractController
 		// after a search, the matching strings are parameters of the session
 		// $hlString: searched string, $allHlContents: array of needles index which may referenced several books
 		$allHlContents = $session->get('hlContents', []);
-			// to be tested, could be null or there is an issue if the session quit with time-out ...
-
 
 		$hlString = $session->get('hlString');
 		$hlContents = [];

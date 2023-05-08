@@ -1,13 +1,12 @@
 <div class="card book-card m-3 p-1">
-    <a href="{{ path('book_show', { 'slug' : book.slug }) }}">
+    <a href="{{ path('book_show', { 'slug' : book.slug }) }}" title="{{book.summary}}">
         {% if book.fpImageFileName %}
         <img src="{{ vich_uploader_asset(book, 'fpImageFile') | imagine_filter('fp_crop')}}" alt="front page" width="100%">
         {% else %}
         <img src="{{ '/couvpardefaut.jpeg' | imagine_filter('fp_crop')}}" alt="default front page" width="100%">
         {% endif %}
         <div class="card-body">
-            <div class="card-title" style="text-align: center; font-size: 0.7srem;">{{ book.author.lastName }}
-            </div>
+            <div class="card-title" style="text-align: center; font-size: 0.7srem;">{{ book.author.lastName }}</div>
             <div class="card-text" style="text-align: center; font-size: 0.9rem;">{{ book.title }}</div>
         </div>
     </a>

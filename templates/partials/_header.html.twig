@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-	<a class="navbar-brand" style="color:darkorange" title="Afficher la sélection.. sinon la bibliothèque" href="{{ path('reset_search') }}">Bib'n'Phi</a>
+	<a class="navbar-brand" style="color:darkorange" title="Accueil" href="{{ path('reset_search') }}">Bib'n'Phi</a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
@@ -11,12 +11,14 @@
 					Nos philosophes {% if nbAuthors is defined %}({{ nbAuthors }}){% endif %}</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">A propos</a>
+				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('book_index') }}">
+					Les titres {% if nbBooks is defined %}({{ nbBooks }}){% endif %}</a>
 			</li>
-
+			<li class="nav-item">
+				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">À propos</a>
+			</li>
 			{% if is_granted('ROLE_LIBRARIAN') %}
 			<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
-
 			{% else %}
 			{% endif %}
 		</ul>
@@ -28,18 +30,18 @@
 				id="sentence-search-button" title="Recherche dans les oeuvres sélectionnées ou la bibliothèque"><i class="fa fa-search"></i></button>
 			</li>
 			<li class="nav-item">
-					{{ include ('partials/_search_form_horiz.html.twig') }}
+				{{ include ('partials/_search_form_horiz.html.twig') }}
 			</li>
 			{% endif %}
 			{% if bookSelectForm is defined %}
 			<li class="nav-item">
-				<button class="nav-link btn btn-outline-primary mx-1" id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
+				<button class="nav-link btn btn-outline-primary mx-1"
+				id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
 			</li>
 			{% endif %}
 			<li class="nav-item">
 				<a class="nav-link btn btn-outline-primary mx-1"
 				id="cancel-selection-button" title="la sélection" href="{{ path('reset_selection') }}">Annuler</a>
-
 			</li>
 			{% if is_granted('ROLE_ADMIN') %}
 			<li class="nav-item">
