@@ -5,9 +5,9 @@
 {% block body %}
 
 <div id="frontpage-content" class="container">
-	<div class="mt-5 mb-5" style="border:1px solid black; text-align:center;">
-		<p>
-			Texte d'accueil
+	<div class="m-5" style="text-align: center;">
+		<p class="m-3" style="font-size: 2rem;font-style:italic;">
+			... Texte d'accueil ...
 		</p>
 		<p>
 			Cette bibliothèque intègre à ce jour {{nbAuthors}} philosophes et permet l'accès à {{nbBooks}} de leurs ouvrages libres de droits 
@@ -15,7 +15,7 @@
 	</div>
 
 	<h5 style="text-align:center;">Les 5 derniers ouvrages référencés</h5>
-	<div class="container" style="display:flex; justify-content:center;">
+	<div style="display:flex; justify-content:center;">
 		{% for book in books %}
 		<div style="display: inline;">
 			{% include 'book/_book.html.twig' %}
@@ -28,8 +28,7 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
-</script>
+<script></script>
 {% endblock %}
 
 

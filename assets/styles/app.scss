@@ -19,9 +19,32 @@ body {
 .table td {
     border: none;
 }
+
+.bookmark {
+    font-size: 0.8rem;
+    border: 1px solid rgb(15, 52, 87);
+    border-radius: 10% 0 0 10%;
+    margin-bottom: 2px;
+    margin-right: 5px;
+    // box-sizing:content-box;
+    padding: 2px;
+    text-align: end;
+    height: 1.5rem;
+    overflow: hidden;
+}
+.bookmark:hover {
+    font-size: 0.9rem;
+    height:fit-content;
+    overflow: visible;
+}
+
 .author-card {
-    background-color: rgb(207, 200, 92);
+    // background-color: rgb(207, 200, 92);
     border: 1px solid black;
+    opacity: 0.7;
+}
+.author-card:hover {
+    opacity: 1;
 }
 
 .book-card {

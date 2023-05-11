@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\SortMgr;
+use App\Service\BookListMgr;
 use App\Entity\BookSelect;
 use App\Form\BookSelectType;
 use App\Entity\SentenceSearch;
@@ -54,6 +55,8 @@ class FrontController extends AbstractController
 		// init
 		//
 		$sm = new SortMgr();
+		$bookListMgr = new BookListMgr($this->br);
+		$bookList =[];
 
 		$authors = [];
 		$authorSelected = false;
@@ -86,7 +89,8 @@ class FrontController extends AbstractController
 		//
 		if ($bookSelectForm->isSubmitted() && $bookSelectForm->isValid())
 		{
-			$bookList = [];
+			// $bookListMgr->SetList($bookSelect);
+			// $bookList = $bookListMgr->GetList();
 
 			if (!$bookSelect->getAuthors()->isEmpty()){
 				// search in all the books wrote by the given author list ..
@@ -96,7 +100,6 @@ class FrontController extends AbstractController
 					$books = $this->br->findByAuthor($author);
 					foreach($books as $book) $bookList[] = $book;
 				}
-				
 			}
 			if (!$bookSelect->getBooks()->isEmpty()){
 				$books = $bookSelect->getBooks();

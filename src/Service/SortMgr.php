@@ -62,8 +62,13 @@ class SortMgr
                 "title"     => strtr($book->getTitle(), $this->table),
             ];
         }
+
         $direction == "ASC" ? asort($books) : arsort($books);
-        foreach( $books as $key => $val) $sortedByAuthor[] = $originalList[$key];
+
+        foreach( $books as $key => $val){
+            if (!$sortedByAuthor->contains($originalList[$key])) $sortedByAuthor[] = $originalList[$key];
+        }
+
         return $sortedByAuthor;
     }
 }

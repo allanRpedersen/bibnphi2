@@ -195,6 +195,11 @@ $(function () {
 		$('.book-row').css('cursor', 'wait');
 	});
 
+	$('.book-card').on('click', function(event){
+		$('body').css('cursor', 'wait');
+		$('.book-card').css('cursor', 'wait');
+	});
+
 
 	$('#user_userRoles').select2({
 		width: '17%',

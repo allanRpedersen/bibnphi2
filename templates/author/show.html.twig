@@ -19,11 +19,13 @@
     </div>
     
     <h4>Ses oeuvres référencées ...</h4>
-    {% for book in author.books %}
-    <div style="display: inline;">
-        {% include 'book/_book.html.twig' %}
-    </div>        
-    {% endfor %}
+    <div style="display:flex; flex-wrap:wrap;">
+        {% for book in author.books %}
+        <div style="display: inline; width: 16%;">
+            {% include 'book/_book.html.twig' %}
+        </div>        
+        {% endfor %}
+    </div>
     
     <div style="display: flex;">
         <a  type="button" class="btn btn-primary mx-1 mt-2"href="{{ path('author_index') }}">retour</a>

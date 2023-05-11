@@ -6,6 +6,7 @@ use Monolog\Logger;
 use App\Entity\Book;
 use App\Entity\Author;
 use App\Form\BookType;
+use App\Service\SortMgr;
 use App\Service\XmlParser;
 use App\Repository\BookRepository;
 use Monolog\Handler\StreamHandler;
@@ -16,8 +17,8 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Vich\UploaderBundle\Form\Type\VichFileType;
 
+use Vich\UploaderBundle\Form\Type\VichFileType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -35,6 +36,7 @@ class BookController extends AbstractController
 	//
 	private $xmlParser;
 	private $book;
+	private $br;
 	
 	private $uploaderHelper;
 	private $logger;
@@ -46,11 +48,15 @@ class BookController extends AbstractController
 	//
 
 
-	public function __construct(KernelInterface $kernel, EntityManagerInterface $em, UploaderHelper $uploaderHelper)
+	public function __construct(KernelInterface $kernel,
+								EntityManagerInterface $em,
+								UploaderHelper $uploaderHelper,
+								BookRepository $br)
 	{
 		$this->projectDir = $kernel->getProjectDir();
 
 		$this->em = $em;
+		$this->br = $br;
 
 		$this->uploaderHelper = $uploaderHelper;
 
@@ -64,13 +70,19 @@ class BookController extends AbstractController
      */
     public function index(Request $request, PaginatorInterface $paginator, BookRepository $bookRepository): Response
     {
-        return $this->render('book/index.html.twig', [
-			'books' => $paginator->paginate(
-				$bookRepository->findByTitleQuery(),
-				$request->query->getInt('page', 1),
-				6
-			),
-		]);
+        // return $this->render('book/index.html.twig', [
+		// 	'books' => $paginator->paginate(
+		// 		$this->br->findByTitleQuery(),
+		// 		$request->query->getInt('page', 1),
+		// 		6
+		// 	),
+		// ]);
+
+			$sm = new SortMgr();
+
+			return $this->render('book/index.html.twig', [
+				'books'	=> $sm->SortByAuthor($this->br->findAll()),
+			]);
 	}
 	
 	/**

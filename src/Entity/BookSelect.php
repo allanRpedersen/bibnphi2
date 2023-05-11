@@ -39,9 +39,7 @@ class BookSelect
     {
         if (!$this->authors->contains($author)) {
             $this->authors[] = $author;
-            // $author->setAuthor($this);
         }
-
         return $this;
     }
 
@@ -88,36 +86,4 @@ class BookSelect
 
         return $this;
     }
-
-
-
-
-
-// 	/**
-// 	 * Le philosophe selectionné
-// 	 *
-// 	 * @var Author | null
-//     */
-//    private $author;
-
-
-// 	public function __construct()
-//     {
-//         // $this->authors = new ArrayCollection();
-//     }
-
-
-// 	public function getAuthor(): ?Author
-// 	{
-// 		return $this->author;
-// 	}
-
-// 	public function setAuthor( Author $author ): self
-// 	{
-// 		$this->author = $author;
-		
-// 		return $this;
-// 	}
-
-
 }
