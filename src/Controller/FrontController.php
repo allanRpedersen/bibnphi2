@@ -3,16 +3,16 @@
 namespace App\Controller;
 
 use App\Service\SortMgr;
-use App\Service\BookListMgr;
 use App\Entity\BookSelect;
 use App\Form\BookSelectType;
 use App\Entity\SentenceSearch;
+use App\Service\SelectAndSearch;
 use App\Form\SentenceSearchType;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
-use App\Repository\BookNoteRepository;
-use App\Repository\BookParagraphRepository;
-use Knp\Component\Pager\PaginatorInterface;
+// use App\Repository\BookNoteRepository;
+// use App\Repository\BookParagraphRepository;
+// use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,15 +23,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class FrontController extends AbstractController
 {
-	private $ar, $br, $nr, $pr;
+	private $ar, $br; // , $nr, $pr;
 
-	private $authors;
-	private $books;
+	private $authors, $books;
 	private $nbAuthors, $nbBooks;
 
-	public function __construct( AuthorRepository $ar, BookRepository $br, BookParagraphRepository $pr, BookNoteRepository $nr )
+	public function __construct( AuthorRepository $ar, BookRepository $br )
 	{
-
 		$this->ar = $ar;
 		$this->authors = $this->ar->findByLastName();
 		$this->nbAuthors = count($this->authors);
@@ -40,26 +38,24 @@ class FrontController extends AbstractController
 		$this->books = $this->br->findAll();
 		$this->nbBooks = count($this->books);
 
-		$this->pr = $pr;
-		$this->nr = $nr;
+		// $this->pr = $pr;
+		// $this->nr = $nr;
 
 	}
-
 
     /**
      * @Route("/", name="front")
 	 * @return Response
      */
-    public function index(Request $request): Response // , PaginatorInterface $paginator)
+    public function index(Request $request, SelectAndSearch $sas): Response // , PaginatorInterface $paginator)
     {
 		// init
 		//
 		$sm = new SortMgr();
-		$bookListMgr = new BookListMgr($this->br);
-		$bookList =[];
-
-		$authors = [];
-		$authorSelected = false;
+		$session = $request->getSession();
+		// $bookList =[];
+		// $authors = [];
+		// $authorSelected = false;
 
 		$hlContent = [
 			'bookId'				=> 0,
@@ -70,10 +66,7 @@ class FrontController extends AbstractController
 			'needles'				=> [],
 		];
 
-		$session = $request->getSession();
-		$hlContents = $session->get('hlContents', []);
-		$stringToSearch = $session->get('hlString', '');
-
+		//
 
 		/** any user authenticated ?
 		 ** 
@@ -89,48 +82,17 @@ class FrontController extends AbstractController
 		//
 		if ($bookSelectForm->isSubmitted() && $bookSelectForm->isValid())
 		{
-			// $bookListMgr->SetList($bookSelect);
-			// $bookList = $bookListMgr->GetList();
-
-			if (!$bookSelect->getAuthors()->isEmpty()){
-				// search in all the books wrote by the given author list ..
-				$authors = $bookSelect->getAuthors();
-				$authorSelected = true;
-				foreach($authors as $author){
-					$books = $this->br->findByAuthor($author);
-					foreach($books as $book) $bookList[] = $book;
-				}
-			}
-			if (!$bookSelect->getBooks()->isEmpty()){
-				$books = $bookSelect->getBooks();
-				foreach($books as $book){
-					$bookList[] = $book;
-				}
-			}
-
-			if (!$bookList && !$authorSelected){ $bookList = $this->books; }
-			$bookList = $sm->sortByAuthor($bookList);
-
-			$bookSelectionIds = [];
-			foreach( $bookList as $book ){
-				$bookSelectionIds[] = $book->getId();
-			}
-
-			$session->set('currentBookSelectionIds', $bookSelectionIds);
-			$session->set('openBookId', NULL);
+			// set currentBookSelectionIds in the session
+			$sas->SelectBooks($bookSelect);
 		}
 		//
-		$currentBookSelectionIds = $session->get('currentBookSelectionIds');
+		$currentBookSelectionIds = $session->get('currentBookSelectionIds', []);
 		if ($currentBookSelectionIds){
-
-			$bookList = [];
 			foreach($currentBookSelectionIds as $id){
-				//
 				// 
 				if ($book = $this->br->findOneById($id)) $bookList[] = $book;
 			}
 			$bookList = $sm->sortByAuthor($bookList);
-
 		}
 		else $bookList = $sm->sortByAuthor($this->books);
 
@@ -140,155 +102,16 @@ class FrontController extends AbstractController
 		$sentenceSearch = new SentenceSearch();
 		$sentenceSearchForm = $this->createForm(SentenceSearchType::class, $sentenceSearch);
 		$sentenceSearchForm->handleRequest($request);
-
+		//
 		if ($sentenceSearchForm->isSubmitted() && $sentenceSearchForm->isValid())
 		{
-			$stringToSearch = $sentenceSearch->getStringToSearch();
-
-			$matchingBookList = [];
-			$hlContents = [];
-
-			$nbFoundInBooks = [];
-
-			$nbFoundStrings = 0;
-
-			// Word/Sentence search process
-			//
-			$bookList = $sm->sortByAuthor($bookList);
-			foreach($bookList as $book){
-
-				$matchingParagraphs = [];
-				$matchingNotes = [];
-				$nbFoundStringsOrig = $nbFoundStrings;
-
-				$paragraphs = $book->getBookParagraphs();
-				foreach($paragraphs as $paragraph){
-
-					if ( $paragraph->isContentMatching($stringToSearch)){
-
-						$matchingParagraphs[] = $paragraph;
-						$nbFoundStrings += count($paragraph->getFoundStringIndexes());
-
-						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
-
-						$hlContent = [
-							'bookId' 		=> $book->getId(),
-							'contentType'	=> 'p',
-							'contentId'		=> $paragraph->getId(),
-							'needles'		=> $paragraph->getFoundStringIndexes(),
-						];
-						
-						$hlContents[] = $hlContent;
-					}
-				}
-
-				$notes = $book->getBookNotes();
-				foreach($notes as $note){
-
-					if ( $note->isContentMatching($stringToSearch)){
-
-						$matchingNotes[] = $note;
-						$nbFoundStrings += count($note->getFoundStringIndexes());
-
-						if ( !in_array( $book, $matchingBookList ) ) $matchingBookList[] = $book;
-
-						$hlContent = [
-							'bookId' 		=> $book->getId(),
-							'contentType' 	=> 'n',
-							'contentId'		=> $note->getId(),
-							'needles'		=> $note->getFoundStringIndexes(),
-						];
-						
-						$hlContents[] = $hlContent;
-					}
-				}
-
-				$nbOccurrencesInBook = $nbFoundStrings - $nbFoundStringsOrig;
-				$currentOccurrenceInBook = 1;
-
-				if ($nbOccurrencesInBook){
-					for ($i=0; $i<count($hlContents); $i++){
-						if($book->getId() == $hlContents[$i]['bookId']){
-							$hlContents[$i]['nbOccurrencesInBook'] = $nbOccurrencesInBook;
-							$hlContents[$i]['firstOccurrence'] = $currentOccurrenceInBook;
-							$currentOccurrenceInBook += count($hlContents[$i]['needles']);
-						}
-					}
-				}
-				$nbFoundInBooks[$book->getId()] = $nbOccurrencesInBook;
-			}
-
-			$session->set('nbFoundStrings', $nbFoundStrings);
-			$session->set('nbFoundInBooks', $nbFoundInBooks);
-
-			if ($nbFoundStrings){
-				$session->set('hlString', $stringToSearch);
-				$session->set('hlContents', $hlContents);
-			}
+			// If the string to search is found ..
+			// then set nbFoundStrings, nbFoundInBooks, hlString, hlContents in the session
+			$sas->SearchString($sentenceSearch, $bookList);
 		}
-			
-		if ($hlContents || $stringToSearch != ''){
 
-			$matchingBookIds = [];
-			$matchingBookList = [];
-			$nbFoundStrings = $session->get('nbFoundStrings');
-			$nbFoundInBooks = $session->get('nbFoundInBooks');
-
-			foreach($hlContents as $hlContent) $matchingBookIds[] = $hlContent['bookId'];
-
-			$matchingBookIds = array_values(array_unique($matchingBookIds));
-			$n = count($matchingBookIds);
-			for ($i=0; $i<$n;$i++){
-				$book = $this->br->findOneById($matchingBookIds[$i]);
-				$book->setNbFoundStrings($nbFoundInBooks[$book->getId()]);
-				$matchingBookList[] = $book;
-			}
-
-			$openBookId = $session->get('openBookId');
-			$openBook = null;
-			$scrollTo = null;
-
-			if ($matchingBookList){
-				$openBook = $openBookId ? $this->br->findOneById($openBookId) : $matchingBookList[0];
-				$scrollTo = 'occurrence_1/' . $openBook->getNbFoundStrings();
-			}
-			foreach($hlContents as $hlContent){
-
-				if ($openBook->getId() == $hlContent['bookId']){
-
-					switch($hlContent['contentType']){
-						case 'p':
-							$p = $this->pr->findOneById($hlContent['contentId']);
-							$p->setFoundStringIndexes($hlContent['needles'])
-							  ->setSearchedString($stringToSearch)
-							  ->setFirstOccurrenceInParagraph($hlContent['firstOccurrence'])
-							  ->setNbOccurrencesInBook($hlContent['nbOccurrencesInBook'])
-							  ;
-						break;
-
-						case 'n':
-							$n = $this->nr->findOneById($hlContent['contentId']);
-							$n->setFoundStringIndexes($hlContent['needles'])
-							  ->setSearchedString($stringToSearch)
-							  ->setFirstOccurrenceInNote($hlContent['firstOccurrence'])
-							  ->setNbOccurrencesInBook($hlContent['nbOccurrencesInBook'])
-							  ;
-						break;
-					}
-				}
-			}
-
-			return $this->render('front/search_result.html.twig', [
-				'sentenceSearchForm'=> $sentenceSearchForm->createView(),
-				'string'			=> $stringToSearch,
-				'matchingBookList'	=> $matchingBookList,
-				'nbFoundStrings'	=> $nbFoundStrings,
-				'openBook'			=> $openBook,
-				'scrollTo'			=> $scrollTo,
-			]);
-
-			
-		}
+		$hlContents = $session->get('hlContents', []);
+		if ($hlContents) return $this->redirectToRoute('sentence_search_result');
 
 		if (( $currentBookSelectionIds ) && $bookList){
 
@@ -300,9 +123,7 @@ class FrontController extends AbstractController
 				'openBook'				=> $openBook,
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
-				// 'isSelectedList'		=> $currentBookSelectionIds,
 			]);
-	
 		}
 
 		//
@@ -324,6 +145,15 @@ class FrontController extends AbstractController
 			'isSelectedList'		=> $currentBookSelectionIds,
         ]);
     }
+
+	/**
+	 * @Route("/showSelected/{id}", name="show_selected")
+	 */
+	public function showSelected(Request $request, $id): Response
+	{
+		$request->getSession()->set('openBookId', $id);
+		return $this->redirectToRoute('front');
+	}
 
     /**
      * @Route("/about", name="about")
@@ -350,16 +180,6 @@ class FrontController extends AbstractController
 		$session->set('nbFoundStrings', 0);
 		$session->set('nbFoundInBooks', 0);
 
-
-		return $this->redirectToRoute('front');
-	}
-
-	/**
-	 * @Route("/showSelected/{id}", name="show_selected")
-	 */
-	public function showSelected(Request $request, $id): Response
-	{
-		$request->getSession()->set('openBookId', $id);
 		return $this->redirectToRoute('front');
 	}
 

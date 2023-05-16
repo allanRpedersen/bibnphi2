@@ -41,7 +41,7 @@ services:
 
     app.service.parser:
         class: 'App\Service\XmlParser'
-        ##autowire: false
+        # autowire: false
         # manually wire all arguments
         arguments:
             - '\App\Entity\Book'
@@ -57,4 +57,5 @@ services:
         tags:
         - { name: 'doctrine.event_subscriber' }
     
+
 

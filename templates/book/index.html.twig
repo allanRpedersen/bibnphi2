@@ -4,16 +4,15 @@
 
 {% block body %}
 
-<div id="frontpage-content" class="container">
-
-	<div style="display:flex; flex-wrap: wrap;">
+<div id="library-content" class="container" style="padding-top: 30px; overflow: scroll;">
+	<h1 style="text-align: center;">La bibliothèque</h1>
+		<div style="display:flex; flex-wrap: wrap;">
 		{% for book in books %}
 		<div style="display: inline; width:16%;">
 			{% include 'book/_book.html.twig' %}
 		</div>
 		{% endfor %}
 	</div>
-
 </div>
 
 {% endblock %}

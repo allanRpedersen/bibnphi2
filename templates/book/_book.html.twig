@@ -1,4 +1,4 @@
-<div class="card book-card m-3 p-1">
+<div class="card book-card m-2 p-1">
     <a href="{{ path('book_show', { 'slug' : book.slug }) }}" title="{{book.summary}}">
         {% if book.fpImageFileName %}
         <img src="{{ vich_uploader_asset(book, 'fpImageFile') | imagine_filter('fp_crop')}}" alt="front page" width="100%">

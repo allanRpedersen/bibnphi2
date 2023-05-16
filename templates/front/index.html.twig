@@ -4,26 +4,86 @@
 
 {% block body %}
 
-<div id="frontpage-content" class="container">
-	<div class="m-5" style="text-align: center;">
-		<p class="m-3" style="font-size: 2rem;font-style:italic;">
-			... Texte d'accueil ...
+<div id="frontpage-content">
+	<div id="frontpage-rightside">
+		<p class="m-5" align="center">
+			La bibliothèque intègre à ce jour {{nbAuthors}} philosophes et permet l'accès à {{nbBooks}} de leurs ouvrages libres de droits 
 		</p>
-		<p>
-			Cette bibliothèque intègre à ce jour {{nbAuthors}} philosophes et permet l'accès à {{nbBooks}} de leurs ouvrages libres de droits 
-		</p>
-	</div>
-
-	<h5 style="text-align:center;">Les 5 derniers ouvrages référencés</h5>
-	<div style="display:flex; justify-content:center;">
-		{% for book in books %}
-		<div style="display: inline; width:16%;">
-			{% include 'book/_book.html.twig' %}
+		<h5 style="text-align:center;">Les 5 derniers ouvrages référencés</h5>
+		<div style="display:flex; flex-wrap:wrap; justify-content:center;">
+			{% for book in books %}
+			<div style="display: inline; max-width:20%; overflow:auto;">
+				{% include 'book/_book.html.twig' %}
+			</div>
+			{% endfor %}
 		</div>
-		{% endfor %}
 	</div>
-
-</div>
+	<div id="frontpage-leftside">
+		<div class="m-5" style="text-align: center;">
+			<p align="center" style="margin-bottom: 0cm; line-height: 100%">Le
+				site web BIB·N·PHI (Bibliothèque Numérique de Philosophie)
+				comporte trois éléments principaux&nbsp;:</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%"><br/></p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%">-&nbsp;La
+				<b>bibliothèque</b> rassemble, à ce jour, {{nbBooks}} œuvres
+				philosophiques numérisées en français (français langue originale,
+				avec orthographe modernisée le cas échéant, ou traduction). Ces
+				œuvres peuvent être lues en ligne, copiées-collées (notamment
+				pour des passages précis) ou encore téléchargées au format texte
+				modifiable ODT (pouvant être ouvert avec LibreOffice, OpenOffice,
+				Microsoft Word, etc.) ou au format PDF.</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%">-&nbsp;Le
+				<b>moteur de recherche</b> permet d’effectuer une requête précise
+				dans une œuvre, toutes les œuvres d’un même auteur ou même
+				toute la bibliothèque. Selon l’ampleur de la recherche (nombre
+				d’œuvres et / ou nombre d’occurrences de la requête),
+				l’affichage du résultat peut prendre un temps variable&nbsp;;
+				évitez autant que possible d’effectuer des recherches susceptibles
+				de donner des résultats trop nombreux (par exemple en cherchant
+				«&nbsp;homme&nbsp;» dans toute la bibliothèque).</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%">-&nbsp;L’<b>espace
+				privé</b> est disponible après inscription (gratuite). Il vous
+				permet de constituer votre propre bibliothèque numérique en
+				sélectionnant les œuvres sur lesquelles vous voulez
+				particulièrement travailler, et qui seront ainsi plus rapidement
+				accessibles après connexion. Vous pourrez souligner et surligner en
+				ligne des passages des textes en différentes couleurs et rédiger
+				des annotations (commentaires, liens, etc.).</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%"><br/></p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%">Vous
+				ne trouverez sur ce site que des œuvres en français ou des
+				traductions françaises d’œuvres datant de plus de 70&nbsp;ans
+				après le décès de leur auteur ou autrice. En effet, selon la
+				Directive européenne sur l’harmonisation de certains aspects du
+				droit d’auteur et des droits voisins dans la société de
+				l’information 93/98/CEE du 29 octobre 1993, une œuvre (notamment
+				écrite) tombe dans le domaine public 70&nbsp;ans après le décès
+				de son auteur<a name="sdendnote1anc" href="#sdendnote1sym"><sup>1</sup></a>.</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%">Nous
+				avons systématiquement privilégié les textes dans leur version
+				intégrale, sauf bien sûr lorsque l’œuvre elle-même ne nous est
+				parvenue intégralement&nbsp;: qu’on ne s’attende pas à trouver
+				ici le livre II de la <i>Poétique</i> d’Aristote…</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%"><br/></p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%">Malgré
+				tout le soin qui a été apporté à la relecture des textes, il est
+				possible (voire probable) que ceux-ci comportent des coquilles. Dans
+				ce cas, n’hésitez pas à nous le signaler par l’intermédiaire
+				du formulaire de contact.</p>
+			<p align="justify" style="margin-bottom: 0cm; line-height: 100%"><br/></p>
+			<div id="sdendnote1">
+				<p class="sdendnote" align="justify" style="margin-bottom: 0cm; line-height: 100%; font-size:0.9rem;"><a name="sdendnote1sym" href="#sdendnote1anc"><sup>1</sup></a>«&nbsp;Les
+				droits de l’auteur d’une œuvre littéraire ou artistique au
+				sens de l’article 2 de la convention de Berne durent toute la vie
+				de l’auteur et pendant soixante-dix ans après sa mort, quelle que
+				soit la date à laquelle l’œuvre a été licitement rendue
+				accessible au public.&nbsp;»</p>
+				<p class="sdendnote" align="justify" style="text-indent: 0cm; background: transparent; font-size:0.8rem;">
+				(<a href="https://eur-lex.europa.eu/legal-content/FR/TXT/HTML/?uri=CELEX:31993L0098" target="_blank rel="noopener noreferrer"">https://eur-lex.europa.eu/legal-content/FR/TXT/HTML/?uri=CELEX:31993L0098</a>).</p>
+			</div>
+		</div>
+	</div>
+</div> <!-- #frontpage-content -->
 
 {% endblock %}
 

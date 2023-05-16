@@ -16,30 +16,33 @@ body {
     background-color: lightgray;
 }
 
+#liste-titres {
+    background-image: url('/public/bibliotheque.jpg');
+}
+
 .table td {
     border: none;
 }
 
 .bookmark {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     border: 1px solid rgb(15, 52, 87);
-    border-radius: 10% 0 0 10%;
+    border-radius: 30% 0 0 30%;
     margin-bottom: 2px;
     margin-right: 5px;
-    // box-sizing:content-box;
     padding: 2px;
     text-align: end;
     height: 1.5rem;
     overflow: hidden;
 }
 .bookmark:hover {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     height:fit-content;
     overflow: visible;
+    background-color: lightblue;
 }
 
 .author-card {
-    // background-color: rgb(207, 200, 92);
     border: 1px solid black;
     opacity: 0.7;
 }
@@ -49,19 +52,13 @@ body {
 
 .book-card {
     background-color: rgb(200, 201, 212);
-    //background-color: rgb(223, 158, 37);
     border: 1px solid darkblue;
     box-shadow: 3px 3px 2px darkblue;
-    // border-radius: 45px 15px 225px 5px/25px 225px 25px 255px;
-    // width: 19.5%;
-
-    // width: 11%; //14.5%;
     display: inline-block;
     vertical-align: top;
 }
 
 .book-card:hover {
-    // box-shadow: inset 3px 3px 2px darkorange;
     box-shadow:  3px 3px 3px yellow;
     border: 1px solid yellow;
 }
@@ -70,30 +67,12 @@ body {
     padding: 2px;
     color: rgb(207, 200, 101);
     background-color: rgb(34, 9, 145);
-
-    // font-size: 1.1rem;
-    // font-style: italic;
-    // font-weight: bold;
-    // text-decoration: underline;
-
-    // border: 1px solid black;
 }
 
-// les cibles des hyperliens vers les notes de fin ..
-// :target {
-//     scroll-margin-top: 70px; /* height of sticky header (where does it come from ??-) */
-// }
-
-//
 // 
 h3:target {
     scroll-margin-top: 0;
 }
-
-
-// html {
-//     scroll-padding-top: 70px; /* height of sticky header */
-//   }
 
 .anchor-no-decoration:hover {
     text-decoration: none;
@@ -132,18 +111,11 @@ a {
     transition: width 3s linear;
 }
 
-// html, body {
-//     height: 100%;
-//     overflow: hidden;
-//     margin: 0;qq
-// }
-
 #book-display-content {
     height: calc(100vh - 91px);
     padding: 3px 33px;
 
 }
-
 #book-display-leftside {
     float: left;
     width: 23%;
@@ -151,14 +123,12 @@ a {
     overflow-y: scroll;
     padding: 0px 3px;
 }
-
 #book-display-rightside {
     width: 77%;
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0 5px;
     background-image: url('/public/papier.jpg');
-
     border:rgb(11, 131, 31) solid 1px;
 
 }
@@ -167,28 +137,33 @@ a {
 #frontpage-content {
     height: calc(100vh - 91px);
     padding: 3px 33px;
-    overflow: auto;
+    overflow: hidden;
 }
 #frontpage-leftside {
-    width: 100%;
+    float: left;
+    width: 40%;
     height: calc(100vh - 91px);
     overflow: auto;
     padding: 0px 3px;
 }
 #frontpage-rightside {
-    display: none;
     float: right;
-    width: 0%;
+    width: 60%;
     height: calc(100vh - 91px);
-    overflow-y: auto;
+    overflow: auto;
     padding: 0px 3px;
+}
+
+#library-content {
+    height: calc(100vh - 91px);
+    padding: 3px 33px;
+    overflow: auto;
 }
 
 // book selection display
 #searching-result-content, #selected-list-content {
     height: calc(100vh - 91px);
     padding: 3px 33px;
-
 }
 #searching-result-leftside, #selected-list-leftside {
     width: 30%;
@@ -204,7 +179,6 @@ a {
     padding: 0 5px;
     background-image: url('/public/papier.jpg');
     border: 1px solid rgb(11, 131, 31);
-
 }
 
 

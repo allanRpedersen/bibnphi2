@@ -7,17 +7,22 @@ use App\Entity\Book;
 use App\Entity\Author;
 use App\Form\BookType;
 use App\Service\SortMgr;
+use App\Entity\BookSelect;
 use App\Service\XmlParser;
+use App\Form\BookSelectType;
+use App\Entity\SentenceSearch;
+use App\Form\SentenceSearchType;
+use App\Service\SelectAndSearch;
 use App\Repository\BookRepository;
+// use Knp\Component\Pager\PaginatorInterface;
 use Monolog\Handler\StreamHandler;
 use App\Repository\BookNoteRepository;
+
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\BookParagraphRepository;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Vich\UploaderBundle\Form\Type\VichFileType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -68,7 +73,8 @@ class BookController extends AbstractController
     /**
      * @Route("/", name="book_index", methods={"GET"})
      */
-    public function index(Request $request, PaginatorInterface $paginator, BookRepository $bookRepository): Response
+    public function index(Request $request, SelectAndSearch $sas): Response
+    // public function index(Request $request, PaginatorInterface $paginator, BookRepository $bookRepository): Response
     {
         // return $this->render('book/index.html.twig', [
 		// 	'books' => $paginator->paginate(
@@ -78,10 +84,42 @@ class BookController extends AbstractController
 		// 	),
 		// ]);
 
-			$sm = new SortMgr();
+		$sm = new SortMgr();
+		//
+		// the Book selection form
+		$bookSelect = new BookSelect();
+		$bookSelectForm = $this->createForm(BookSelectType::class, $bookSelect);
+		$bookSelectForm->handleRequest($request);
+		//
+		if ($bookSelectForm->isSubmitted() && $bookSelectForm->isValid())
+		{
+			// set currentBookSelectionIds in the session
+			$sas->SelectBooks($bookSelect);
+			return $this->redirectToRoute('front');
+		}
 
-			return $this->render('book/index.html.twig', [
-				'books'	=> $sm->SortByAuthor($this->br->findAll()),
+		//
+		$bookList = $sm->SortByAuthor($this->br->findAll());
+
+		//
+		// the Sentence search form
+		$sentenceSearch = new SentenceSearch();
+		$sentenceSearchForm = $this->createForm(SentenceSearchType::class, $sentenceSearch);
+		$sentenceSearchForm->handleRequest($request);
+		//
+		if ($sentenceSearchForm->isSubmitted() && $sentenceSearchForm->isValid())
+		{
+			// If the string to search is found ..
+			// then set nbFoundStrings, nbFoundInBooks, hlString, hlContents in the session
+			$sas->SearchString($sentenceSearch, $bookList);
+			return $this->redirectToRoute('front');
+		}
+
+		return $this->render('book/index.html.twig', [
+			'books'		=> $bookList,
+			'bodyId'	=> 'liste-titres',
+			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
+			'bookSelectForm'		=> $bookSelectForm->createView(),
 			]);
 	}
 	
@@ -306,11 +344,6 @@ class BookController extends AbstractController
      */
 	public function new( Request $request ): Response
     {
-
-		//
-		// $this->logger->info('>>> Entrée BookController->new()' . microtime(true));
-		// $this->logger->info('>>> $request->getMethod() : ' . $request->getMethod() );
-
 		//
         $book = new Book();
 		$form = $this->createForm(BookType::class, $book);

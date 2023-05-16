@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Author;
 use App\Form\AuthorType;
+use App\Entity\BookSelect;
+use App\Form\BookSelectType;
+use App\Service\SelectAndSearch;
 use App\Repository\AuthorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,14 +22,15 @@ class AuthorController extends AbstractController
 {
 
     private $em; // Entity manager
-
+    private $ar; // Author repository
 
     /**
      * 
      */
-    public function __construct( EntityManagerInterface $em ){
+    public function __construct(AuthorRepository $ar, EntityManagerInterface $em ){
 
         $this->em = $em;
+        $this->ar = $ar;
 
 		// $this->authors = $this->ar->findByLastName();
 		// $this->nbAuthors = count($this->authors);
@@ -35,10 +39,27 @@ class AuthorController extends AbstractController
     /**
      * @Route("/", name="author_index", methods={"GET"})
      */
-    public function index(AuthorRepository $authorRepository): Response
+    public function index(Request $request, SelectAndSearch $sas): Response
     {
+		// the Book selection form
+		$bookSelect = new BookSelect();
+		$bookSelectForm = $this->createForm(BookSelectType::class, $bookSelect);
+		$bookSelectForm->handleRequest($request);
+		//
+		if ($bookSelectForm->isSubmitted() && $bookSelectForm->isValid())
+		{
+			// set currentBookSelectionIds in the session
+			$sas->SelectBooks($bookSelect);
+			return $this->redirectToRoute('front');
+		}
+
+
+
         return $this->render('author/index.html.twig', [
-            'authors' => $authorRepository->findByLastName(),
+            'authors' => $this->ar->findByLastName(),
+            // 'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
+            'bookSelectForm'		=> $bookSelectForm->createView(),
+
         ]);
     }
 

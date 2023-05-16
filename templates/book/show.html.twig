@@ -29,7 +29,7 @@
 				{% endif %}
 			</div>
 			{% if book.bookmarks is not empty %}
-			<div style="text-align:center; margin-top: 2rem;">Signets</div>
+			<div style="text-align:end; margin-top: 2rem; margin-right: 5px; font-size: 0.9">Signets</div>
 			{% for bookmark in book.bookmarks %}
 				<a href="#_{{bookmark.paragraph.id}}">
 					<div class="bookmark">
