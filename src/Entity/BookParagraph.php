@@ -273,11 +273,12 @@ class BookParagraph
                                 . $illustration->getSvgWidth()
                                 . '" height="'
                                 . $illustration->getSvgHeight()
-                                . '" style="'
-                                . "margin:0px 5px";
+                                . '" style="margin:0px 5px;"';
                     }
-                    // else $mimeType could be "image/svg+xml" , "image/png"
-                    //
+                    // else $mimeType could be "image/svg+xml" , "image/png, image/gif"
+                    else {
+                            $str .= '" style="max-width:100%; margin:Opx 5px;';    
+                    }
 
                     $str .= '">';
                     $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];

@@ -162,7 +162,6 @@ class BookNote
         }
 
         // les index des sous-chaîne(s) à afficher en surbrillance
-
         $nbOccurencesInNote = count($this->foundStringIndexes);
         if ($nbOccurencesInNote){
 
@@ -189,38 +188,6 @@ class BookNote
             }    
         }
 
-        // if (count($this->foundStringIndexes)){
-
-        //     if ($this->nextOccurence){
-
-        //         $beginTag = '<a title="Aller à la prochaine occurrence" href="#'
-        //         . $this->nextOccurence
-        //         . '"><mark>';
-        //     }
-        //     else
-        //     {   
-        //         $beginTag = '<a title="Aller dans l\'ouvrage" href="book/'
-        //         . $this->book->getSlug()
-        //         . '/jumpTo/note_'
-        //         . $this->id
-        //         . '"><mark>';
-        //     }
-	    	
-        //     $endTag = '</mark></a>';
-
-        //     $strLength = mb_strlen($this->searchedString);
-
-        //     foreach($this->foundStringIndexes as $foundStringIndex){
-
-        //             $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
-        //             $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
-
-        //     }
-
-        // }
-
-
-
         // illustrations
         if (count($this->illustrations)){
 
@@ -241,13 +208,15 @@ class BookNote
                                 . $illustration->getSvgWidth()
                                 . '" height="'
                                 . $illustration->getSvgHeight()
-                                . '" style="'
-                                . "margin:0px 5px";
+                                . '" style="margin:Opx 5px;';
                     }
-                    // else $mimeType could be "image/svg+xml" , "image/png"
-                    //
+                    // else $mimeType could be "image/svg+xml" , "image/png", "image/gif"
+                    else {
+                        $str .= '" style="max-width:100%; margin:Opx 5px;';
+                    }
 
                     $str .= '">';
+
                     $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];
                 }
                 else {
