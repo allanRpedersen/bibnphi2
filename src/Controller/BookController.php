@@ -245,7 +245,7 @@ class BookController extends AbstractController
 
 				$this->addFlash(
 					'info',
-					'L\'analyse du document : ' . $book->getTitle() . ' s\'est terminée avec succès par la commande extèrieure !');
+					'L\'analyse du document : ' . $book->getTitle() . ' s\'est terminée avec succès par la commande extérieure !');
 
 				return $this->redirectToRoute('book_show', [
 					'slug' => $book->getSlug()
@@ -268,7 +268,7 @@ class BookController extends AbstractController
 									$this->getParameter('kernel.project_dir'), 
 									$fileBufferSize, 
 									$this->em,
-									/// "dev"
+									$_ENV['APP_ENV'], // 'dev' or 'prod'
 									);
 
 				$this->xmlParser = $xmlParser;

@@ -26,6 +26,7 @@ class XmlParserCommand extends Command
     private $book;
 
     private $projectDir;
+    private $logger;
 
     private $br;
     private $em;

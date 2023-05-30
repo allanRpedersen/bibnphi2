@@ -74,8 +74,13 @@ class BookParagraph
     private $foundStringIndexes = [];       // Les indices des occurences de la chaine recherchée dans le paragraphe
     private $searchedString = '';           // La chaîne recherchée
     private $nextOccurence;                 // la prochaine occurence dans le livre (paragraphe ou note)
-    private $nbOccurrencesInBook;           // le 
+    private $nbOccurrencesInBook;           //  
     private $firstOccurrenceInParagraph;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+
+    // /**
+    //  * @ORM\OneToOne(targetEntity=BookTable::class, mappedBy="anchorParagraph", cascade={"persist", "remove"})
+    //  */
+    // private $bookTable; // si positionné, ce paragraphe sert d'ancre à un tableau
 
 
     public function __construct()
@@ -83,6 +88,7 @@ class BookParagraph
         $this->notes = new ArrayCollection();
         $this->alterations = new ArrayCollection();
         $this->illustrations = new ArrayCollection();
+        $this->content = '';
     }
 
     public function getId(): ?int
@@ -285,21 +291,6 @@ class BookParagraph
                 }
                 else {
                     // $mimeType null or "" not set ..
-
-
-                    // $str = '<img src="'
-                    //         . "/default-image.jpg"
-                    //         . '" alt="'
-                    //         . "image par défaut"
-                    //         . '" width="'
-                    //         . "20"
-                    //         . '" height="'
-                    //         . "20"
-                    //         . '" title="'
-                    //         . "format d'image non supporté"
-                    //         . '" style="'
-                    //         . "margin:0px 5px"
-                    //         . '">';
                 }
 
             }
@@ -488,4 +479,21 @@ class BookParagraph
 
         return $this;
     }
+
+    // public function getBookTable(): ?BookTable
+    // {
+    //     return $this->bookTable;
+    // }
+
+    // public function setBookTable(BookTable $bookTable): self
+    // {
+    //     // set the owning side of the relation if necessary
+    //     if ($bookTable->getAnchorParagraph() !== $this) {
+    //         $bookTable->setAnchorParagraph($this);
+    //     }
+
+    //     $this->bookTable = $bookTable;
+
+    //     return $this;
+    // }
 }

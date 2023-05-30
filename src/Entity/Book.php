@@ -174,7 +174,7 @@ class Book
     private int $nbFoundStrings = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity=Bookmark::class, mappedBy="Book", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Bookmark::class, mappedBy="book", orphanRemoval=true)
      */
     private $bookmarks;
 

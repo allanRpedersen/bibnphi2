@@ -6,12 +6,14 @@ use Monolog\Logger;
 use App\Entity\Book;
 use App\Entity\Bookmark;
 use App\Entity\BookNote;
-use App\Entity\BookParagraph;
+// use App\Entity\BookTable;
+// use App\Entity\TableCell;
 use App\Entity\Illustration;
+use App\Entity\BookParagraph;
 use App\Entity\TextAlteration;
+// use App\Entity\TableCellParagraph;
 use Monolog\Handler\StreamHandler;
 use Doctrine\ORM\EntityManagerInterface;
-
 
 class XmlParser {
 
@@ -57,6 +59,14 @@ class XmlParser {
 			// $indexDrawFrame,
 			// $drawFrameWithObject,
 			$text;
+
+	private $cell,
+			$table,
+			$nbRows,
+			$nbCells,
+			$nbColumns,
+			$insideTable,
+			$cellParagraph;
 
 	// private $style = [
 	// 	'name'			=> '',
@@ -139,8 +149,8 @@ class XmlParser {
 	private $logger;
 	private $em;
 
-	private $runningMode;
 	private $percentProgressFileName;
+	private $modeDev = false;
 		
 	public function __construct( $book, $workingDir, $projectDir, $bufferSize, EntityManagerInterface $em, $mode='prod' )
 	{
@@ -151,7 +161,7 @@ class XmlParser {
 		$xmlFileName = $workingDir . '/document.xml';
 
 		$this->em = $em;
-		$this->runningMode = $mode; // 'prod' | 'dev'
+		$this->modeDev = ($mode=='dev');
 		
 		// $this->logger = $logger;
 		$this->logger = new Logger('_xmlParser');
@@ -178,6 +188,9 @@ class XmlParser {
 		$this->nbSentences = 0;
 		$this->nbParagraphs = 0;
 		$this->numBuffer = 0;
+
+		$this->insideTable = false;
+
 
 	}
 
@@ -328,14 +341,20 @@ class XmlParser {
 			case "BIBNPHI":
 			case "OFFICE:DOCUMENT-STYLES":
 			case "OFFICE:DOCUMENT-CONTENT":
-				// $this->logger->info($element);
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 			
+			case "OFFICE:BODY":
+				if ($this->modeDev){
+					// log document styles ??
+				}
+				break;
+
 			case "DRAW:A":
 				break;
 
 			case "DRAW:FRAME":
-				if ($this->runningMode == 'dev') $this->logger->info("<$element> " . json_encode($attribs) );
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 
 				//
 				$this->insideDrawFrame = true;
@@ -355,10 +374,9 @@ class XmlParser {
 				break;
 
 			case "DRAW:IMAGE":
-				if ($this->runningMode == 'dev') $this->logger->info("<$element> " . json_encode($attribs) );
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 
 				if ($this->firstImage){
-					//
 					//
 					if(array_key_exists('XLINK:HREF', $attribs)) $this->illustration['fileName'] = $attribs['XLINK:HREF'];
 
@@ -374,7 +392,7 @@ class XmlParser {
 				break;
 			
 			case "DRAW:OBJECT":
-				if ($this->runningMode == 'dev') $this->logger->info("<$element> " . json_encode($attribs) );
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 					
 			case "OFFICE:ANNOTATION":
@@ -383,8 +401,7 @@ class XmlParser {
 				break;
 
 			case "OFFICE:AUTOMATIC-STYLES":
-				if ($this->runningMode == 'dev') $this->logger->info("<$element> " . json_encode($attribs) );
-				// dd($element);
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 
 			case "OFFICE:MASTER-STYLES":
@@ -428,31 +445,50 @@ class XmlParser {
 				$this->isSvgTitle = true;
 				$this->svgTitle = '';
 				break;
+			
+			case "TABLE:TABLE": // create table entity
+				$this->insideTable = true;
+				$this->nbColumns = 0;
+				$this->nbRows = 0;
+
+				// $this->table = new BookTable();
+				// $this->table->setNbRows($this->nbRows);
+				// $this->table->setNbColumns($this->nbColumns);
+
+				// $anchor = new BookParagraph();
+				// $anchor->setBook($this->book)
+				// 		->setContent('')
+				// 		->setParagraphStyles('')
+				// 		;
+
+				// $this->table->setAnchorParagraph($anchor);
+
+				// $this->em->persist($this->table);
+
+
+				break;
+
+			case "TABLE:TABLE-CELL":
+				// $this->cell = new TableCell();
+				// $this->cell->setBookTable($this->table);
+				// $this->em->persist($this->cell); // 
+
+				// if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
+				break;
+
+			case "TABLE:COVERED-TABLE-CELL": // fusion de plusieurs cellules sur une rangée ?! cf pascal-pensees
+				break;
+			
+			case "TABLE:TABLE-COLUMN": // count number of columns, thanks to type casting !! rather than intval()...
+				$this->nbColumns += array_key_exists('TABLE:NUMBER-COLUMNS-REPEATED', $attribs) ? $attribs['TABLE:NUMBER-COLUMNS-REPEATED'] : "1";
+				break;
+
+			case "TABLE:TABLE-ROW":
+				$this->nbRows += 1;
+				break;
 
 			case "TEXT:BOOKMARK":
 				$this->bookmarkName = $attribs['TEXT:NAME'];
-				break;
-			
-			case "TEXT:LINE-BREAK":
-				// $this->logger->info("!!!!! <$element> " . json_encode($attribs));
-				break;
-
-			case "TEXT:NOTE":
-				//
-				// strlen, number of bytes, but some characters may be multi-bytes ...
-				// iconv_strlen, number of characters
-				//
-				// index from the beginning of the paragraph !!
-				$this->indexNoteCitation = iconv_strlen($this->text);
-				$this->insideNote = true;
-				break;
-				
-			case "TEXT:NOTE-BODY":
-				$this->isNoteBody = true;
-				break;
-			
-			case "TEXT:NOTE-CITATION":
-				$this->isNoteCitation = TRUE;
 				break;
 
 			case "TEXT:H":
@@ -498,13 +534,33 @@ class XmlParser {
 
 				}
 				break;
+	
+			case "TEXT:LINE-BREAK":
+				break;
+
+			case "TEXT:NOTE":
+				//
+				// strlen, number of bytes, but some characters may be multi-bytes ...
+				// iconv_strlen, number of characters
+				//
+				// index from the beginning of the paragraph !!
+				$this->indexNoteCitation = iconv_strlen($this->text);
+				$this->insideNote = true;
+				break;
+				
+			case "TEXT:NOTE-BODY":
+				$this->isNoteBody = true;
+				break;
+			
+			case "TEXT:NOTE-CITATION":
+				$this->isNoteCitation = TRUE;
+				break;
 
 			case "TEXT:P":
 				if (!$this->insideNote){
 					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
 
 					// reset paragraph style properties and illustrations
-					
 					$this->styleProperty = [
 						'text-align'	=> 'justify',
 						'font-weight'	=> 'normal',
@@ -521,7 +577,6 @@ class XmlParser {
 						'mimeType'	=> '',	// "DRAW:MIME-TYPE
 						'svgTitle'	=> '',
 					];
-
 				}
 				break;
 				
@@ -543,8 +598,7 @@ class XmlParser {
 				break;
 				
 			default ;
-				// $this->logger->info("<$element> " . json_encode($attribs) );
-				if ($this->runningMode == 'dev') $this->logger->info("!!!!! <$element> " . json_encode($attribs));
+				if ($this->modeDev) $this->logger->info("--- BALISE NON GÉRÉE !! <$element> " . json_encode($attribs));
 		} 
 	}
 
@@ -553,13 +607,12 @@ class XmlParser {
 		switch($element){
 
 			case "BIBNPHI":
+			case "OFFICE:BODY":
 			case "OFFICE:DOCUMENT-STYLES":
 			case "OFFICE:DOCUMENT-CONTENT":
-				// $this->logger->info($element);
+				if ($this->modeDev) $this->logger->info("</$element> ");
 				break;
 				
-	
-			
 			case "DRAW:FRAME":
 				// handle illustration(s)
 				//
@@ -579,7 +632,6 @@ class XmlParser {
 				break;
 			
 			case "OFFICE:AUTOMATIC-STYLES":
-				// $this->logger->info("</$element>" );
 				break;
 
 			case "OFFICE:MASTER-STYLES":
@@ -595,7 +647,6 @@ class XmlParser {
 				$name = $this->styleProperty['name'];
 				$this->abnormalStyles[$name] = $this->styleProperty;
 			}
-
 			// reset style
 			$this->styleProperty = [
 				'name'			=> '',
@@ -612,7 +663,28 @@ class XmlParser {
 				$this->isSvgTitle = false;
 				break;
 
-			case "TEXT-BOOKMARK":
+			case "TABLE:TABLE":
+				// $this->table->setNbColumns($this->nbColumns);
+				// $this->table->setNbRows($this->nbRows);
+				
+				// $this->em->persist($this->table);
+				// $this->em->flush();
+
+				$this->insideTable = false;
+				break;
+
+			case "TABLE:TABLE-COLUMN":
+			case "TABLE:TABLE-ROW":
+				if ($this->modeDev) $this->logger->info("</$element>");
+				break;
+
+			case "TABLE:TABLE-CELL":
+				if ($this->modeDev) $this->logger->info("</$element>");
+				// $this->table->addCell($this->cell);
+				// $this->em->persist($this->cell);
+				break;
+					
+			case "TEXT:BOOKMARK":
 				break;
 			
 			case "TEXT:LINE-BREAK":
@@ -668,8 +740,8 @@ class XmlParser {
 				if (!$this->insideNote){
 
 					// handle paragraph content, notes, alterations, illustrations
-					//
-					$this->handleBookParagraph($this->text, $this->noteCollection); 
+					// either BookParagraph or TableCellParagraph
+					$this->handleParagraph($this->text, $this->noteCollection);
 
 					// reset
 					$this->text = '';
@@ -744,12 +816,13 @@ class XmlParser {
 
 	}
 
+
 	/**
 	 * Flush every raw paragraph followed by its notes (each as a paragraph) in db
 	 * 
 	 * 
 	 */
-	private function handleBookParagraph($rawParagraph, $noteCollection)
+	private function handleParagraph($rawParagraph, $noteCollection)
 	{
 		$bookParagraph = NULL;
 		$illustrations = $this->illustrations;
@@ -776,9 +849,13 @@ class XmlParser {
 			// }
 
 
-		if ($rawParagraph != '' || $illustrations || $isBookmark){
+		if ($rawParagraph != '' || $illustrations || $isBookmark)
+		{
 
+			// if ($this->insideTable) $bookParagraph = new TableCellParagraph();
+			// else 
 			$bookParagraph = new BookParagraph();
+
 			$bookParagraph->setBook($this->book);
 
 			// handle content alteration, text style attributes
@@ -907,9 +984,7 @@ class XmlParser {
 								'font-weight: ' . $style['font-weight'] . ';"';
 
 				// foreach($style as $k => $v){ $styleStr .= $k . ": " . $v . ";"; }
-
-				if ($this->runningMode == 'dev')
-					$this->logger->info("style de paragraphes : $this->currentStyleName, $styleStr");
+				if ($this->modeDev)	$this->logger->info("style de paragraphes : $this->currentStyleName, $styleStr");
 
 				
 			}
@@ -940,21 +1015,15 @@ class XmlParser {
 			$this->nbParagraphs++;				
 			$this->em->persist($bookParagraph);
 
-			// vvvvv <<<<<<<<<<<< ?? can it be done later, to flush several paragraphs at once ??
-			$this->em->flush(); 
+			// if ($this->insideTable){
+			// 	$this->cell->addCellParagraph($bookParagraph);
+			// }
 
+			$this->em->flush(); 
 		}
 				
 	}
 
-
-	/**
-	 * Get the value of spans
-	 */ 
-	public function getSpans()
-	{
-		return $this->spans;
-	}
 
 	/**
 	 * Check if the text style name is managed, if true return associated alteration object
@@ -980,6 +1049,14 @@ class XmlParser {
 			return $alt;
 		}
 		return null;
+	}
+
+	/**
+	 * Get the value of spans
+	 */ 
+	public function getSpans()
+	{
+		return $this->spans;
 	}
 
 	/**
