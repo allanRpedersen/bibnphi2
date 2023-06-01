@@ -62,6 +62,10 @@ class Illustration
      */
     private $bookNote;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=CellParagraph::class, inversedBy="illustrations")
+     */
+    private $cellParagraph;
 
 
     public function getId(): ?int
@@ -181,6 +185,18 @@ class Illustration
     public function setBookNote($bookNote)
     {
         $this->bookNote = $bookNote;
+
+        return $this;
+    }
+
+    public function getCellParagraph(): ?CellParagraph
+    {
+        return $this->cellParagraph;
+    }
+
+    public function setCellParagraph(?CellParagraph $cellParagraph): self
+    {
+        $this->cellParagraph = $cellParagraph;
 
         return $this;
     }

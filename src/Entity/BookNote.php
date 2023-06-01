@@ -61,7 +61,6 @@ class BookNote
      */
     private $illustrations;
 
-
     /**
      * 
      */    
@@ -441,4 +440,5 @@ class BookNote
 
         return $this;
     }
+
 }

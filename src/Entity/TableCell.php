@@ -26,7 +26,7 @@ class TableCell
     private $bookTable;
 
     /**
-     * @ORM\OneToMany(targetEntity=TableCellParagraph::class, mappedBy="tableCell", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=CellParagraph::class, mappedBy="tableCell", orphanRemoval=true)
      */
     private $cellParagraphs;
 
@@ -34,6 +34,9 @@ class TableCell
     {
         $this->cellParagraphs = new ArrayCollection();
     }
+
+    // $cellParagraphs
+    
 
     public function getId(): ?int
     {
@@ -53,14 +56,14 @@ class TableCell
     }
 
     /**
-     * @return Collection<int, TableCellParagraph>
+     * @return Collection<int, CellParagraph>
      */
-    public function getCellParagraph(): Collection
+    public function getCellParagraphs(): Collection
     {
         return $this->cellParagraphs;
     }
 
-    public function addCellParagraph(TableCellParagraph $cellParagraph): self
+    public function addCellParagraph(CellParagraph $cellParagraph): self
     {
         if (!$this->cellParagraphs->contains($cellParagraph)) {
             $this->cellParagraphs[] = $cellParagraph;
@@ -70,7 +73,7 @@ class TableCell
         return $this;
     }
 
-    public function removeCellParagraph(TableCellParagraph $cellParagraph): self
+    public function removeCellParagraph(CellParagraph $cellParagraph): self
     {
         if ($this->cellParagraphs->removeElement($cellParagraph)) {
             // set the owning side to null (unless already changed)
@@ -81,4 +84,5 @@ class TableCell
 
         return $this;
     }
+
 }

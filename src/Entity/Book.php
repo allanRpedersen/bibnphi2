@@ -178,7 +178,6 @@ class Book
      */
     private $bookmarks;
 
-
     public function __construct()
     {
         $this->bookParagraphs = new ArrayCollection();
@@ -199,13 +198,13 @@ class Book
 	 * @return void
 	 */
 	public function InitializeSlug()
-                   {
-                       // if ( empty($this->slug) ){}
-                   
-                       // le slug est systèmatiquement recalculé ..
-                       $slugify = new Slugify();
-                       $this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
-                   }
+    {
+        // if ( empty($this->slug) ){}
+    
+        // le slug est systèmatiquement recalculé ..
+        $slugify = new Slugify();
+        $this->slug = $slugify->slugify($this->author->getlastName() . '-' . $this->title);
+    }
 
 
     public function getId(): ?int
@@ -321,9 +320,9 @@ class Book
     }
 
 	public function setBookMimeType(?string $bookMimeType): void
-                   {
-                       $this->bookMimeType = $bookMimeType;
-                   }
+    {
+        $this->bookMimeType = $bookMimeType;
+    }
 
     public function getBookMimeType(): ?string
     {
@@ -331,9 +330,9 @@ class Book
     }
 
 	public function setOdtOriginalName(?string $odtOriginalName): void
-                   {
-                       $this->odtOriginalName = $odtOriginalName;
-                   }
+    {
+        $this->odtOriginalName = $odtOriginalName;
+    }
 
     public function getOdtOriginalName(): ?string
     {
@@ -615,4 +614,5 @@ class Book
 
         return $this;
     }
+
 }

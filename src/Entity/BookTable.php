@@ -40,6 +40,7 @@ class BookTable
      */
     private $anchorParagraph; // un paragraphe vide auquel est raccroché le tableau
 
+    
     public function __construct()
     {
         $this->cells = new ArrayCollection();

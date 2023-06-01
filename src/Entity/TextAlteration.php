@@ -53,6 +53,11 @@ class TextAlteration
      */
     private $bookNote;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=CellParagraph::class, inversedBy="alterations")
+     */
+    private $cellParagraph;
+
 
     public function getId(): ?int
     {
@@ -139,6 +144,18 @@ class TextAlteration
     public function setBookNote(?BookNote $bookNote): self
     {
         $this->bookNote = $bookNote;
+
+        return $this;
+    }
+
+    public function getCellParagraph(): ?CellParagraph
+    {
+        return $this->cellParagraph;
+    }
+
+    public function setCellParagraph(?CellParagraph $cellParagraph): self
+    {
+        $this->cellParagraph = $cellParagraph;
 
         return $this;
     }
