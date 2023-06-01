@@ -42,10 +42,16 @@ class CellParagraph
      */
     private $illustrations;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="cellParagraph")
+     */
+    private $notes;
+
     public function __construct()
     {
         $this->alterations = new ArrayCollection();
         $this->illustrations = new ArrayCollection();
+        $this->notes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -121,6 +127,36 @@ class CellParagraph
     public function setTableCell(?TableCell $tableCell): self
     {
         $this->tableCell = $tableCell;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BookNote>
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(BookNote $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes[] = $note;
+            $note->setCellParagraph($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(BookNote $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getCellParagraph() === $this) {
+                $note->setCellParagraph(null);
+            }
+        }
 
         return $this;
     }

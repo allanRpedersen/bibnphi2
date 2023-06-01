@@ -67,8 +67,17 @@ class BookNote
     private $foundStringIndexes = [];
     private $searchedString = '';
     private $nextOccurence;
-    private $nbOccurrencesInBook = 0;  // le 
-    private $firstOccurrenceInNote;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+    private $nbOccurrencesInBook = 0;
+    
+    /**
+     * le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+     */
+    private $firstOccurrenceInNote;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CellParagraph::class, inversedBy="notes")
+     */
+    private $cellParagraph;
 
 
     public function __construct()
@@ -437,6 +446,18 @@ class BookNote
     public function setFirstOccurrenceInNote($firstOccurrenceInNote)
     {
         $this->firstOccurrenceInNote = $firstOccurrenceInNote;
+
+        return $this;
+    }
+
+    public function getCellParagraph(): ?CellParagraph
+    {
+        return $this->cellParagraph;
+    }
+
+    public function setCellParagraph(?CellParagraph $cellParagraph): self
+    {
+        $this->cellParagraph = $cellParagraph;
 
         return $this;
     }

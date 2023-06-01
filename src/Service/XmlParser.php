@@ -6,12 +6,12 @@ use Monolog\Logger;
 use App\Entity\Book;
 use App\Entity\Bookmark;
 use App\Entity\BookNote;
-// use App\Entity\BookTable;
-// use App\Entity\TableCell;
+use App\Entity\BookTable;
+use App\Entity\TableCell;
 use App\Entity\Illustration;
 use App\Entity\BookParagraph;
+use App\Entity\CellParagraph;
 use App\Entity\TextAlteration;
-// use App\Entity\TableCellParagraph;
 use Monolog\Handler\StreamHandler;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -451,27 +451,27 @@ class XmlParser {
 				$this->nbColumns = 0;
 				$this->nbRows = 0;
 
-				// $this->table = new BookTable();
-				// $this->table->setNbRows($this->nbRows);
-				// $this->table->setNbColumns($this->nbColumns);
+				$this->table = new BookTable();
+				$this->table->setNbRows($this->nbRows);
+				$this->table->setNbColumns($this->nbColumns);
 
-				// $anchor = new BookParagraph();
-				// $anchor->setBook($this->book)
-				// 		->setContent('')
-				// 		->setParagraphStyles('')
-				// 		;
+				$anchor = new BookParagraph();
+				$anchor->setBook($this->book)
+						->setContent('')
+						->setParagraphStyles('')
+						;
 
-				// $this->table->setAnchorParagraph($anchor);
+				$this->table->setAnchorParagraph($anchor);
 
-				// $this->em->persist($this->table);
+				$this->em->persist($this->table);
 
 
 				break;
 
 			case "TABLE:TABLE-CELL":
-				// $this->cell = new TableCell();
-				// $this->cell->setBookTable($this->table);
-				// $this->em->persist($this->cell); // 
+				$this->cell = new TableCell();
+				$this->cell->setBookTable($this->table);
+				$this->em->persist($this->cell); // 
 
 				// if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
@@ -639,23 +639,23 @@ class XmlParser {
 				break;
 
 			case "STYLE:STYLE":
-			if( $this->styleProperty['font-weight']		!= 'normal'		||
-				$this->styleProperty['font-style']		!= 'normal'		||
-				$this->styleProperty['text-align']		!= 'justify'	||
-				$this->styleProperty['text-position']	!= 'normal'		)
-			{
-				$name = $this->styleProperty['name'];
-				$this->abnormalStyles[$name] = $this->styleProperty;
-			}
-			// reset style
-			$this->styleProperty = [
-				'name'			=> '',
-				'family'		=> '',
-				'text-align'	=> 'justify',
-				'font-style' 	=> 'normal',
-				'font-weight'	=> 'normal',
-				'text-position'	=> 'normal',
-			];
+				if( $this->styleProperty['font-weight']		!= 'normal'		||
+					$this->styleProperty['font-style']		!= 'normal'		||
+					$this->styleProperty['text-align']		!= 'justify'	||
+					$this->styleProperty['text-position']	!= 'normal'		)
+				{
+					$name = $this->styleProperty['name'];
+					$this->abnormalStyles[$name] = $this->styleProperty;
+				}
+				// reset style
+				$this->styleProperty = [
+					'name'			=> '',
+					'family'		=> '',
+					'text-align'	=> 'justify',
+					'font-style' 	=> 'normal',
+					'font-weight'	=> 'normal',
+					'text-position'	=> 'normal',
+				];
 				break;
 			
 			case "SVG:TITLE":
@@ -664,11 +664,11 @@ class XmlParser {
 				break;
 
 			case "TABLE:TABLE":
-				// $this->table->setNbColumns($this->nbColumns);
-				// $this->table->setNbRows($this->nbRows);
+				$this->table->setNbColumns($this->nbColumns);
+				$this->table->setNbRows($this->nbRows);
 				
-				// $this->em->persist($this->table);
-				// $this->em->flush();
+				$this->em->persist($this->table);
+				$this->em->flush();
 
 				$this->insideTable = false;
 				break;
@@ -679,9 +679,9 @@ class XmlParser {
 				break;
 
 			case "TABLE:TABLE-CELL":
-				if ($this->modeDev) $this->logger->info("</$element>");
-				// $this->table->addCell($this->cell);
-				// $this->em->persist($this->cell);
+				// if ($this->modeDev) $this->logger->info("</$element>");
+				$this->table->addCell($this->cell);
+				$this->em->persist($this->cell);
 				break;
 					
 			case "TEXT:BOOKMARK":
@@ -852,12 +852,17 @@ class XmlParser {
 		if ($rawParagraph != '' || $illustrations || $isBookmark)
 		{
 
-			// if ($this->insideTable) $bookParagraph = new TableCellParagraph();
-			// else 
-			$bookParagraph = new BookParagraph();
+			if ($this->insideTable)
+			{
+				$bookParagraph = new CellParagraph();
+				$bookParagraph->setTableCell($this->cell);
+			}
+			else {
 
-			$bookParagraph->setBook($this->book);
-
+				$bookParagraph = new BookParagraph();
+				$bookParagraph->setBook($this->book);
+	
+			} 
 			// handle content alteration, text style attributes
 			//
 			foreach($this->spans as $span){
@@ -1015,9 +1020,9 @@ class XmlParser {
 			$this->nbParagraphs++;				
 			$this->em->persist($bookParagraph);
 
-			// if ($this->insideTable){
-			// 	$this->cell->addCellParagraph($bookParagraph);
-			// }
+			if ($this->insideTable){
+				$this->cell->addCellParagraph($bookParagraph);
+			}
 
 			$this->em->flush(); 
 		}
