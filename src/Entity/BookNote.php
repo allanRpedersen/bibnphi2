@@ -32,7 +32,6 @@ class BookNote
 
     /**
      * @ORM\ManyToOne(targetEntity=BookParagraph::class, inversedBy="notes")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $bookParagraph;
 

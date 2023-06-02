@@ -35,8 +35,6 @@ class TableCell
         $this->cellParagraphs = new ArrayCollection();
     }
 
-    // $cellParagraphs
-    
 
     public function getId(): ?int
     {

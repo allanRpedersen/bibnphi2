@@ -459,9 +459,10 @@ class XmlParser {
 				$anchor->setBook($this->book)
 						->setContent('')
 						->setParagraphStyles('')
+						->setBookTable($this->table)
 						;
 
-				$this->table->setAnchorParagraph($anchor);
+				// $this->table->setAnchorParagraph($anchor);
 
 				$this->em->persist($this->table);
 
@@ -469,15 +470,20 @@ class XmlParser {
 				break;
 
 			case "TABLE:TABLE-CELL":
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
+				$nbRowsSpan = (array_key_exists('TABLE:NUMBER-ROWS-SPAN', $attribs) ? $attribs['TABLE:NUMBER-ROWS-SPAN'] : 0);
+				$nbColsSpan = (array_key_exists('TABLE:NUMBER-COLUMNS-SPAN', $attribs) ? $attribs['TABLE:NUMBER-COLUMNS-SPAN'] : 0);
+						
 				$this->cell = new TableCell();
 				$this->cell->setBookTable($this->table);
 				$this->em->persist($this->cell); // 
 
-				// if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 
 			case "TABLE:COVERED-TABLE-CELL": // fusion de plusieurs cellules sur une rangée ?! cf pascal-pensees
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
+
 			
 			case "TABLE:TABLE-COLUMN": // count number of columns, thanks to type casting !! rather than intval()...
 				$this->nbColumns += array_key_exists('TABLE:NUMBER-COLUMNS-REPEATED', $attribs) ? $attribs['TABLE:NUMBER-COLUMNS-REPEATED'] : "1";
@@ -675,7 +681,7 @@ class XmlParser {
 
 			case "TABLE:TABLE-COLUMN":
 			case "TABLE:TABLE-ROW":
-				if ($this->modeDev) $this->logger->info("</$element>");
+				// if ($this->modeDev) $this->logger->info("</$element>");
 				break;
 
 			case "TABLE:TABLE-CELL":
@@ -870,8 +876,11 @@ class XmlParser {
 				if ($alt = $this->isStyleManaged($span['styleName'])){
 
 					$alt->SetLength($span['endIndex'] - $span['beginIndex'])
-						->SetPosition($span['beginIndex'])
-						->setBookparagraph($bookParagraph);
+						->SetPosition($span['beginIndex']);
+
+					if ($this->insideTable){$alt->setCellparagraph($bookParagraph);}
+					else {$alt->setBookparagraph($bookParagraph);}
+						
 					
 					$this->em->persist($alt);
 					$bookParagraph->addAlteration($alt);
@@ -887,11 +896,14 @@ class XmlParser {
 					$bookNote = new BookNote();
 					
 					$bookNote->setBook($this->book)
-							->setBookParagraph($bookParagraph)	
 							->setContent($note['content'])
 							->setCitation($note['citation'])
 							->setCitationIndex($note['index']);
-					
+
+					if ($this->insideTable){$bookNote->setCellparagraph($bookParagraph);}
+					else {$bookNote->setBookparagraph($bookParagraph);}
+				
+
 					if ($note['alterations'] ){
 						foreach( $note['alterations'] as $alteration){
 
@@ -972,8 +984,11 @@ class XmlParser {
 					->setFileName('/' . $this->workingDir . '/' . $illustration['fileName'])
 					->setMimeType(($illustration['mimeType']))
 					->setSvgTitle($illustration['svgTitle'])
-					->setBookParagraph($bookParagraph)
 					;
+
+				if ($this->insideTable){$ill->setCellparagraph($bookParagraph);}
+				else {$ill->setBookparagraph($bookParagraph);}
+
 
 				$this->em->persist($ill);
 				$bookParagraph->addIllustration($ill);

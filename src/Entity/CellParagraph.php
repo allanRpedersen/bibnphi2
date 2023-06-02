@@ -33,25 +33,28 @@ class CellParagraph
     private $tableCell;
 
     /**
-     * @ORM\OneToMany(targetEntity=TextAlteration::class, mappedBy="cellParagraph")
+     * @ORM\OneToMany(targetEntity=TextAlteration::class, mappedBy="cellParagraph", orphanRemoval=true)
      */
     private $alterations;
 
     /**
-     * @ORM\OneToMany(targetEntity=Illustration::class, mappedBy="cellParagraph")
+     * @ORM\OneToMany(targetEntity=Illustration::class, mappedBy="cellParagraph", orphanRemoval=true)
      */
     private $illustrations;
 
     /**
-     * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="cellParagraph")
+     * @ORM\OneToMany(targetEntity=BookNote::class, mappedBy="cellParagraph", orphanRemoval=true)
      */
     private $notes;
+
+    private $bookTable;
 
     public function __construct()
     {
         $this->alterations = new ArrayCollection();
         $this->illustrations = new ArrayCollection();
         $this->notes = new ArrayCollection();
+        $this->bookTable = null;
     }
 
     public function getId(): ?int
@@ -157,6 +160,26 @@ class CellParagraph
                 $note->setCellParagraph(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of bookTable
+     */ 
+    public function getBookTable()
+    {
+        return $this->bookTable;
+    }
+
+    /**
+     * Set the value of bookTable
+     *
+     * @return  self
+     */ 
+    public function setBookTable($bookTable)
+    {
+        $this->bookTable = $bookTable;
 
         return $this;
     }

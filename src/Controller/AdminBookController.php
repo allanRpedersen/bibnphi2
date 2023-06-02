@@ -85,7 +85,7 @@ class AdminBookController extends AbstractController
 
 
     /**
-     * @Route("/{slug}", name="admin_book_delete", methods={"DELETE"})
+     * @Route("/{slug}", name="admin_book_delete", methods={"DELETE", "POST"})
      */
     public function delete(Request $request, Book $book): Response
     {

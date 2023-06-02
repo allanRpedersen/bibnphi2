@@ -77,10 +77,10 @@ class BookParagraph
     private $nbOccurrencesInBook;           //  
     private $firstOccurrenceInParagraph;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
 
-    // /**
-    //  * @ORM\OneToOne(targetEntity=BookTable::class, mappedBy="anchorParagraph", cascade={"persist", "remove"})
-    //  */
-    // private $bookTable; // si positionné, ce paragraphe sert d'ancre à un tableau
+    /**
+     * @ORM\OneToOne(targetEntity=BookTable::class, mappedBy="anchorParagraph", cascade={"persist", "remove"})
+     */
+    private $bookTable; // si positionné, ce paragraphe sert d'ancre à un tableau
 
 
     public function __construct()
@@ -89,6 +89,7 @@ class BookParagraph
         $this->alterations = new ArrayCollection();
         $this->illustrations = new ArrayCollection();
         $this->content = '';
+        $this->bookTable = null;
     }
 
     public function getId(): ?int
@@ -480,20 +481,20 @@ class BookParagraph
         return $this;
     }
 
-    // public function getBookTable(): ?BookTable
-    // {
-    //     return $this->bookTable;
-    // }
+    public function getBookTable(): ?BookTable
+    {
+        return $this->bookTable;
+    }
 
-    // public function setBookTable(BookTable $bookTable): self
-    // {
-    //     // set the owning side of the relation if necessary
-    //     if ($bookTable->getAnchorParagraph() !== $this) {
-    //         $bookTable->setAnchorParagraph($this);
-    //     }
+    public function setBookTable(BookTable $bookTable): self
+    {
+        // set the owning side of the relation if necessary
+        if ($bookTable->getAnchorParagraph() !== $this) {
+            $bookTable->setAnchorParagraph($this);
+        }
 
-    //     $this->bookTable = $bookTable;
+        $this->bookTable = $bookTable;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 }

@@ -2,16 +2,62 @@
     <!-- un peu d'air avant le début du texte -->
 </div>
 {% for paragraph in book.bookParagraphs %}
-    {% if paragraph.paragraphStyles %}
-    <p {{ paragraph.paragraphStyles|raw }} id="_{{ paragraph.id }}">
-    {% else %}
-    <p class="p-justify"  id="_{{ paragraph.id }}">
-    {% endif %}
+
+    {% if paragraph.bookTable %}
+    <p  id="_{{ paragraph.id }}">
         {% if is_granted('ROLE_ADMIN')%}
         <a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
         {% endif %}
-    {{ paragraph.FormattedContent | raw }}
+
+        <table class="table mt-3">
+        {% set nbRows = paragraph.bookTable.nbRows %}
+        {% set nbCols = paragraph.bookTable.nbColumns %}
+        {% set nbCellsMax = nbRows * nbCols %}
+        
+        {% for row in 1..nbRows %}
+            <tr>
+                {% set ext_index = loop.index %}
+                {% for col in 1..nbCols %}
+                <td>
+                    {% set Y = row - 1 %}
+                    {% set X = loop.index %}
+                    {% set N = (Y * nbCols) + loop.index - 1 %}
+                    {{ Y }} - {{ X }} - {{ N }} - {{ nbCellsMax }}
+                    {# {% if N < nbCellsMax - 1 %} <!-- !!!!!!!!!!! --> #}
+                    {% if paragraph.bookTable.cells[N] is defined %}
+                        <p style="background-color: rgb(218, 124, 218);">
+                            {{ paragraph.bookTable.cells[N].cellParagraphs[0].FormattedContent | raw }}
+                        </p>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+
+            {# {% for cell in paragraph.bookTable.cells %}
+                {% for cellp in cell.cellParagraphs %}
+                    {{ cellp.FormattedContent | raw }}
+                {% endfor %}
+            {% endfor %} #}
+
     </p>
+
+    {% else %}
+
+        {% if paragraph.paragraphStyles %}
+        <p {{ paragraph.paragraphStyles|raw }} id="_{{ paragraph.id }}">
+        {% else %}
+        <p class="p-justify"  id="_{{ paragraph.id }}">
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN')%}
+        <a href="{{ path('paragraph_edit', {'id': paragraph.id}) }}"><sub>§{{ paragraph.id }}</sub></a>
+        {% endif %}
+        {{ paragraph.FormattedContent | raw }}
+        </p>
+
+    {% endif %}
+
 {% endfor %}
 {% for note in book.bookNotes %}
 <p class="p-justify" id="note_{{ note.id }}">
