@@ -22,12 +22,13 @@
                     {% set Y = row - 1 %}
                     {% set X = loop.index %}
                     {% set N = (Y * nbCols) + loop.index - 1 %}
+                    {% if app_env == "dev" %}
                     {{ Y }} - {{ X }} - {{ N }} - {{ nbCellsMax }}
-                    {# {% if N < nbCellsMax - 1 %} <!-- !!!!!!!!!!! --> #}
+                    {% endif %}
                     {% if paragraph.bookTable.cells[N] is defined %}
-                        <p style="background-color: rgb(218, 124, 218);">
-                            {{ paragraph.bookTable.cells[N].cellParagraphs[0].FormattedContent | raw }}
-                        </p>
+                        {% for cellp in paragraph.bookTable.cells[N].cellParagraphs %}
+                            <p style="background-color: rgb(190, 250, 178);">{{ cellp.FormattedContent | raw }}</p>
+                        {% endfor %}
                     {% endif %}
                 </td>
                 {% endfor %}

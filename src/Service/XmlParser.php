@@ -447,6 +447,8 @@ class XmlParser {
 				break;
 			
 			case "TABLE:TABLE": // create table entity
+				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
+
 				$this->insideTable = true;
 				$this->nbColumns = 0;
 				$this->nbRows = 0;
@@ -586,6 +588,9 @@ class XmlParser {
 				}
 				break;
 				
+			case "TEXT:SOFT-PAGE-BREAK":
+				break;
+
 			case "TEXT:SPAN":
 				//
 				// strlen, number of bytes, some characters may be multi-bytes ...
@@ -677,11 +682,11 @@ class XmlParser {
 				$this->em->flush();
 
 				$this->insideTable = false;
+				if ($this->modeDev) $this->logger->info("</$element>");
 				break;
 
 			case "TABLE:TABLE-COLUMN":
 			case "TABLE:TABLE-ROW":
-				// if ($this->modeDev) $this->logger->info("</$element>");
 				break;
 
 			case "TABLE:TABLE-CELL":
