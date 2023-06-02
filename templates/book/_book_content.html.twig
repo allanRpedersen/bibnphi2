@@ -27,7 +27,7 @@
                     {% endif %}
                     {% if paragraph.bookTable.cells[N] is defined %}
                         {% for cellp in paragraph.bookTable.cells[N].cellParagraphs %}
-                            <p style="background-color: rgb(190, 250, 178);">{{ cellp.FormattedContent | raw }}</p>
+                            <p {% if app_env == "dev" %}style="background-color: rgb(190, 250, 178);"{% endif %}>{{ cellp.FormattedContent | raw }}</p>
                         {% endfor %}
                     {% endif %}
                 </td>
