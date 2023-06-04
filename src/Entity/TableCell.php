@@ -30,9 +30,15 @@ class TableCell
      */
     private $cellParagraphs;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $cellAttributes;
+
     public function __construct()
     {
         $this->cellParagraphs = new ArrayCollection();
+        $this->cellAttributes = '';
     }
 
 
@@ -83,4 +89,15 @@ class TableCell
         return $this;
     }
 
+    public function getCellAttributes(): ?string
+    {
+        return $this->cellAttributes;
+    }
+
+    public function setCellAttributes(string $cellAttributes): self
+    {
+        $this->cellAttributes = $cellAttributes;
+
+        return $this;
+    }
 }

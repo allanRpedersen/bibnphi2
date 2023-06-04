@@ -84,6 +84,7 @@ class XmlParser {
 		'text-align'	=> 'justify',
 		'font-style'	=> 'normal',
 		'font-weight'	=> 'normal',
+		'font-size'		=> 'inherit',
 		'text-position'	=> 'normal',
 	];
 
@@ -478,11 +479,22 @@ class XmlParser {
 				
 				$this->cell = new TableCell();
 				$this->cell->setBookTable($this->table);
+
+				if ($nbRowsSpanned>1) $this->cell->setCellAttributes(' rowspan=' . $nbRowsSpanned . ' style=vertical-align:middle;');
+				else if ($nbColsSpanned>1){
+					$this->cell->setCellAttributes(' colspan=' . $nbColsSpanned);
+					$this->nbColsSpanned = $nbColsSpanned;
+				}
+				
 				$this->em->persist($this->cell); // 
 
+				
 				for ($i=1; $i<$nbColsSpanned; $i++){
 					$spanCell = new TableCell();
 					$spanCell->setBookTable($this->table);
+
+					// set cell attributes
+					$spanCell->setCellAttributes(' hidden');
 					$this->em->persist($spanCell);
 
 					// add an empty cellParagraph
@@ -510,6 +522,10 @@ class XmlParser {
 					else {
 						$spanCell = new TableCell();
 						$spanCell->setBookTable($this->table);
+
+						// set cell attributes
+						$spanCell->setCellAttributes(' hidden');
+
 						$this->em->persist($spanCell);
 
 						// add an empty cellParagraph
@@ -550,9 +566,11 @@ class XmlParser {
 					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
 
 					if (array_key_exists($this->currentStyleName, $this->abnormalStyles)){
-							if ($this->abnormalStyles[$this->currentStyleName]['font-style'] != 'italic')
-									// set to bold
-									$this->abnormalStyles[$this->currentStyleName]['font-weight'] = 'bold';
+							if ($this->abnormalStyles[$this->currentStyleName]['font-style'] != 'italic'){
+								// set to bold
+								$this->abnormalStyles[$this->currentStyleName]['font-weight'] = 'bold';
+								$this->abnormalStyles[$this->currentStyleName]['font-size'] = '1.5rem';
+							}
 					}
 					else {
 						// add a new 
@@ -563,6 +581,7 @@ class XmlParser {
 							'font-weight'	=> 'bold',
 							'font-style'	=> 'normal',
 							'text-position' => 'normal',
+							'font-size'		=> '1.5em',
 						];
 						$this->abnormalStyles[$this->currentStyleName] = $styleProperty;
 					}
@@ -574,6 +593,7 @@ class XmlParser {
 						'font-weight'	=> 'bold',
 						'font-style'	=> 'normal',
 						'text-position' => 'normal',
+						'font-size'		=> 'inherit',
 					];
 
 					$this->illustration = [
@@ -1076,8 +1096,8 @@ class XmlParser {
 			//
 			//
 			$paragraph
-						->setParagraphStyles($styleStr)
-						->setContent($rawParagraph);
+					->setParagraphStyles($styleStr)
+					->setContent($rawParagraph);
 		}
 
 		//

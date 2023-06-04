@@ -18,10 +18,10 @@
             <tr>
                 {% set ext_index = loop.index %}
                 {% for col in 1..nbCols %}
-                <td>
                     {% set Y = row - 1 %}
                     {% set X = loop.index %}
                     {% set N = (Y * nbCols) + loop.index - 1 %}
+                <td {{paragraph.bookTable.cells[N].cellAttributes}}>
                     {% if app_env == "dev" %}
                     {{ Y }} - {{ X }} - {{ N }} - {{ nbCellsMax }}
                     {% endif %}
