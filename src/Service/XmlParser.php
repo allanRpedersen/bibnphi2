@@ -62,11 +62,14 @@ class XmlParser {
 
 	private $cell,
 			$table,
+			$timer,
 			$nbRows,
 			$nbCells,
+			$timerSet,
 			$nbColumns,
 			$insideTable,
-			$cellParagraph;
+			$nbRowsSpanned,
+			$nbColsSpanned;
 
 	// private $style = [
 	// 	'name'			=> '',
@@ -75,7 +78,6 @@ class XmlParser {
 	// 	'fontWeight'	=> '', // "bold" ..
 	// 	'text-position'	=> 'normal',
 	// ];
-
 	private $styleProperty = [
 		'name'			=> '',
 		'family'		=> '',
@@ -190,6 +192,8 @@ class XmlParser {
 		$this->numBuffer = 0;
 
 		$this->insideTable = false;
+		$this->timer = 0;
+		$this->timerSet = false;
 
 
 	}
@@ -464,25 +468,67 @@ class XmlParser {
 						->setBookTable($this->table)
 						;
 
-				// $this->table->setAnchorParagraph($anchor);
-
 				$this->em->persist($this->table);
-
-
 				break;
 
 			case "TABLE:TABLE-CELL":
 				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
-				$nbRowsSpan = (array_key_exists('TABLE:NUMBER-ROWS-SPAN', $attribs) ? $attribs['TABLE:NUMBER-ROWS-SPAN'] : 0);
-				$nbColsSpan = (array_key_exists('TABLE:NUMBER-COLUMNS-SPAN', $attribs) ? $attribs['TABLE:NUMBER-COLUMNS-SPAN'] : 0);
-						
+				$nbRowsSpanned = (array_key_exists('TABLE:NUMBER-ROWS-SPANNED', $attribs) ? $attribs['TABLE:NUMBER-ROWS-SPANNED'] : 0);
+				$nbColsSpanned = (array_key_exists('TABLE:NUMBER-COLUMNS-SPANNED', $attribs) ? $attribs['TABLE:NUMBER-COLUMNS-SPANNED'] : 0);
+				
 				$this->cell = new TableCell();
 				$this->cell->setBookTable($this->table);
 				$this->em->persist($this->cell); // 
 
+				for ($i=1; $i<$nbColsSpanned; $i++){
+					$spanCell = new TableCell();
+					$spanCell->setBookTable($this->table);
+					$this->em->persist($spanCell);
+
+					// add an empty cellParagraph
+					$this->noteCollection = [];
+					$this->spans = [];
+					$this->illustrations = [];
+					$this->bookmarkName = '';
+					$this->currentStyleName = '';
+
+					$this->handleParagraph(' ', null);
+				}
+
+				if ( $nbRowsSpanned > 1 ) {
+					if ($this->modeDev) $this->logger->info("=== NUMBER-ROWS-SPANNED : " . $attribs['TABLE:NUMBER-ROWS-SPANNED'] . " <$element> ");
+					// set timer
+					$this->timer = $this->nbColumns;
+					$this->timerSet = true;
+					$this->nbRowsSpanned = $nbRowsSpanned;
+				}
+
+				if ( $this->timerSet )	{
+					if ( $this->timer > $this->nbRowsSpanned - 1 ) {
+						$this->timer--;
+					}
+					else {
+						$spanCell = new TableCell();
+						$spanCell->setBookTable($this->table);
+						$this->em->persist($spanCell);
+
+						// add an empty cellParagraph
+						$this->noteCollection = [];
+						$this->spans = [];
+						$this->illustrations = [];
+						$this->bookmarkName = '';
+						$this->currentStyleName = '';
+
+						$this->handleParagraph(' ', null);
+
+						$this->timerSet = false;
+						$this->nbRowsSpanned = 1;
+					}
+				}
+
 				break;
 
-			case "TABLE:COVERED-TABLE-CELL": // fusion de plusieurs cellules sur une rangée ?! cf pascal-pensees
+			case "TABLE:COVERED-TABLE-CELL": // ancre de cellule recouverte ?! cf pascal-pensees
 				if ($this->modeDev) $this->logger->info("<$element> " . json_encode($attribs) );
 				break;
 
@@ -835,7 +881,7 @@ class XmlParser {
 	 */
 	private function handleParagraph($rawParagraph, $noteCollection)
 	{
-		$bookParagraph = NULL;
+		$paragraph = NULL;
 		$illustrations = $this->illustrations;
 		$isBookmark = ($this->bookmarkName != '');
 
@@ -865,13 +911,13 @@ class XmlParser {
 
 			if ($this->insideTable)
 			{
-				$bookParagraph = new CellParagraph();
-				$bookParagraph->setTableCell($this->cell);
+				$paragraph = new CellParagraph();
+				$paragraph->setTableCell($this->cell);
 			}
 			else {
 
-				$bookParagraph = new BookParagraph();
-				$bookParagraph->setBook($this->book);
+				$paragraph = new BookParagraph();
+				$paragraph->setBook($this->book);
 	
 			} 
 			// handle content alteration, text style attributes
@@ -883,12 +929,12 @@ class XmlParser {
 					$alt->SetLength($span['endIndex'] - $span['beginIndex'])
 						->SetPosition($span['beginIndex']);
 
-					if ($this->insideTable){$alt->setCellparagraph($bookParagraph);}
-					else {$alt->setBookparagraph($bookParagraph);}
+					if ($this->insideTable){$alt->setCellparagraph($paragraph);}
+					else {$alt->setBookparagraph($paragraph);}
 						
 					
 					$this->em->persist($alt);
-					$bookParagraph->addAlteration($alt);
+					$paragraph->addAlteration($alt);
 
 				}
 
@@ -905,8 +951,8 @@ class XmlParser {
 							->setCitation($note['citation'])
 							->setCitationIndex($note['index']);
 
-					if ($this->insideTable){$bookNote->setCellparagraph($bookParagraph);}
-					else {$bookNote->setBookparagraph($bookParagraph);}
+					if ($this->insideTable){$bookNote->setCellparagraph($paragraph);}
+					else {$bookNote->setBookparagraph($paragraph);}
 				
 
 					if ($note['alterations'] ){
@@ -965,7 +1011,7 @@ class XmlParser {
 					}
 
 					$this->em->persist($bookNote);
-					$bookParagraph->addNote($bookNote); //
+					$paragraph->addNote($bookNote); //
 				}
 			}
 			//
@@ -991,12 +1037,12 @@ class XmlParser {
 					->setSvgTitle($illustration['svgTitle'])
 					;
 
-				if ($this->insideTable){$ill->setCellparagraph($bookParagraph);}
-				else {$ill->setBookparagraph($bookParagraph);}
+				if ($this->insideTable){$ill->setCellparagraph($paragraph);}
+				else {$ill->setBookparagraph($paragraph);}
 
 
 				$this->em->persist($ill);
-				$bookParagraph->addIllustration($ill);
+				$paragraph->addIllustration($ill);
 			}
 			//
 			// handle paragraph style attributes if they're differents from default values
@@ -1019,7 +1065,7 @@ class XmlParser {
 				$bookmark =  new Bookmark();
 
 				// $bookmark->setBook($this->book);
-				$bookmark->setParagraph($bookParagraph);
+				$bookmark->setParagraph($paragraph);
 				$bookmark->setName($this->bookmarkName);
 
 				$this->em->persist($bookmark);
@@ -1029,19 +1075,19 @@ class XmlParser {
 
 			//
 			//
-			$bookParagraph
+			$paragraph
 						->setParagraphStyles($styleStr)
 						->setContent($rawParagraph);
 		}
 
 		//
-		if ( NULL !== $bookParagraph ){
+		if ( NULL !== $paragraph ){
 
 			$this->nbParagraphs++;				
-			$this->em->persist($bookParagraph);
+			$this->em->persist($paragraph);
 
 			if ($this->insideTable){
-				$this->cell->addCellParagraph($bookParagraph);
+				$this->cell->addCellParagraph($paragraph);
 			}
 
 			$this->em->flush(); 
