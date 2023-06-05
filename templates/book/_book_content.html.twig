@@ -22,9 +22,9 @@
                     {% set X = loop.index %}
                     {% set N = (Y * nbCols) + loop.index - 1 %}
                 <td {{paragraph.bookTable.cells[N].cellAttributes}}>
-                    {% if app_env == "dev" %}
+                    {# {% if app_env == "dev" %}
                     {{ Y }} - {{ X }} - {{ N }} - {{ nbCellsMax }}
-                    {% endif %}
+                    {% endif %} #}
                     {% if paragraph.bookTable.cells[N] is defined %}
                         {% for cellp in paragraph.bookTable.cells[N].cellParagraphs %}
                             <p {{ cellp.paragraphStyles | raw }}

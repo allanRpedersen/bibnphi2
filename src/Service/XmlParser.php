@@ -414,17 +414,24 @@ class XmlParser {
 				break;
 
 			case "STYLE:STYLE":
+				//
 				$this->styleProperty['name'] = $attribs['STYLE:NAME'];
 
 				// 'text', 'paragraph', 'table', 'table-column', 'table-cell'
 				$this->styleProperty['family'] = $attribs['STYLE:FAMILY'];
+
+				// style inheritance
+				// 'text-align' property only
+				if(array_key_exists('STYLE:PARENT-STYLE-NAME', $attribs)){
+					$parentStyle = $attribs['STYLE:PARENT-STYLE-NAME'];
+					$this->styleProperty['text-align'] = (array_key_exists($parentStyle, $this->abnormalStyles)) ? 
+															$this->abnormalStyles[$parentStyle]['text-align'] : 'justify' ;
+				}
 				break;
 
 			case "STYLE:PARAGRAPH-PROPERTIES":
 				// FO:TEXT-ALIGN ('justify', 'center', 'start', 'end')
-				$this->styleProperty['text-align'] = (array_key_exists('FO:TEXT-ALIGN', $attribs) ?
-															$attribs['FO:TEXT-ALIGN'] :
-															'justify');
+				if (array_key_exists('FO:TEXT-ALIGN', $attribs)) $this->styleProperty['text-align'] = $attribs['FO:TEXT-ALIGN'];
 				break;
 				
 			case "STYLE:TEXT-PROPERTIES":
@@ -436,6 +443,11 @@ class XmlParser {
 				if(array_key_exists('FO:FONT-WEIGHT', $attribs)){
 					$this->styleProperty['font-weight'] = $attribs['FO:FONT-WEIGHT'];
 				}
+				// FO:FONT-SIZE ()
+				if (array_key_exists('FO:FONT-SIZE', $attribs)){
+					$this->styleProperty['font-size'] = $attribs['FO:FONT-SIZE'];
+				}
+
 				// STYLE:TEXT-POSITION ("super 58%", "0% 100%" )
 				if(array_key_exists('STYLE:TEXT-POSITION', $attribs)){
 					$this->styleProperty['text-position'] = ( "super 58%" == $attribs['STYLE:TEXT-POSITION'] ) ? 'sup' : 'normal';
@@ -565,6 +577,8 @@ class XmlParser {
 				if (!$this->insideNote){
 					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
 
+					// dd($this->currentStyleName, $this->abnormalStyles[$this->currentStyleName]);
+
 					if (array_key_exists($this->currentStyleName, $this->abnormalStyles)){
 							if ($this->abnormalStyles[$this->currentStyleName]['font-style'] != 'italic'){
 								// set to bold
@@ -639,6 +653,7 @@ class XmlParser {
 						'text-align'	=> 'justify',
 						'font-weight'	=> 'normal',
 						'font-style'	=> 'normal',
+						'font-size'		=> 'inherit',
 						'text-position' => 'normal',
 					];
 
@@ -718,6 +733,7 @@ class XmlParser {
 			case "STYLE:STYLE":
 				if( $this->styleProperty['font-weight']		!= 'normal'		||
 					$this->styleProperty['font-style']		!= 'normal'		||
+					$this->styleProperty['font-size']		!= 'inherit'	||
 					$this->styleProperty['text-align']		!= 'justify'	||
 					$this->styleProperty['text-position']	!= 'normal'		)
 				{
@@ -729,6 +745,7 @@ class XmlParser {
 					'name'			=> '',
 					'family'		=> '',
 					'text-align'	=> 'justify',
+					'font-size'		=> 'inherit',
 					'font-style' 	=> 'normal',
 					'font-weight'	=> 'normal',
 					'text-position'	=> 'normal',
@@ -1071,6 +1088,7 @@ class XmlParser {
 				$style = $this->abnormalStyles[$this->currentStyleName];
 
 				$styleStr = 'style="text-align: ' . $style['text-align'] . ';' .
+								'font-size: ' . $style['font-size'] . ';' .
 								'font-style: ' . $style['font-style'] . ';' .
 								'font-weight: ' . $style['font-weight'] . ';"';
 
