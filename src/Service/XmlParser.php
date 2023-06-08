@@ -1099,10 +1099,9 @@ class XmlParser {
 			}
 			//
 			// this paragraph may be a bookmark even if there is no content !!
-			if ($isBookmark){
+			// No bookmarks in tables !! (until...)
+			if ($isBookmark && !$this->insideTable){
 				$bookmark =  new Bookmark();
-
-				// $bookmark->setBook($this->book);
 				$bookmark->setParagraph($paragraph);
 				$bookmark->setName($this->bookmarkName);
 

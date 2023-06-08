@@ -40,6 +40,8 @@ trait TraitContent
      * 
      */
     private $nbOccurrencesInBook;
+    private $firstOccurrenceInParagraph;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+
 
     /**
      * 
@@ -79,6 +81,11 @@ trait TraitContent
      * 2- application du surlignage <mark>..</mark>
      * 3- application de styles, <strong>, <em>, ..
      * 4- insertion des illustrations
+     * 
+     * les propriétés suivantes sont requises pour utiliser ce Trait
+     *      $this->illustrations
+     *      $this->alterations
+     *      $this->notes
      * 
      */ 
     public function getFormattedContent(): string
@@ -313,6 +320,26 @@ trait TraitContent
     public function setNbOccurrencesInBook($nbOccurrencesInBook)
     {
         $this->nbOccurrencesInBook = $nbOccurrencesInBook;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of firstOccurrenceInParagraph
+     */ 
+    public function getFirstOccurrenceInParagraph()
+    {
+        return $this->firstOccurrenceInParagraph;
+    }
+
+    /**
+     * Set the value of firstOccurrenceInParagraph
+     *
+     * @return  self
+     */ 
+    public function setFirstOccurrenceInParagraph($firstOccurrenceInParagraph)
+    {
+        $this->firstOccurrenceInParagraph = $firstOccurrenceInParagraph;
 
         return $this;
     }

@@ -21,11 +21,12 @@ body {
 }
 
 .table td {
-    border: none;
+    border: 1px solid $bibnphi-text-color;
 }
 .cell-paragraph {
     background-color: rgb(174, 215, 238);
     border-radius : 5%;
+
 }
 
 .bookmark {
