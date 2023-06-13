@@ -174,9 +174,9 @@ class FrontController extends AbstractController
 
 		$session->set('currentBookSelectionIds', NULL);
 		$session->set('openBookId', NULL);
+
 		$session->set('hlContents', []);
 		$session->set('hlString', '');
-
 		$session->set('nbFoundStrings', 0);
 		$session->set('nbFoundInBooks', 0);
 

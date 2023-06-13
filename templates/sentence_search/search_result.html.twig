@@ -13,27 +13,33 @@
 			{% endif %}
 		</div>
 		<div id="searching-result-leftside">
-			{% if nbFoundStrings > 0 %}
-				<h5 class="mb-3">{{ nbFoundStrings }} occurrence{% if nbFoundStrings > 1 %}s{% endif %} de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+			{% if nbFoundStrings < 1 %}
+			<h5>Aucune occurrence de <span class="found-content">{{ string }}</span> n'a été trouvée dans la liste demandée !-/</h5>
 			{% else %}
-				<h5 class="mb-3" style="text-align:center;">Aucune occurrence de <span class="found-content">{{ string }}</span> n'a été trouvée dans la liste demandée !-/</h5>
+			<h5>{{ nbFoundStrings }} occurrence{% if nbFoundStrings > 1 %}s{% endif %} de : <span class="found-content">{{ string }}</span> dans les ouvrages suivants</h5>
+			<dl>
+				{% for key, books in matchingAuthors %}
+				<div>
+				<dt>{{key}}</dt>
+					{% for book in books %}
+					<dd id="book_{{book.id}}" class="book-row {% if book.id == openBookId %} open-book-row{% endif %}">
+						<a href="{{ path('show_selected', {'id': book.id}) }}">
+							{{book.title}} ({{book.nbFound}})
+						</a>
+					</dd>
+					{% endfor %}
+				</div>
+				{% endfor %}
+			</dl>
+			{# <div>
+				<p style="text-align:center; margin:0px;">
+					<a href="#"><i class="fa-solid fa-angles-left"></i>livre préc. </a> - <a href="#">livre suiv.<i class="fa-solid fa-angles-right"></i></a> 
+				</p>
+				<p style="text-align:center; margin:0px;">
+					<a href="#"><i class="fa-solid fa-chevron-left"></i>occ. préc. </a> - <a href="#">occ. suiv.<i class="fa-solid fa-chevron-right"></i></a>
+				</p>
+			</div> #}
 			{% endif %}
-			{% for book in matchingBookList %}
-				<a href="{{ path('show_selected', {'id': book.id}) }}">
-					<div id="book_{{book.id}}" class="row book-row{% if book == openBook %} open-book-row{% endif %} mt-3 mx-0">
-						<div class="col-md-4">
-							{{ book.author.lastName }}
-						</div>
-						<div class="col-md-6">
-							{{ book.title }}
-						</div>
-						<div class="col-md-2" style="text-align:center;">
-							{{ book.nbFoundStrings }}
-						</div>
-					</div>
-				</a>
-
-			{% endfor %}
 		</div>
 	</div>
 {% endblock %}

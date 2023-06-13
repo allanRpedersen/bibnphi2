@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class SentenceSearchController extends AbstractController
 {
@@ -40,28 +41,41 @@ class SentenceSearchController extends AbstractController
     {
         $session = $request->getSession();
         $matchingBookList = [];
+        $openBook = null;;
 
         $hlContents = $session->get('hlContents');
         $stringToSearch = $session->get('hlString');
         $nbFoundStrings = $session->get('nbFoundStrings');
         $nbFoundInBooks = $session->get('nbFoundInBooks');
 
-        foreach($nbFoundInBooks as $key=>$val){
+        $matchingAuthors = [];
+        $openBookId = $session->get('openBookId', null);
+
+        foreach($nbFoundInBooks as $key => $val){
+
             $book = $this->br->findOneById($key);
             $book->setNbFoundStrings($val);
             $matchingBookList[] = $book;
-        }
 
-        $openBookId = $session->get('openBookId', NULL);
-        $openBook = null;
+            if ($book->getId() == $openBookId){ $openBook = $book; }
+
+            $matchingAuthors[$book->getAuthor()->getLastName()][] = [
+                'id'        => $key,
+                'title'     => $book->getTitle(),
+                'nbFound'   => $val
+            ];
+        }
         $scrollTo = null;
-
-        if ($matchingBookList){
-            $openBook = $openBookId ? $this->br->findOneById($openBookId) : $matchingBookList[0];
-            $scrollTo = 'occurrence_1/' . $openBook->getNbFoundStrings();
+        if (!$openBook) {
+            $openBook = $matchingBookList[0];
+            $openBookId = $openBook->getId();
         }
-        foreach($hlContents as $hlContent){
 
+        $scrollTo = 'occurrence_1/' . $openBook->getNbFoundStrings();
+        // $firstAuthor = array_key_first($matchingAuthors);
+        // dump($matchingAuthors, $firstAuthor);
+        
+        foreach($hlContents as $hlContent){
             if ($openBook->getId() == $hlContent['bookId']){
 
                 switch($hlContent['contentType']){
@@ -89,9 +103,11 @@ class SentenceSearchController extends AbstractController
             // 'sentenceSearchForm'=> $sentenceSearchForm->createView(),
             // 'bookSelectForm'	=> $bookSelectForm->createView(),
             'string'			=> $stringToSearch,
-            'matchingBookList'	=> $matchingBookList,
+            // 'matchingBookList'	=> $matchingBookList,
+            'matchingAuthors'   => $matchingAuthors,
             'nbFoundStrings'	=> $nbFoundStrings,
             'openBook'			=> $openBook,
+            'openBookId'        => $openBookId,
             'scrollTo'			=> $scrollTo,
         ]);
     }

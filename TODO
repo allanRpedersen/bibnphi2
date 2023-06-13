@@ -36,3 +36,8 @@ Je t'enverrai des textes pour ces pages à l'occasion.
         - dissocier un bandeau générique et un bandeau session / utilisateur connecté.
         - 
 11. si utilisateur connecté (ROLE_USER), bouton de sauvegarde de la sélection
+
+12. affichage bibliothéque
+        - scroller les livres, pas le titre de la page
+
+13. appliquer le recherche aux contenus des tableaux.. i.e. inclure les cellParagraph..
