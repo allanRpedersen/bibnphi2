@@ -985,6 +985,7 @@ class XmlParser {
 					
 					$bookNote->setBook($this->book)
 							->setContent($note['content'])
+							->setParagraphStyles('')
 							->setCitation($note['citation'])
 							->setCitationIndex($note['index']);
 

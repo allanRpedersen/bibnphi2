@@ -32,6 +32,10 @@ class TableCell
 
     /**
      * @ORM\Column(type="string", length=255)
+     * 
+     * Les infos de fusion de cellules, horizontales ou verticales...
+     * Les styles applicables à la cellule...
+     * 
      */
     private $cellAttributes;
 

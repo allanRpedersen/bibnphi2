@@ -4,10 +4,11 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-// use App\Service\ContentMgr;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookNoteRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Model\TraitContentMgr;
+
 // use ApiPlatform\Metadata\ApiResource;
 
 
@@ -17,6 +18,11 @@ use ApiPlatform\Core\Annotation\ApiResource;
  */
 class BookNote
 {
+    /**
+     * 
+     */
+    use TraitContentMgr;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -46,11 +52,6 @@ class BookNote
     private $citation;
 
     /**
-     * @ORM\Column(type="text")
-     */  
-    private $content;
-
-    /**
      * @ORM\OneToMany(targetEntity=TextAlteration::class, mappedBy="bookNote", orphanRemoval=true)
      */
     private $alterations;
@@ -61,12 +62,17 @@ class BookNote
     private $illustrations;
 
     /**
+     * @ORM\ManyToOne(targetEntity=CellParagraph::class, inversedBy="notes")
+     */
+    private $cellParagraph;
+
+    /**
      * 
      */    
-    private $foundStringIndexes = [];
-    private $searchedString = '';
-    private $nextOccurence;
-    private $nbOccurrencesInBook = 0;
+    // private $foundStringIndexes = [];
+    // private $searchedString = '';
+    // private $nextOccurence;
+    // private $nbOccurrencesInBook = 0;
     
     /**
      * le numéro dans le livre de la première occurrence trouvée dans le paragraphe
@@ -74,9 +80,10 @@ class BookNote
     private $firstOccurrenceInNote;
 
     /**
-     * @ORM\ManyToOne(targetEntity=CellParagraph::class, inversedBy="notes")
+     * la propriété $notes n'est ici que pour satisfaire 
+     * TraitContentMgr::getFormattedContent() !!!
      */
-    private $cellParagraph;
+    private $notes = [];
 
 
     public function __construct()
@@ -94,7 +101,6 @@ class BookNote
     {
         return $this->book;
     }
-
     public function setBook(?Book $Book): self
     {
         $this->book = $Book;
@@ -106,22 +112,9 @@ class BookNote
     {
         return $this->citation;
     }
-
     public function setCitation(string $citation): self
     {
         $this->citation = $citation;
-
-        return $this;
-    }
-
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
-
-    public function setContent(string $content): self
-    {
-        $this->content = $content;
 
         return $this;
     }
@@ -130,7 +123,6 @@ class BookNote
     {
         return $this->citationIndex;
     }
-
     public function setCitationIndex(int $citationIndex): self
     {
         $this->citationIndex = $citationIndex;
@@ -142,7 +134,6 @@ class BookNote
     {
         return $this->bookParagraph;
     }
-
     public function setBookParagraph(?BookParagraph $bookParagraph): self
     {
         $this->bookParagraph = $bookParagraph;
@@ -150,201 +141,13 @@ class BookNote
         return $this;
     }
 
-    /**
-     * 
-     */
-    public function getFormattedContent(): string
+    public function getCellParagraph(): ?CellParagraph
     {
-        $htmlToInsert = [];
-        $formattedContent = '';
-
-        // ajout des mises en forme permanentes ( bold, italic, ..)
-        if (count($this->alterations)){
-            foreach ($this->alterations as $alteration){
-                $i = $alteration->getPosition();
-                $l = $alteration->getLength();
-                $htmlToInsert[] = [ 'index'=>$i, 'string'=>$alteration->getBeginTag() ];
-                if ($l > 0 ) $htmlToInsert[] = [ 'index'=>$i+$l, 'string'=>$alteration->getEndTag() ];
-            }
-        }
-
-        // les index des sous-chaîne(s) à afficher en surbrillance
-        $nbOccurencesInNote = count($this->foundStringIndexes);
-        if ($nbOccurencesInNote){
-
-            // use <mark></mark> to highlight an occurrence of a found string
-
-            $endTag = '</a></mark>';
-            $strLength = mb_strlen($this->searchedString);
-
-            $currentOccurrenceInBook = $this->firstOccurrenceInNote;
-
-            foreach($this->foundStringIndexes as $foundStringIndex){
-
-                $nextOccurrenceInBook = $currentOccurrenceInBook == $this->nbOccurrencesInBook ? 1 : $currentOccurrenceInBook+1;
-
-                $beginTag = '<mark id="occurrence_' . $currentOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">'
-                            . '<a title="aller à la prochaine occurrence"'
-                            . ' href="#occurrence_'
-                            . $nextOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">';
-
-                $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
-                $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
-
-                $currentOccurrenceInBook++;
-            }    
-        }
-
-        // illustrations
-        if (count($this->illustrations)){
-
-            foreach($this->illustrations as $illustration){
-
-                $mimeType = $illustration->getMimeType();
-                if ($mimeType){
-
-                    $str = '<img src="'
-                            . $illustration->getFileName()
-                            . '" alt="'
-                            . $illustration->getName()
-                            . '" title="'
-                            . $illustration->getSvgTitle();
-
-                    if($mimeType == "image/jpeg"){
-                        $str .= '" width="'
-                                . $illustration->getSvgWidth()
-                                . '" height="'
-                                . $illustration->getSvgHeight()
-                                . '" style="margin:Opx 5px;';
-                    }
-                    // else $mimeType could be "image/svg+xml" , "image/png", "image/gif"
-                    else {
-                        $str .= '" style="max-width:100%; margin:Opx 5px;';
-                    }
-
-                    $str .= '">';
-
-                    $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];
-                }
-                else {
-                    // $mimeType null or "" not set ..
-
-
-                    // $str = '<img src="'
-                    //         . "/default-image.jpg"
-                    //         . '" alt="'
-                    //         . "image par défaut"
-                    //         . '" width="'
-                    //         . "20"
-                    //         . '" height="'
-                    //         . "20"
-                    //         . '" title="'
-                    //         . "format d'image non supporté"
-                    //         . '" style="'
-                    //         . "margin:0px 5px"
-                    //         . '">';
-                }
-
-            }
-        }
-
-        //
-        if ($count=count($htmlToInsert)){
-
-            //
-            //
-            $indexes = array_column($htmlToInsert, 'index');
-            array_multisort($indexes, SORT_ASC, $htmlToInsert);
-
-            //
-            //
-            $currentIndex = 0;
-            $insertIndex = 0;
-            for($i=0; $i<$count; $i++){
-
-                $insertIndex = $htmlToInsert[$i]['index'];
-                $formattedContent .= mb_substr($this->content, $currentIndex, $insertIndex-$currentIndex);
-                $formattedContent .= $htmlToInsert[$i]['string'];
-                $currentIndex = $insertIndex;
-            }
-            $formattedContent .= mb_substr($this->content, $insertIndex);
-
-            return $formattedContent;
-        }
-
-        return $this->content;
-
+        return $this->cellParagraph;
     }
-
-    /**
-     * isContentMatching
-     */
-    public function isContentMatching($stringToSearch) : array
+    public function setCellParagraph(?CellParagraph $cellParagraph): self
     {
-        $encoding = mb_detect_encoding($this->content);
-        
-        $fromIndex = 0;
-        $indexFound = 0;
-        $this->foundStringIndexes = [];
-        $this->searchedString = $stringToSearch;
-        $strLength = mb_strlen($this->searchedString);
-
-        //
-        //
-        while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
-
-            $this->foundStringIndexes[] = $indexFound;
-            $fromIndex = $indexFound + $strLength;
-
-        }
-
-        // false if empty !!
-        return ($this->foundStringIndexes);
-
-    }
-
-
-
-    /**
-     * Get the value of foundStringIndexes
-     */ 
-    public function getFoundStringIndexes()
-    {
-        return $this->foundStringIndexes;
-    }
-
-    /**
-     * Set the value of foundStringIndexes
-     *
-     * @return  self
-     */ 
-    public function setFoundStringIndexes($foundStringIndexes): self
-    {
-        $this->foundStringIndexes = $foundStringIndexes;
-
-        return $this;
-    }
-
-    /**
-     * Set the value of nextOccurence
-     *
-     * @return  self
-     */ 
-    public function setNextOccurence($nextOccurence): self
-    {
-        $this->nextOccurence = $nextOccurence;
-
-        return $this;
-    }
-
-    /**
-     * Set the value of searchedString
-     *
-     * @return  self
-     */ 
-    public function setSearchedString($searchedString): self
-    {
-        $this->searchedString = $searchedString;
+        $this->cellParagraph = $cellParagraph;
 
         return $this;
     }
@@ -356,7 +159,6 @@ class BookNote
     {
         return $this->alterations;
     }
-
     public function addAlteration(TextAlteration $alteration): self
     {
         if (!$this->alterations->contains($alteration)) {
@@ -366,7 +168,6 @@ class BookNote
 
         return $this;
     }
-
     public function removeAlteration(TextAlteration $alteration): self
     {
         if ($this->alterations->removeElement($alteration)) {
@@ -386,7 +187,6 @@ class BookNote
     {
         return $this->illustrations;
     }
-
     public function addIllustration(Illustration $illustration): self
     {
         if (!$this->illustrations->contains($illustration)) {
@@ -396,7 +196,6 @@ class BookNote
 
         return $this;
     }
-
     public function removeIllustration(Illustration $illustration): self
     {
         if ($this->illustrations->removeElement($illustration)) {
@@ -410,33 +209,12 @@ class BookNote
     }
 
     /**
-     * Get the value of nbOccurrencesInBook
-     */ 
-    public function getNbOccurrencesInBook()
-    {
-        return $this->nbOccurrencesInBook;
-    }
-
-    /**
-     * Set the value of nbOccurrencesInBook
-     *
-     * @return  self
-     */ 
-    public function setNbOccurrencesInBook($nbOccurrencesInBook)
-    {
-        $this->nbOccurrencesInBook = $nbOccurrencesInBook;
-
-        return $this;
-    }
-
-    /**
      * Get the value of firstOccurrenceInNote
      */ 
     public function getFirstOccurrenceInNote()
     {
         return $this->firstOccurrenceInNote;
     }
-
     /**
      * Set the value of firstOccurrenceInNote
      *
@@ -449,16 +227,234 @@ class BookNote
         return $this;
     }
 
-    public function getCellParagraph(): ?CellParagraph
-    {
-        return $this->cellParagraph;
-    }
+    /**
+     * 
+     * 
+     */
 
-    public function setCellParagraph(?CellParagraph $cellParagraph): self
-    {
-        $this->cellParagraph = $cellParagraph;
+    //  public function getContent(): ?string
+    //  {
+    //      return $this->content;
+    //  }
+    //  public function setContent(string $content): self
+    //  {
+    //      $this->content = $content;
+ 
+    //      return $this;
+    //  }
+    // /**
+    //  * 
+    //  */
+    // public function getFormattedContent(): string
+    // {
+    //     $htmlToInsert = [];
+    //     $formattedContent = '';
 
-        return $this;
-    }
+    //     // ajout des mises en forme permanentes ( bold, italic, ..)
+    //     if (count($this->alterations)){
+    //         foreach ($this->alterations as $alteration){
+    //             $i = $alteration->getPosition();
+    //             $l = $alteration->getLength();
+    //             $htmlToInsert[] = [ 'index'=>$i, 'string'=>$alteration->getBeginTag() ];
+    //             if ($l > 0 ) $htmlToInsert[] = [ 'index'=>$i+$l, 'string'=>$alteration->getEndTag() ];
+    //         }
+    //     }
+
+    //     // les index des sous-chaîne(s) à afficher en surbrillance
+    //     $nbOccurencesInNote = count($this->foundStringIndexes);
+    //     if ($nbOccurencesInNote){
+
+    //         // use <mark></mark> to highlight an occurrence of a found string
+
+    //         $endTag = '</a></mark>';
+    //         $strLength = mb_strlen($this->searchedString);
+
+    //         $currentOccurrenceInBook = $this->firstOccurrenceInNote;
+
+    //         foreach($this->foundStringIndexes as $foundStringIndex){
+
+    //             $nextOccurrenceInBook = $currentOccurrenceInBook == $this->nbOccurrencesInBook ? 1 : $currentOccurrenceInBook+1;
+
+    //             $beginTag = '<mark id="occurrence_' . $currentOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">'
+    //                         . '<a title="Occurrence ' . $currentOccurrenceInBook . ' sur ' . $this->nbOccurrencesInBook . '"'
+    //                         . ' href="#occurrence_'
+    //                         . $nextOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">';
+
+    //             $htmlToInsert[] = [ 'index'=>$foundStringIndex, 'string'=>$beginTag ];
+    //             $htmlToInsert[] = [ 'index'=>$foundStringIndex + $strLength, 'string'=>$endTag ];
+
+    //             $currentOccurrenceInBook++;
+    //         }    
+    //     }
+
+    //     // illustrations
+    //     if (count($this->illustrations)){
+
+    //         foreach($this->illustrations as $illustration){
+
+    //             $mimeType = $illustration->getMimeType();
+    //             if ($mimeType){
+
+    //                 $str = '<img src="'
+    //                         . $illustration->getFileName()
+    //                         . '" alt="'
+    //                         . $illustration->getName()
+    //                         . '" title="'
+    //                         . $illustration->getSvgTitle();
+
+    //                 if($mimeType == "image/jpeg"){
+    //                     $str .= '" width="'
+    //                             . $illustration->getSvgWidth()
+    //                             . '" height="'
+    //                             . $illustration->getSvgHeight()
+    //                             . '" style="margin:Opx 5px;';
+    //                 }
+    //                 // else $mimeType could be "image/svg+xml" , "image/png", "image/gif"
+    //                 else {
+    //                     $str .= '" style="max-width:100%; margin:Opx 5px;';
+    //                 }
+
+    //                 $str .= '">';
+
+    //                 $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];
+    //             }
+    //             else {
+    //                 // $mimeType null or "" not set ..
+
+
+    //                 // $str = '<img src="'
+    //                 //         . "/default-image.jpg"
+    //                 //         . '" alt="'
+    //                 //         . "image par défaut"
+    //                 //         . '" width="'
+    //                 //         . "20"
+    //                 //         . '" height="'
+    //                 //         . "20"
+    //                 //         . '" title="'
+    //                 //         . "format d'image non supporté"
+    //                 //         . '" style="'
+    //                 //         . "margin:0px 5px"
+    //                 //         . '">';
+    //             }
+
+    //         }
+    //     }
+
+    //     //
+    //     if ($count=count($htmlToInsert)){
+
+    //         //
+    //         //
+    //         $indexes = array_column($htmlToInsert, 'index');
+    //         array_multisort($indexes, SORT_ASC, $htmlToInsert);
+
+    //         //
+    //         //
+    //         $currentIndex = 0;
+    //         $insertIndex = 0;
+    //         for($i=0; $i<$count; $i++){
+
+    //             $insertIndex = $htmlToInsert[$i]['index'];
+    //             $formattedContent .= mb_substr($this->content, $currentIndex, $insertIndex-$currentIndex);
+    //             $formattedContent .= $htmlToInsert[$i]['string'];
+    //             $currentIndex = $insertIndex;
+    //         }
+    //         $formattedContent .= mb_substr($this->content, $insertIndex);
+
+    //         return $formattedContent;
+    //     }
+
+    //     return $this->content;
+
+    // }
+    // /**
+    //  * isContentMatching
+    //  */
+    // public function isContentMatching($stringToSearch) : array
+    // {
+    //     $encoding = mb_detect_encoding($this->content);
+        
+    //     $fromIndex = 0;
+    //     $indexFound = 0;
+    //     $this->foundStringIndexes = [];
+    //     $this->searchedString = $stringToSearch;
+    //     $strLength = mb_strlen($this->searchedString);
+
+    //     //
+    //     //
+    //     while (FALSE !== ($indexFound = mb_stripos($this->content, $stringToSearch, $fromIndex, $encoding))){
+
+    //         $this->foundStringIndexes[] = $indexFound;
+    //         $fromIndex = $indexFound + $strLength;
+
+    //     }
+
+    //     // false if empty !!
+    //     return ($this->foundStringIndexes);
+
+    // }
+
+    // /**
+    //  * Get the value of foundStringIndexes
+    //  */ 
+    // public function getFoundStringIndexes()
+    // {
+    //     return $this->foundStringIndexes;
+    // }
+    // /**
+    //  * Set the value of foundStringIndexes
+    //  *
+    //  * @return  self
+    //  */ 
+    // public function setFoundStringIndexes($foundStringIndexes): self
+    // {
+    //     $this->foundStringIndexes = $foundStringIndexes;
+
+    //     return $this;
+    // }
+
+    // /**
+    //  * Set the value of nextOccurence
+    //  *
+    //  * @return  self
+    //  */ 
+    // public function setNextOccurence($nextOccurence): self
+    // {
+    //     $this->nextOccurence = $nextOccurence;
+
+    //     return $this;
+    // }
+
+    // /**
+    //  * Set the value of searchedString
+    //  *
+    //  * @return  self
+    //  */ 
+    // public function setSearchedString($searchedString): self
+    // {
+    //     $this->searchedString = $searchedString;
+
+    //     return $this;
+    // }
+    // /**
+    //  * Get the value of nbOccurrencesInBook
+    //  */ 
+    // public function getNbOccurrencesInBook()
+    // {
+    //     return $this->nbOccurrencesInBook;
+    // }
+    // /**
+    //  * Set the value of nbOccurrencesInBook
+    //  *
+    //  * @return  self
+    //  */ 
+    // public function setNbOccurrencesInBook($nbOccurrencesInBook)
+    // {
+    //     $this->nbOccurrencesInBook = $nbOccurrencesInBook;
+
+    //     return $this;
+    // }
+
+
 
 }

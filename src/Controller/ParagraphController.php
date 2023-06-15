@@ -6,7 +6,6 @@ use App\Entity\BookParagraph;
 use App\Form\BookParagraphType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\BookParagraphRepository;
-use App\Service\ContentMgr;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

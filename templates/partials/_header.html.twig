@@ -1,8 +1,14 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
 	<a class="navbar-brand" style="color:darkorange" title="Accueil BIB.N.PHI (ou la sélection d'ouvrages courante)" href="{{ path('reset_search') }}">
-		<img src="/Logo BIB·N·PHI - Chouette.png" alt="Logo BIB·N·PHI" height="40px"></a>
+		<img height="40px"
+			{% if app_env == "dev" %}
+			src="/bibnphi-icon-admin.png"
+			{% else %}
+			src="/Logo BIB·N·PHI - Chouette.png" alt="Logo BIB·N·PHI"
+			{% endif %}>
+	</a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
+	<span class="navbar-toggler-icon"></span>
 	</button>
 
 	<div class="collapse navbar-collapse" id="navbarColor02">

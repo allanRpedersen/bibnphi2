@@ -1,7 +1,7 @@
 <?php
 namespace App\Model;
 
-trait TraitContent
+trait TraitContentMgr
 {
     /**
      * @ORM\Column(type="text")
@@ -17,33 +17,33 @@ trait TraitContent
      * 
      * La chaine de caractères qui contient les attributs de mise en forme applicables au paragraphe entier
      * 
-     * e.g. "text-align:justify; font-weight: normal; font-style: normal;"
+     * e.g. "text-align:justify; font-weight: normal; font-style: normal; font-size: 1em;"
      * 
      * text-align: start || end || center || justify
      * font-weight: normal || bold || light
      * font-style: normal || italic
+     * font-size: 1em
      * 
      */
     private $paragraphStyles;
 
     /**
-     * La table des indices des chaînes de caractères trouvées dans le contenu
-     */
-    private $foundStringIndexes = [];
-
-    /**
      * 
      */
-    private $searchedString;
-
+    
     /**
-     * 
+     *  Recherche dans le contenu
      */
-    private $nbOccurrencesInBook;
-    private $firstOccurrenceInParagraph;    // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+    private $firstOccurrenceInParagraph;  // le numéro dans le livre de la première occurrence trouvée dans le paragraphe
+    private $foundStringIndexes = [];     // La table des indices des occurrences de la chaîne de caractères trouvée dans le contenu
+    private $nbOccurrencesInBook;         // le nombre d'occurrences trouvé dans le livre
+    private $nextOccurence;               // la prochaine occurence dans le livre (paragraphe ou note)
+    private $searchedString;              // la chaîne recherchée
 
 
     /**
+     *   
+     * initialise et remplit le tableau :  $this->foundStringIndexes
      * 
      */
     public function isContentMatching($stringToSearch) : array
@@ -71,7 +71,6 @@ trait TraitContent
         return ($this->foundStringIndexes);
     }
 
-
     /**
      * Construit et retourne le contenu mise en forme pour l'affichage.
      *
@@ -82,10 +81,12 @@ trait TraitContent
      * 3- application de styles, <strong>, <em>, ..
      * 4- insertion des illustrations
      * 
-     * les propriétés suivantes sont requises pour utiliser ce Trait
+     * les propriétés suivantes sont définies par les classes qui utilisent ce Trait
+     * 
      *      $this->illustrations
      *      $this->alterations
      *      $this->notes
+     * 
      * 
      */ 
     public function getFormattedContent(): string
@@ -126,7 +127,7 @@ trait TraitContent
                 $nextOccurrenceInBook = ($currentOccurrenceInBook == $this->nbOccurrencesInBook) ? 1 : $currentOccurrenceInBook+1;
 
                 $beginTag = '<mark id="occurrence_' . $currentOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">'
-                            . '<a title="aller à la prochaine occurrence"'
+                            . '<a title="Occurrence ' . $currentOccurrenceInBook . ' sur ' . $this->nbOccurrencesInBook . '"'
                             . ' href="#occurrence_'
                             . $nextOccurrenceInBook . '/' . $this->nbOccurrencesInBook . '">';
 
@@ -221,49 +222,20 @@ trait TraitContent
         return $this->content;
     }
 
-
-
-
     /**
      * Get the value of content
      */ 
-    public function getContent()
+    public function getContent(): ?string
     {
         return $this->content;
     }
-
     /**
-     * Set the value of content
-     *
-     * @return  self
+     * Get the value of firstOccurrenceInParagraph
      */ 
-    public function setContent($content)
+    public function getFirstOccurrenceInParagraph()
     {
-        $this->content = $content;
-
-        return $this;
+        return $this->firstOccurrenceInParagraph;
     }
-
-    /**
-     * Get the value of paragraphStyles
-     */ 
-    public function getParagraphStyles()
-    {
-        return $this->paragraphStyles;
-    }
-
-    /**
-     * Set the value of paragraphStyles
-     *
-     * @return  self
-     */ 
-    public function setParagraphStyles($paragraphStyles)
-    {
-        $this->paragraphStyles = $paragraphStyles;
-
-        return $this;
-    }
-
     /**
      * Get la table des indices des chaînes de caractères trouvées dans le contenu
      */ 
@@ -271,19 +243,20 @@ trait TraitContent
     {
         return $this->foundStringIndexes;
     }
-
     /**
-     * Set la table des indices des chaînes de caractères trouvées dans le contenu
-     *
-     * @return  self
+     * Get the value of nbOccurrencesInBook
      */ 
-    public function setFoundStringIndexes($foundStringIndexes)
+    public function getNbOccurrencesInBook()
     {
-        $this->foundStringIndexes = $foundStringIndexes;
-
-        return $this;
+        return $this->nbOccurrencesInBook;
     }
-
+    /**
+     * Get the value of paragraphStyles
+     */ 
+    public function getParagraphStyles(): ?string
+    {
+        return $this->paragraphStyles;
+    }
     /**
      * Get the value of searchedString
      */ 
@@ -292,55 +265,83 @@ trait TraitContent
         return $this->searchedString;
     }
 
+
+    /**
+     * Set the value of content
+     *
+     * @return  self
+     */ 
+    public function setContent($content): self
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+    /**
+     * Set the value of nextOccurence
+     *
+     * @return  self
+     */ 
+    public function setNextOccurence($nextOccurence): self
+    {
+        $this->nextOccurence = $nextOccurence;
+
+        return $this;
+    }
+    /**
+     * Set the value of firstOccurrenceInParagraph
+     *
+     * @return  self
+     */ 
+    public function setFirstOccurrenceInParagraph($firstOccurrenceInParagraph): self
+    {
+        $this->firstOccurrenceInParagraph = $firstOccurrenceInParagraph;
+
+        return $this;
+    }
+    /**
+     * Set la table des indices des chaînes de caractères trouvées dans le contenu
+     *
+     * @return  self
+     */ 
+    public function setFoundStringIndexes($foundStringIndexes): self
+    {
+        $this->foundStringIndexes = $foundStringIndexes;
+
+        return $this;
+    }
+    /**
+     * Set the value of nbOccurrencesInBook
+     *
+     * @return  self
+     */ 
+    public function setNbOccurrencesInBook($nbOccurrencesInBook): self
+    {
+        $this->nbOccurrencesInBook = $nbOccurrencesInBook;
+
+        return $this;
+    }
+    /**
+     * Set the value of paragraphStyles
+     *
+     * @return  self
+     */ 
+    public function setParagraphStyles($paragraphStyles): self
+    {
+        $this->paragraphStyles = $paragraphStyles;
+
+        return $this;
+    }
     /**
      * Set the value of searchedString
      *
      * @return  self
      */ 
-    public function setSearchedString($searchedString)
+    public function setSearchedString($searchedString): self
     {
         $this->searchedString = $searchedString;
 
         return $this;
     }
 
-    /**
-     * Get the value of nbOccurrencesInBook
-     */ 
-    public function getNbOccurrencesInBook()
-    {
-        return $this->nbOccurrencesInBook;
-    }
-
-    /**
-     * Set the value of nbOccurrencesInBook
-     *
-     * @return  self
-     */ 
-    public function setNbOccurrencesInBook($nbOccurrencesInBook)
-    {
-        $this->nbOccurrencesInBook = $nbOccurrencesInBook;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of firstOccurrenceInParagraph
-     */ 
-    public function getFirstOccurrenceInParagraph()
-    {
-        return $this->firstOccurrenceInParagraph;
-    }
-
-    /**
-     * Set the value of firstOccurrenceInParagraph
-     *
-     * @return  self
-     */ 
-    public function setFirstOccurrenceInParagraph($firstOccurrenceInParagraph)
-    {
-        $this->firstOccurrenceInParagraph = $firstOccurrenceInParagraph;
-
-        return $this;
-    }
 }
