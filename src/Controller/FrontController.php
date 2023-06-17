@@ -123,6 +123,7 @@ class FrontController extends AbstractController
 				'openBook'				=> $openBook,
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
+				'showCancelSelection'	=> true
 			]);
 		}
 
@@ -143,6 +144,7 @@ class FrontController extends AbstractController
 			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 			'bookSelectForm'		=> $bookSelectForm->createView(),
 			'isSelectedList'		=> $currentBookSelectionIds,
+			// 'hideContact'			=> true,
         ]);
     }
 
@@ -162,7 +164,9 @@ class FrontController extends AbstractController
 	
 	public function about(Request $request): Response
 	{
-		return $this->render('front/about.html.twig');
+		return $this->render('front/about.html.twig',[
+			'hideAbout' => true,
+		]);
 	}
 
 	/**

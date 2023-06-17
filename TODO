@@ -7,7 +7,7 @@ forget me not !!!!!
 2.  Modif d'un paragraphe dans la base non répercutée dans le doc d'origine !!
 4.  Ya un truc qui coince dans la modification/prise en compte du document odt originel.
 
-5.  Prise en compte de la balise xml <TABLE> ..... 
+5.  Prise en compte de la balise xml <TABLE> ..... <DONE->
 
 6.  L'esprit des lois - la citation de la note 1099 (entre autres) est en italique <em> ??? 
 
@@ -17,7 +17,7 @@ forget me not !!!!!
 
 4. Il faudra prévoir au moins deux nouvelles pages :
 - Un formulaire de contact (par exemple pour signaler une coquille dans un texte).
-- Une page de présentation du site avec des explications diverses.
+- Une page de présentation du site avec des explications diverses. <DONE->
 Je t'enverrai des textes pour ces pages à l'occasion.
 
 5. C'est loin d'être urgent, mais à terme, j'aimerais qu'il y ait la possibilité pour chaque utilisateur de se connecter à un espace privé (par un login et mot de passe) lui permettant :
@@ -25,13 +25,14 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 - de surligner / souligner des passages de ces œuvres sélectionnées de différentes couleurs (une dizaines proposées) et de retrouver ces modifications d'une session à l'autre.
 - de faire des annotations au texte, dans une "marge" ou quelque chose comme ça.
 
-6. Sélection/recherche par auteurs/titres <DONE>
+6. Sélection/recherche par auteurs/titres <DONE->
 7. Gestion des utilisateurs !!!!! <<<<<<<<<<<<<<<<<< Espace perso. surlignage/annotations !!!
-3. Suppression de rôle dans le user !! <DONE:->
+3. Suppression de rôle dans le user !! <DONE->
 
 8. Relook des formulaires <...>
 
 9. FormController.php, selected_index.html.twig, affichage de l'ouvrage selectionné dans la partie droite <DONE:->
+
 10. bandeau de navigation, ça va pas.
         - dissocier un bandeau générique et un bandeau session / utilisateur connecté.
         - 
@@ -39,8 +40,10 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 
 12. affichage bibliothéque
         - scroller les livres, pas le titre de la page
-
+        
+        
 13. appliquer la recherche de chaîne de caractères aux contenus des tableaux.. i.e. inclure les cellParagraph..
 
-14. Partage de code, utilisation de TraitContent.php dans toutes les entités de contenu.
+14. Partage de code, utilisation de TraitContent.php dans toutes les entités de contenu. <DONE:>
 
+15. Formulaire de contact <<<<<

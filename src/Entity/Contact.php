@@ -14,7 +14,14 @@ class Contact {
      * @Assert\NotBlank()
      * @Assert\Length(min=5, max=55)
      */
-    private $name;
+    private $firstName;
+
+    /**
+     * @var string|null
+     * @Assert\NotBlank()
+     * @Assert\Length(min=5, max=55)
+     */
+    private $lastName;
 
     /**
      * @var string|null
@@ -43,30 +50,6 @@ class Contact {
 
 
    
-
-    /**
-     * Get the value of name
-     *
-     * @return  string|null
-     */ 
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the value of name
-     *
-     * @param  string|null  $name
-     *
-     * @return  self
-     */ 
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
 
     /**
      * Get pattern="/[0-9]{10}/"
@@ -136,6 +119,54 @@ class Contact {
     public function setMessage($message)
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of firstName
+     *
+     * @return  string|null
+     */ 
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * Set the value of firstName
+     *
+     * @param  string|null  $firstName
+     *
+     * @return  self
+     */ 
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of lastName
+     *
+     * @return  string|null
+     */ 
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * Set the value of lastName
+     *
+     * @param  string|null  $lastName
+     *
+     * @return  self
+     */ 
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
 
         return $this;
     }
