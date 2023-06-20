@@ -120,6 +120,8 @@ class BookController extends AbstractController
 			'bodyId'	=> 'liste-titres',
 			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 			'bookSelectForm'		=> $bookSelectForm->createView(),
+			'hideContact'			=> true,
+
 			]);
 	}
 	

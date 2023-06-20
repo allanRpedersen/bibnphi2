@@ -6,7 +6,7 @@
 <div class="container" style="padding-top: 55px;">
 
     <div class="mx-5">
-    <img src="/Logo BIB·N·PHI.png" alt="Logo BIB·N·PHI" style="display:block;margin:auto;margin-top:2rem;max-width:100%;">
+        <img src="/Logo BIB·N·PHI.png" alt="Logo BIB·N·PHI" style="display:block;margin:auto;margin-top:2rem;max-width:100%;">
         <p align="justify" style="font-size: 1.2rem;margin-top:2rem;margin-bottom: 0cm; line-height: 100%">Le
         site BIB·N·PHI a été initié par Marc Anglaret, professeur de
         philosophie au lycée Arago de Perpignan, qui en assure aujourd’hui
@@ -73,6 +73,18 @@
         ailleurs écrits par des philosophes reconnus comme tels. Dans le
         doute, ces œuvres ont été intégrées à la bibliothèque. Libre à
         chacun·e de les ignorer.</p>
+    </div>
+    <h5 id="contactTitle" class="margin-top" style="margin-top:30px; text-align:center;padding-top: 30px;">Contact</h5>
+    <div style="display:flex; justify-content:center; ">
+        <div id="contactForm">
+            {{form_start(contactForm)}}
+
+            {{form_rest(contactForm)}}
+            <div style="text-align:center;">
+                <button class="btn btn-primary">Envoyer</button>
+            </div>
+            {{form_end(contactForm)}}
+        </div>
     </div>
     <div class="text-center mt-5">
 

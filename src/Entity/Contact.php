@@ -25,7 +25,6 @@ class Contact {
 
     /**
      * @var string|null
-     * @Assert\NotBlank()
      * @Assert\Regex(
      *  pattern="/[0-9]{10}/"
      * )
@@ -47,9 +46,6 @@ class Contact {
     private $message;
 
 
-
-
-   
 
     /**
      * Get pattern="/[0-9]{10}/"

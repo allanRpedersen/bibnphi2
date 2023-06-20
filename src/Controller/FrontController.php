@@ -2,17 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Contact;
 use App\Service\SortMgr;
+use App\Form\ContactType;
 use App\Entity\BookSelect;
 use App\Form\BookSelectType;
 use App\Entity\SentenceSearch;
-use App\Service\SelectAndSearch;
 use App\Form\SentenceSearchType;
+use App\Service\SelectAndSearch;
 use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
-// use App\Repository\BookNoteRepository;
-// use App\Repository\BookParagraphRepository;
-// use Knp\Component\Pager\PaginatorInterface;
+use App\Service\ContactNotification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class FrontController extends AbstractController
 {
-	private $ar, $br; // , $nr, $pr;
+	private $ar, $br;
 
 	private $authors, $books;
 	private $nbAuthors, $nbBooks;
@@ -38,9 +38,6 @@ class FrontController extends AbstractController
 		$this->books = $this->br->findAll();
 		$this->nbBooks = count($this->books);
 
-		// $this->pr = $pr;
-		// $this->nr = $nr;
-
 	}
 
     /**
@@ -53,9 +50,6 @@ class FrontController extends AbstractController
 		//
 		$sm = new SortMgr();
 		$session = $request->getSession();
-		// $bookList =[];
-		// $authors = [];
-		// $authorSelected = false;
 
 		$hlContent = [
 			'bookId'				=> 0,
@@ -123,7 +117,9 @@ class FrontController extends AbstractController
 				'openBook'				=> $openBook,
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
-				'showCancelSelection'	=> true
+				'showCancelSelection'	=> true,
+				'hideContact'			=> true,
+
 			]);
 		}
 
@@ -138,13 +134,11 @@ class FrontController extends AbstractController
 			// 			3
 			// ),
 			'books'		=> $bookList,
-			// 'books'		=> $this->br->findByDate(),
 			'nbAuthors'	=> $this->nbAuthors,
 			'nbBooks'	=> $this->nbBooks,
 			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 			'bookSelectForm'		=> $bookSelectForm->createView(),
 			'isSelectedList'		=> $currentBookSelectionIds,
-			// 'hideContact'			=> true,
         ]);
     }
 
@@ -162,10 +156,23 @@ class FrontController extends AbstractController
 	 * @return Response
      */
 	
-	public function about(Request $request): Response
+	public function about(Request $request, ContactNotification $notification): Response
 	{
+		$contact = new Contact;
+		$contactForm = $this->createForm(ContactType::class, $contact);
+		
+		$contactForm->handleRequest($request);
+		if ($contactForm->isSubmitted() && $contactForm->isValid())
+		{
+			$notification->notify($contact);
+			$this->addFlash('info',	'Envoi du message effectué !');
+
+			return $this->redirectToRoute('front');
+		}
+		
 		return $this->render('front/about.html.twig',[
-			'hideAbout' => true,
+			'hideAbout'		=> true,
+			'contactForm'	=> $contactForm->createView()
 		]);
 	}
 

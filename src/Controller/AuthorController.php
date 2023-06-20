@@ -59,6 +59,8 @@ class AuthorController extends AbstractController
             'authors' => $this->ar->findByLastName(),
             // 'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
             'bookSelectForm'		=> $bookSelectForm->createView(),
+            'hideContact'           => true,
+
 
         ]);
     }
