@@ -74,17 +74,18 @@
         doute, ces œuvres ont été intégrées à la bibliothèque. Libre à
         chacun·e de les ignorer.</p>
     </div>
-    <h5 id="contactTitle" class="margin-top" style="margin-top:30px; text-align:center;padding-top: 30px;">Contact</h5>
-    <div style="display:flex; justify-content:center; ">
-        <div id="contactForm">
-            {{form_start(contactForm)}}
-
-            {{form_rest(contactForm)}}
-            <div style="text-align:center;">
-                <button class="btn btn-primary">Envoyer</button>
-            </div>
-            {{form_end(contactForm)}}
+    <h5 id="contactTitle" style="margin-top:30px; text-align:center;padding-top: 30px;">Contact</h5>
+    <div id="contactForm" style="display:flex; justify-content:center; ">
+        {{form_start(contactForm)}}
+        <div class="row">
+            <div class="col">{{form_row(contactForm.lastName)}}</div>
+            <div class="col">{{form_row(contactForm.firstName)}}</div>
         </div>
+        {{form_rest(contactForm)}}
+        <div style="text-align:center;">
+            <button class="btn btn-primary">Envoyer</button>
+        </div>
+        {{form_end(contactForm)}}
     </div>
     <div class="text-center mt-5">
 

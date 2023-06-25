@@ -19,9 +19,8 @@ class ContactType extends GenericType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('firstName', TextType::class, $this->mkBasics( 'Prénom', ''))
             ->add('lastName', TextType::class, $this->mkBasics( 'Nom', ''))
-            // ->add('phone', TextType::class)
+            ->add('firstName', TextType::class, $this->mkBasics( 'Prénom', '', false))
             ->add('email', TextType::class, $this->mkBasics( 'Mèl', ''))
             ->add('message', TextareaType::class, $this->mkBasics( 'Message', ''));
     }
