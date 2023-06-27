@@ -118,7 +118,7 @@ class FrontController extends AbstractController
 				'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 				'bookSelectForm'		=> $bookSelectForm->createView(),
 				'showCancelSelection'	=> true,
-				'hideContact'			=> true,
+				'hideAbout'				=> true,
 
 			]);
 		}
@@ -172,6 +172,7 @@ class FrontController extends AbstractController
 		
 		return $this->render('front/about.html.twig',[
 			'hideAbout'		=> true,
+			'hideContact'	=> true,
 			'contactForm'	=> $contactForm->createView()
 		]);
 	}

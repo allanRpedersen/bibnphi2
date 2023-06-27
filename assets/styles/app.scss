@@ -48,7 +48,7 @@ body {
 
 .author-card {
     border: 1px solid black;
-    opacity: 0.7;
+    opacity: 0.85;
 }
 .author-card:hover {
     opacity: 1;
@@ -60,12 +60,14 @@ body {
     box-shadow: 3px 3px 2px darkblue;
     display: inline-block;
     vertical-align: top;
+    opacity: 0.95;
 }
 
 .book-card:hover {
     box-shadow:  3px 3px 3px yellow;
     border: 1px solid yellow;
-    opacity: 0.9;
+    opacity: 1;
+    z-index: 111;
 }
 
 .found-content {

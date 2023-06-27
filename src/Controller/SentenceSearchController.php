@@ -109,6 +109,7 @@ class SentenceSearchController extends AbstractController
             'openBook'			=> $openBook,
             'openBookId'        => $openBookId,
             'scrollTo'			=> $scrollTo,
+            'hideAbout'         => true,
         ]);
     }
 }
