@@ -16,7 +16,7 @@ forget me not !!!!!
 3. La possibilité d'exporter en ODT et en PDF la liste des résultats d'une requête. <<<<<<<<<<<<<    html2pdf 
 
 4. Il faudra prévoir au moins deux nouvelles pages :
-- Un formulaire de contact (par exemple pour signaler une coquille dans un texte).
+- Un formulaire de contact (par exemple pour signaler une coquille dans un texte). <DONE->
 - Une page de présentation du site avec des explications diverses. <DONE->
 Je t'enverrai des textes pour ces pages à l'occasion.
 
@@ -46,4 +46,8 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 
 14. Partage de code, utilisation de TraitContent.php dans toutes les entités de contenu. <DONE:>
 
-15. Formulaire de contact <<<<<
+15. Formulaire de contact. <DONE:>
+
+16. Parcours du résultat d'une recherche de chaîne de car.
+
+17. 
