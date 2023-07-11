@@ -52,6 +52,9 @@ class BookParagraph
      */
     private $illustrations;
 
+     /**
+     * @ORM\OneToOne(targetEntity=BookTable::class, mappedBy="anchorParagraph", cascade={"persist", "remove"})
+     */
     private $bookTable; // si positionné, ce paragraphe sert d'ancre à un tableau
 
 
