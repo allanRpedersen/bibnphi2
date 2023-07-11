@@ -92,7 +92,7 @@ class SentenceSearchController extends AbstractController
                         $n = $this->nr->findOneById($hlContent['contentId']);
                         $n->setFoundStringIndexes($hlContent['needles'])
                           ->setSearchedString($stringToSearch)
-                          ->setFirstOccurrenceInNote($hlContent['firstOccurrence'])
+                          ->setFirstOccurrenceInParagraph($hlContent['firstOccurrence']) ///////////////////////
                           ->setNbOccurrencesInBook($hlContent['nbOccurrencesInBook'])
                           ;
                     break;

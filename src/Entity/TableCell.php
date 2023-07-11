@@ -31,7 +31,7 @@ class TableCell
     private $cellParagraphs;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * 
      * Les infos de fusion de cellules, horizontales ou verticales...
      * Les styles applicables à la cellule...

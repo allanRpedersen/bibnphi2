@@ -53,7 +53,7 @@ class Book
     private $author;
 
     /**
-     * @ORM\Column(type="string", length=11, nullable=true)
+     * @ORM\Column(type="string", length=17, nullable=true)
      */
     private $publishedYear;
 

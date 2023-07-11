@@ -13,7 +13,7 @@ trait TraitContentMgr
 
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * 
      * La chaine de caractères qui contient les attributs de mise en forme applicables au paragraphe entier
      * 
@@ -167,24 +167,36 @@ trait TraitContentMgr
                 if ($mimeType){
 
                     $str = '<img src="'
-                            // . 'https://bibnphi2.webcoop.fr'    <<<<<<<<<< big bug.. to be removed !!!!!!!!
                             . $illustration->getFileName()
                             . '" alt="'
                             . $illustration->getName()
                             . '" title="'
                             . $illustration->getSvgTitle();
 
-                    if($mimeType == "image/jpeg"){
-                        $str .= '" width="'
+                    switch ($mimeType) {
+                        case "image/jpeg":
+                        case "image/png":
+                            $str .= '" width="'
                                 . $illustration->getSvgWidth()
                                 . '" height="'
                                 . $illustration->getSvgHeight()
                                 . '" style="margin:0px 5px;"';
-                    }
-                    // else $mimeType could be "image/svg+xml" , "image/png, image/gif"
-                    else {
+                            break;
+                        
+                        default:// else $mimeType could be "image/svg+xml" , image/gif, image/"
                             $str .= '" style="max-width:100%; margin:Opx 5px;';    
+                            break;
                     }
+                                                        // if($mimeType == "image/jpeg"){
+                                                        //     $str .= '" width="'
+                                                        //             . $illustration->getSvgWidth()
+                                                        //             . '" height="'
+                                                        //             . $illustration->getSvgHeight()
+                                                        //             . '" style="margin:0px 5px;"';
+                                                        // }     
+                                                        // else {
+                                                        //         $str .= '" style="max-width:100%; margin:Opx 5px;';    
+                                                        // }
 
                     $str .= '">';
                     $htmlToInsert[] = ['index' => $illustration->getIllustrationIndex(), 'string' => $str];
