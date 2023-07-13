@@ -116,7 +116,6 @@ class SortMgr
 
             array_multisort( $years, SORT_DESC, $titles, SORT_ASC, $clefs );
 
-            $books = [];
             foreach( $years as $key => $value){
                 $books[] = [
                     "year"  => $years[$key],
