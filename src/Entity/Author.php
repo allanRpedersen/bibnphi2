@@ -254,7 +254,8 @@ class Author
         $books = $this->books;
         $sm = new SortMgr;
 
-        return $sm->sortByTitle($books);
+        // return $sm->sortByTitle($books);
+        return $sm->sortByPublicationDate($books);
 
     }
 

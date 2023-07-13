@@ -42,8 +42,11 @@ class SortMgr
         $titles = [];
 
         foreach ($originalList as $book) $titles[] = strtr($book->getTitle(), $this->table);
+
         $direction == "ASC" ? asort($titles) : arsort($titles);
+        
         foreach( $titles as $key => $val) $sortedBooks[] = $originalList[$key];
+        
         return $sortedBooks;
     }
 
@@ -70,5 +73,63 @@ class SortMgr
         }
 
         return $sortedByAuthor;
+    }
+
+        /**
+     * 
+     * @param Collection|Book[] $originalList
+     * @return Collection|Book[]
+     */
+    public function sortByPublicationDate($originalList, $direction="ASC"): Collection
+    {
+        $sortedBooks = new ArrayCollection();
+        $books = [];
+
+        $years = []; $titles = []; $clefs = [];
+
+        foreach( $originalList as $key => $book ){
+            $year = $book->getPublishedYear();
+
+
+            // Le signe '-' marque une date av jc, on inverse le tri
+            if (substr($year, 0, 1) == '-'){
+
+                $direction = "DESC";
+
+                if (preg_match('/[\d]+/', $year, $matchingArray)) $year = $matchingArray[0];
+                // dump($matchingArray);
+
+                $years[] = $year;
+                $titles[] = $book->getTitle();
+                $clefs[] = $key;
+
+            }
+            else
+                $books[] = [
+                    "year"  => $year,
+                    "title" => $book->getTitle(),
+                    "clef"  => $key,
+                ];
+        }
+
+        if ($years && $titles && $clefs ){
+
+            array_multisort( $years, SORT_DESC, $titles, SORT_ASC, $clefs );
+
+            $books = [];
+            foreach( $years as $key => $value){
+                $books[] = [
+                    "year"  => $years[$key],
+                    "title" => $titles[$key],
+                    "clef"  => $clefs[$key],
+                ];
+            }
+        }
+        else{
+            $direction == "ASC" ? asort($books) : arsort($books);
+        }
+
+        foreach( $books as $book) $sortedBooks[] = $originalList[$book['clef']];
+        return $sortedBooks;
     }
 }

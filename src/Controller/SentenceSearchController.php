@@ -65,6 +65,7 @@ class SentenceSearchController extends AbstractController
                 'nbFound'   => $val
             ];
         }
+
         $scrollTo = null;
         if (!$openBook) {
             $openBook = $matchingBookList[0];

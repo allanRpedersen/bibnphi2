@@ -5,7 +5,7 @@
 	</a>
 	{% if nbBooks is defined %}
 	<p style="display:inline; font-size:0.85rem">
-		({{nbBooks}} Ouvrages aujourd'hui)
+		({{ "now"|date("d/m/Y") }} - {{nbBooks}} Ouvrages)
 	</p>
 	 {% endif %}
 	 <img src="/Copyleft16x16.png" alt="copyleft" style="height:1rem;">

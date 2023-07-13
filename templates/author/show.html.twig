@@ -22,6 +22,7 @@
     <div style="display:flex; flex-wrap:wrap;">
         {% for book in author.books %}
         <div style="display: inline; width: 16%;">
+            {% set date = book.publishedYear %}
             {% include 'book/_book.html.twig' %}
         </div>        
         {% endfor %}
