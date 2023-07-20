@@ -76,7 +76,14 @@ body {
     background-color: rgb(34, 9, 145);
 }
 
-// 
+//
+hr {
+    border: none;
+    border-bottom:  double $bibnphi-text-color;
+    // border-bottom: 1rem solid;
+    width: 80%;
+}
+
 h3:target {
     scroll-margin-top: 0;
 }

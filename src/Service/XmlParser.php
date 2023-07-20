@@ -71,20 +71,13 @@ class XmlParser {
 			$nbRowsSpanned,
 			$nbColsSpanned;
 
-	// private $style = [
-	// 	'name'			=> '',
-	// 	'family'		=> '', // "text"
-	// 	'fontStyle'		=> '', // "normal" | "italic" ..
-	// 	'fontWeight'	=> '', // "bold" ..
-	// 	'text-position'	=> 'normal',
-	// ];
 	private $styleProperty = [
-		'name'			=> '',
-		'family'		=> '',
-		'text-align'	=> 'justify',
+		'name'			=> 'name',
+		'family'		=> 'family',
+		'font-size'		=> '1em',
 		'font-style'	=> 'normal',
 		'font-weight'	=> 'normal',
-		'font-size'		=> 'inherit',
+		'text-align'	=> 'justify',
 		'text-position'	=> 'normal',
 	];
 
@@ -148,6 +141,8 @@ class XmlParser {
 
 	// Le texte du signet
 	private $bookmarkName = '';
+
+	private $isHorizontalLine = false;
 
 	private $logger;
 	private $em;
@@ -417,15 +412,28 @@ class XmlParser {
 				//
 				$this->styleProperty['name'] = $attribs['STYLE:NAME'];
 
-				// 'text', 'paragraph', 'table', 'table-column', 'table-cell'
+				// could be 'text', 'paragraph', 'table', 'table-column', 'table-cell' ... 'Horizontal_20_Line'
 				$this->styleProperty['family'] = $attribs['STYLE:FAMILY'];
 
 				// style inheritance
-				// 'text-align' property only
+				//
+				// 		'text-align' property only
+				//
+				//
+				//
 				if(array_key_exists('STYLE:PARENT-STYLE-NAME', $attribs)){
 					$parentStyle = $attribs['STYLE:PARENT-STYLE-NAME'];
-					$this->styleProperty['text-align'] = (array_key_exists($parentStyle, $this->abnormalStyles)) ? 
-															$this->abnormalStyles[$parentStyle]['text-align'] : 'justify' ;
+					$thisStyle = $this->styleProperty['name'];
+
+					$this->styleProperty['text-align'] = (array_key_exists($parentStyle, $this->abnormalStyles))	? 
+															$this->abnormalStyles[$parentStyle]['text-align']		:
+															'justify' ;
+					
+					if ($parentStyle == 'Horizontal_20_Line'){
+						$this->styleProperty['family'] = 'Horizontal_20_Line';
+
+						if ($this->modeDev) $this->logger->info("(Ihou !!-) Le style parent de : $thisStyle est : $parentStyle ");
+					}
 				}
 				break;
 
@@ -577,13 +585,11 @@ class XmlParser {
 				if (!$this->insideNote){
 					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
 
-					// dd($this->currentStyleName, $this->abnormalStyles[$this->currentStyleName]);
-
 					if (array_key_exists($this->currentStyleName, $this->abnormalStyles)){
 							if ($this->abnormalStyles[$this->currentStyleName]['font-style'] != 'italic'){
-								// set to bold
+								// set to bold !! why ?
 								$this->abnormalStyles[$this->currentStyleName]['font-weight'] = 'bold';
-								$this->abnormalStyles[$this->currentStyleName]['font-size'] = '1.5rem';
+								// $this->abnormalStyles[$this->currentStyleName]['font-size'] = '1.5rem';
 							}
 					}
 					else {
@@ -603,11 +609,12 @@ class XmlParser {
 					// reset paragraph style properties and illustrations
 					
 					$this->styleProperty = [
-						'text-align'	=> 'justify',
-						'font-weight'	=> 'bold',
+						'family'		=> '',
+						'font-size'		=> '1em',
 						'font-style'	=> 'normal',
+						'font-weight'	=> 'bold',
+						'text-align'	=> 'justify',
 						'text-position' => 'normal',
-						'font-size'		=> 'inherit',
 					];
 
 					$this->illustration = [
@@ -619,7 +626,6 @@ class XmlParser {
 						'mimeType'	=> '',	// "DRAW:MIME-TYPE
 						'svgTitle'	=> '',
 					];
-
 				}
 				break;
 	
@@ -650,11 +656,13 @@ class XmlParser {
 
 					// reset paragraph style properties and illustrations
 					$this->styleProperty = [
-						'text-align'	=> 'justify',
-						'font-weight'	=> 'normal',
+						'family'		=> $this->abnormalStyles[$this->currentStyleName]['family'],
+						'font-size'		=> '1em',
 						'font-style'	=> 'normal',
-						'font-size'		=> 'inherit',
+						'font-weight'	=> 'normal',
+						'text-align'	=> 'justify',
 						'text-position' => 'normal',
+
 					];
 
 					$this->illustration = [
@@ -731,10 +739,11 @@ class XmlParser {
 				break;
 
 			case "STYLE:STYLE":
-				if( $this->styleProperty['font-weight']		!= 'normal'		||
-					$this->styleProperty['font-style']		!= 'normal'		||
-					$this->styleProperty['font-size']		!= 'inherit'	||
-					$this->styleProperty['text-align']		!= 'justify'	||
+				if( $this->styleProperty['family']   		== 'Horizontal_20_Line' ||
+					$this->styleProperty['font-size']		!= '1em'				||
+					$this->styleProperty['font-style']		!= 'normal'				||
+					$this->styleProperty['font-weight']		!= 'normal'				||
+					$this->styleProperty['text-align']		!= 'justify'			||
 					$this->styleProperty['text-position']	!= 'normal'		)
 				{
 					$name = $this->styleProperty['name'];
@@ -744,10 +753,10 @@ class XmlParser {
 				$this->styleProperty = [
 					'name'			=> '',
 					'family'		=> '',
-					'text-align'	=> 'justify',
-					'font-size'		=> 'inherit',
+					'font-size'		=> '1em',
 					'font-style' 	=> 'normal',
 					'font-weight'	=> 'normal',
+					'text-align'	=> 'justify',
 					'text-position'	=> 'normal',
 				];
 				break;
@@ -833,6 +842,17 @@ class XmlParser {
 			case "TEXT:P":
 				if (!$this->insideNote){
 
+					//
+					if ($this->styleProperty['family'] == 'Horizontal_20_Line') {
+						// le paragraphe est une ancre pour une ligne horizontale <HR>, il n'a pas de contenu.
+						$this->isHorizontalLine = true;
+						$this->spans[] = [
+							'styleName'		=> $this->currentStyleName,
+							'beginIndex'	=> 0,
+							'endIndex'		=> 0,
+						];
+					}
+
 					// handle paragraph content, notes, alterations, illustrations
 					// either BookParagraph or TableCellParagraph
 					$this->handleParagraph($this->text, $this->noteCollection);
@@ -843,6 +863,7 @@ class XmlParser {
 					$this->spans = [];
 					$this->illustrations = [];
 					$this->bookmarkName = '';
+					$this->isHorizontalLine = false;
 				}
 				break;
 
@@ -883,15 +904,6 @@ class XmlParser {
 		//
 		//
 
-									// if ($this->isNoteBody) $this->noteBody .= $data;
-									// else if (!$this->insideAnnotation){
-									// 	if ($this->isNoteCitation) $this->noteCitation = $data; 
-									// 	else if ($this->insideDrawFrame){
-									// 			$this->svgTitle .= $data;
-									// 		} 
-									// 		else $this->text .= $data;
-									// }
-
 		if ( !$this->insideAnnotation &&
 			 !$this->insideMasterStyles )
 		{
@@ -921,7 +933,9 @@ class XmlParser {
 		$paragraph = NULL;
 		$illustrations = $this->illustrations;
 		$isBookmark = ($this->bookmarkName != '');
+		$isLine = $this->isHorizontalLine;
 
+		// strip beginning white spaces.
 		$rawParagraph = ltrim($rawParagraph);
 
 		// remove all non-breaking spaces !! (  "/ regex /u" means unicode support )
@@ -943,8 +957,10 @@ class XmlParser {
 			// }
 
 
-		if ($rawParagraph != '' || $illustrations || $isBookmark)
-		{
+		if ( $rawParagraph != '' ||
+				$illustrations	 ||
+				$isBookmark		 ||
+				$isLine			 ){
 
 			if ($this->insideTable)
 			{
@@ -952,11 +968,10 @@ class XmlParser {
 				$paragraph->setTableCell($this->cell);
 			}
 			else {
-
 				$paragraph = new BookParagraph();
 				$paragraph->setBook($this->book);
-	
 			} 
+
 			// handle content alteration, text style attributes
 			//
 			foreach($this->spans as $span){
@@ -969,12 +984,9 @@ class XmlParser {
 					if ($this->insideTable){$alt->setCellparagraph($paragraph);}
 					else {$alt->setBookparagraph($paragraph);}
 						
-					
 					$this->em->persist($alt);
 					$paragraph->addAlteration($alt);
-
 				}
-
 			}
 			//
 			// handle notes if any for the paragraph
@@ -1088,16 +1100,15 @@ class XmlParser {
 			if (array_key_exists($this->currentStyleName, $this->abnormalStyles)){
 				$style = $this->abnormalStyles[$this->currentStyleName];
 
-				$styleStr = 'style="text-align: ' . $style['text-align'] . ';' .
-								'font-size: ' . $style['font-size'] . ';' .
-								'font-style: ' . $style['font-style'] . ';' .
-								'font-weight: ' . $style['font-weight'] . ';"';
+				$styleStr = 'style="text-align: '	. $style['text-align']	. ';' .
+							'font-size: '			. $style['font-size']	. ';' .
+							'font-style: '			. $style['font-style']	. ';' .
+							'font-weight: '			. $style['font-weight'] . ';"'; ///
 
 				// foreach($style as $k => $v){ $styleStr .= $k . ": " . $v . ";"; }
-				if ($this->modeDev)	$this->logger->info("style de paragraphes : $this->currentStyleName, $styleStr");
-
-				
+				if ($this->modeDev)	$this->logger->info("style de paragraphe : $this->currentStyleName, $styleStr");
 			}
+
 			//
 			// this paragraph may be a bookmark even if there is no content !!
 			// No bookmarks in tables !! (until...)
@@ -1143,13 +1154,13 @@ class XmlParser {
 
 		if (array_key_exists($styleName, $this->abnormalStyles)){
 
-			if ($styleName == "TEXT:LINE-BREAK"){ $bt = "<BR>" ; $et = ""; }
-			else {
-				if ($this->abnormalStyles[$styleName]['font-style']		== 'italic'){ $bt .= '<EM>'; $et .= '</EM>'; }
-				if ($this->abnormalStyles[$styleName]['font-weight']	== 'bold'){ $bt .= '<STRONG>'; $et .= '</STRONG>'; }
-				if ($this->abnormalStyles[$styleName]['text-position']	== 'sup' ){ $bt .= '<SUP>'; $et .= '</SUP>'; }
-			}
-
+			if ($styleName == "TEXT:LINE-BREAK") { $bt = "<BR>" ; $et = ""; }
+			else if ($this->abnormalStyles[$styleName]['family'] == 'Horizontal_20_Line') { $bt = "<HR>" ; $et = ""; }
+				else {
+					if ($this->abnormalStyles[$styleName]['font-style']		== 'italic') { $bt .= '<EM>'; $et .= '</EM>'; }
+					if ($this->abnormalStyles[$styleName]['font-weight']	== 'bold')	{ $bt .= '<STRONG>'; $et .= '</STRONG>'; }
+					if ($this->abnormalStyles[$styleName]['text-position']	== 'sup' )	{ $bt .= '<SUP>'; $et .= '</SUP>'; }
+				}
 			$alt = new TextAlteration();
 			$alt->setName($styleName)
 				->setBeginTag($bt)

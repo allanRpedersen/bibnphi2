@@ -88,32 +88,37 @@ class SortMgr
         $years = []; $titles = []; $clefs = [];
 
         foreach( $originalList as $key => $book ){
+
             $year = $book->getPublishedYear();
+            $title = strtr($book->getTitle(), $this->table);
 
 
-            // Le signe '-' marque une date av jc, on inverse le tri
+            // Le signe '-' marque une date av jc, le tri se complique
+            // il faut effectuer un tri décroissant sur la date MAIS un tri croissant sur le nom de l'auteur !!
+            // 
             if (substr($year, 0, 1) == '-'){
 
                 $direction = "DESC";
 
-                if (preg_match('/[\d]+/', $year, $matchingArray)) $year = $matchingArray[0];
-                // dump($matchingArray);
+                // get the first string of digits
+                $year = (preg_match('/[\d]+/', $year, $matchingArray)) ? $matchingArray[0] : 0 ;
 
                 $years[] = $year;
-                $titles[] = $book->getTitle();
+                $titles[] = $title;
                 $clefs[] = $key;
 
             }
             else
                 $books[] = [
                     "year"  => $year,
-                    "title" => $book->getTitle(),
+                    "title" => $title,
                     "clef"  => $key,
                 ];
         }
 
         if ($years && $titles && $clefs ){
 
+            // thanks to PHP :)
             array_multisort( $years, SORT_DESC, $titles, SORT_ASC, $clefs );
 
             foreach( $years as $key => $value){
