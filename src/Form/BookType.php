@@ -19,7 +19,7 @@ class BookType extends GenericType
     {
         $builder
             ->add('title')
-            ->add('summary')
+            // ->add('summary')
 			->add('publishedYear')
 			->add('author', EntityType::class, [
 				'class' => Author::class,
@@ -37,14 +37,14 @@ class BookType extends GenericType
 					return $book->getTitle();
 				},
 			])
-			->add('fpImageFile', VichImageType::class, [
-				'label' => 'Image de couverture',
-				'required' => false,
-				'allow_delete' => true,
-				'download_label' => static function (Book $book) {
-					return $book->getFpImageFileName();
-				},
-            ])
+			// ->add('fpImageFile', VichImageType::class, [
+			// 	'label' => 'Image de couverture',
+			// 	'required' => false,
+			// 	'allow_delete' => true,
+			// 	'download_label' => static function (Book $book) {
+			// 		return $book->getFpImageFileName();
+			// 	},
+            // ])
 
             // ->add('odtBookName')
             // ->add('odtBookSize')

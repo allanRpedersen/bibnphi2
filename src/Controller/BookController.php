@@ -237,7 +237,7 @@ class BookController extends AbstractController
 				//
 				//
 				$cmd = $this->getParameter('kernel.project_dir')
-						. '/bin/console app:xml-parser --mode=prod --quiet '
+						. '/bin/console app:xml-parser --quiet --mode=' . $_ENV['APP_ENV']. ' '
 						. $workingDir . ' '
 						. $book->getId() . ' > /dev/null 2>&1';
 				
@@ -494,7 +494,7 @@ class BookController extends AbstractController
 
 		$form = $this->createFormBuilder($book)
 					->add('title')
-					->add('summary')
+					// ->add('summary')
 					->add('publishedYear')
 					->add('author', EntityType::class, [
 						'class' => Author::class,
@@ -506,14 +506,14 @@ class BookController extends AbstractController
 						'allow_delete' => false,
 						'download_label' => new PropertyPath('odtBookName')
 					])
-					->add('fpImageFile', VichFileType::class, [
-						'label' => 'Image de couverture',
-						'required' => false,
-						'allow_delete' => false,
-						'download_label' => static function (Book $book) {
-							return $book->getFpImageFileName();
-						},
-					])
+					// ->add('fpImageFile', VichFileType::class, [
+					// 	'label' => 'Image de couverture',
+					// 	'required' => false,
+					// 	'allow_delete' => false,
+					// 	'download_label' => static function (Book $book) {
+					// 		return $book->getFpImageFileName();
+					// 	},
+					// ])
 		
 					->getForm();
 

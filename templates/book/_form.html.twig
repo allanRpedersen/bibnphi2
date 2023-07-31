@@ -21,30 +21,14 @@
 		{{ form_widget(form.publishedYear) }}
 	</div>
 </div>
-<div class="row mt-3">
+
+{# <div class="row mt-3">
 	<div class="col mx-1">
 		{{ form_label(form.summary, 'Résumé') }}
 		{{ form_widget(form.summary) }}
 
 	</div>
 </div>
-
-
-
-{# {{ form_row(form.title, {'label': 'titre'}) }}
-<div class="row">
-	<div class="col-md-4">
-		{{ form_row(form.author, {'label': 'auteur.e'}) }}
-	</div>	
-	<div class="col-md-3">
-		{{ form_row(form.publishedYear, {'label': 'publié en'}) }}
-	</div>
-	<div class="col-md-5">
-		{{ form_row(form.odtBookFile) }}
-	</div>
-</div> #}
-
-
 
 <div class="row">
 	<div class="col-md-6 mx-1">
@@ -55,11 +39,11 @@
 		{% if book.fpImageFileName %}
 		<img src="{{ vich_uploader_asset(book, 'fpImageFile') | imagine_filter('fp_thumb') }}" alt="">
 		{% else %}
-		{# <img src="/default-image.png" alt=""> #}
+		<img src="/default-image.png" alt="">
 
 		{% endif %}
 	</div>
-</div>
+</div> #}
 
 {# {{ form_widget(form) }} #}
 

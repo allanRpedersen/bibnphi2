@@ -361,7 +361,7 @@ class XmlParser {
 				$this->firstImage = true;
 				
 				//
-				// des illustrations apparaissent dans les notes de fin de texte ..
+				// des illustrations apparaissent aussi dans les notes de fin de texte ..
 				// 
 				$this->illustration['index'] = $this->insideNote ? iconv_strlen($this->noteBody): iconv_strlen($this->text);
 
@@ -412,7 +412,7 @@ class XmlParser {
 				//
 				$this->styleProperty['name'] = $attribs['STYLE:NAME'];
 
-				// could be 'text', 'paragraph', 'table', 'table-column', 'table-cell' ... 'Horizontal_20_Line'
+				// could be 'text', 'paragraph', 'table', 'table-column', 'table-cell', 'graphic' ... 'Horizontal_20_Line'
 				$this->styleProperty['family'] = $attribs['STYLE:FAMILY'];
 
 				// style inheritance
@@ -655,8 +655,12 @@ class XmlParser {
 					$this->currentStyleName = array_key_exists('TEXT:STYLE-NAME', $attribs) ? $attribs['TEXT:STYLE-NAME'] : '';
 
 					// reset paragraph style properties and illustrations
+					$family = (array_key_exists($this->currentStyleName, $this->abnormalStyles))	?
+								$this->abnormalStyles[$this->currentStyleName]['family'] 			:
+								'';
+
 					$this->styleProperty = [
-						'family'		=> $this->abnormalStyles[$this->currentStyleName]['family'],
+						'family'		=> $family,
 						'font-size'		=> '1em',
 						'font-style'	=> 'normal',
 						'font-weight'	=> 'normal',
@@ -803,14 +807,18 @@ class XmlParser {
 
 				$this->lineBreak['styleName'] = $element;
 				
+				// on ajout un blanc insécable au contenu pour faire avancer l'index !!!!!
+				//
 				if ($this->insideNote) {
 					$this->lineBreak['beginIndex'] = iconv_strlen($this->noteBody);
-					$this->lineBreak['endIndex'] = $this->lineBreak['beginIndex'];
+					// $this->noteBody .= ' ';
+					$this->lineBreak['endIndex'] = iconv_strlen($this->noteBody);
 					$this->noteSpans[] = $this->lineBreak;
 				}
 				else {
 					$this->lineBreak['beginIndex'] = iconv_strlen($this->text);
-					$this->lineBreak['endIndex'] = $this->lineBreak['beginIndex'];
+					// $this->text .= ' ';
+					$this->lineBreak['endIndex'] = iconv_strlen($this->text);
 					$this->spans[] = $this->lineBreak;
 				}
 

@@ -41,7 +41,6 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 12. affichage bibliothéque
         - scroller les livres, pas le titre de la page
         
-        
 13. appliquer la recherche de chaîne de caractères aux contenus des tableaux.. i.e. inclure les cellParagraph..
 
 14. Partage de code, utilisation de TraitContent.php dans toutes les entités de contenu. <DONE:>
@@ -52,7 +51,7 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 
 17. Les formules de LibreOffice Math !!
         Qd ya pas d'image associée à la formule.. (bergson-l'évolution créatrice)
-                1. il faut la comprendere et la dessiner !!!-/
+                1. il faut la comprendre, interpréter le langage de Math et la dessiner !!!-/
                 (2. il faut la fabriquer :)
                         . reproduire la formule dans LibreOffice Draw (insertion objet > formule)
                         . exporter en graphique vectoriel (svg)
@@ -60,11 +59,11 @@ Je t'enverrai des textes pour ces pages à l'occasion.
                         . et pis l'insérer à la place de la formule dans le document odt
                         ... pfff
 
-18. Tri des oeuvres d'un auteur par date de rédaction/publication
+18. Tri des oeuvres d'un auteur par date de rédaction/publication <DONE:>
 Quand on clique sur un auteur, les titres doivent apparaître dans l'ordre chronologique de l'année de publication ou
 de rédaction et, en cas d'égalité, par ordre alphabétique.
 
-Remplacer le paramètre "Année de publication" par "Année ou période de publication ou de rédaction".
+Remplacer le paramètre "Année de publication" par "Année ou période de publication ou de rédaction". <DONE:>
 Pour l'Antiquité notamment, il n'y a pas de publication à proprement parler, mais parfois une année de rédaction.
 Mais le plus souvent, c'est une période de plusieurs années. 
 Par exemple, pour les livres de Platon, je vais mettre comme année de rédaction pour plusieurs dialogues : "-399 à -390".
