@@ -144,6 +144,17 @@ class BookRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findOneBySlug($value): ?Book
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.slug = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+
 
     // /**
     //  * @return Book[] Returns an array of Book objects

@@ -246,7 +246,7 @@ class BookController extends AbstractController
 							////////
 
 				$this->addFlash(
-					'info',
+					'success',
 					'L\'analyse du document : ' . $book->getTitle() . ' s\'est terminée avec succès par la commande extérieure !');
 
 				return $this->redirectToRoute('book_show', [
@@ -308,7 +308,7 @@ class BookController extends AbstractController
 					$this->em->flush();
 
 					$this->addFlash(
-						'info',
+						'success',
 						'L\'analyse du document s\'est terminée avec succès ! ( ' . $xmlParser->getNbParagraphs() . ' paragraphes en '. round($xmlParser->getParsingTime(), 2) . ' secondes)');
 
 					return $this->redirectToRoute('book_show', [
@@ -318,7 +318,7 @@ class BookController extends AbstractController
 				}
 				else {
 					$this->addFlash(
-						'info',
+						'warning',
 						'Echec de l\'analyse du document : ' . $book->getTitle());
 
 					return $this->redirectToRoute('front');
@@ -363,14 +363,30 @@ class BookController extends AbstractController
 				;
 
             $this->em->persist($book);
-			$this->em->flush();
 
-			$this->logger->info('>>> $book->getOdtOriginalName() : ' . $book->getOdtOriginalName() );
-			//
-			//
-			return $this->redirectToRoute('book_processing',[
-				'slug' => $book->getSlug(),
-			]);
+			$slug = $book->getSlug();
+			if (!$this->br->findOneBySlug($slug)){
+				$this->em->flush();
+
+				$this->logger->info('>>> $book->getOdtOriginalName() : ' . $book->getOdtOriginalName() );
+				//
+				//
+				return
+					$this->redirectToRoute('book_processing',[
+						'slug' => $book->getSlug(),
+					]);
+			}
+			else {
+
+			// dd($slug);
+
+			$this->addFlash(
+				'danger',
+				'Ajout impossible !! Un ouvrage du même nom existe déjà dans la bibliothèque.');
+			}
+
+
+
 			//
 			//
 
