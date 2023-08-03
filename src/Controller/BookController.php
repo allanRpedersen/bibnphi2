@@ -618,10 +618,10 @@ class BookController extends AbstractController
 			}
 			//
 			//
-			$bookId = $book->getId();
-			$parsingTime = $book->getParsingTime();
-			$title = $book->getTitle();
-			$odtFileName = $book->getOdtBookName();
+			$bookId			= $book->getId();
+			$odtFileName	= $book->getOdtBookName();
+			$parsingTime 	= $book->getParsingTime();
+			$title			= $book->getTitle();
 
 			$this->em->remove($book);
 			$this->em->flush();
@@ -630,14 +630,13 @@ class BookController extends AbstractController
 			// unix cmd
 			// remove odt file
 			passthru('rm -v books/'. $odtFileName . ' > /dev/null 2>&1', $errCode );
-	
 			if ($errCode){
 				$this->logger->info('Erreur de suppression du fichier : ' . $odtFileName );
 				$this->addFlash('error', 'Erreur de suppression du fichier : ' . $odtFileName . '[$errCode:' . $errCode . ']' );
 			}
 			else {
-				$this->logger->info('Remove odt file : books/' . $odtFileName . ' (with title : ' . $title . ')');
-				$this->logger->info('Was parsed in : ' . $parsingTime . 'sec.');
+				$this->logger->info('Suppression du fichier : books/' . $odtFileName . ' (with title : ' . $title . '),');
+				$this->logger->info('qui avait été analysé en : ' . $parsingTime . 'secondes !!!');
 			}
 	
 			// remove .whatever to get directory name from odt file name << maybe buggy !-(
@@ -649,16 +648,20 @@ class BookController extends AbstractController
 				$this->logger->info('Erreur de suppression du répertoire : ' . $dirName );
 				$this->addFlash('error', 'Erreur de suppression du Répertoire : ' . $dirName . '[$errCode:' . $errCode . ']' );
 			}
+			else {
+				$this->logger->info('Suppression du répertoire : books/' . $dirName . ' ET de son arborescence !' );
+			}
 	
 			//
 			// clear the array 'currentBookSelectionIds' in the session if any, and if deleted book is part of it
 			$session = $request->getSession();
 			$currentBookSelectionIds = $session->get('currentBookSelectionIds');
 			if ($currentBookSelectionIds){
-	
+				$this->logger->info('Ya une liste sélectionnée !!!' );
 				if (in_array( $bookId, $currentBookSelectionIds)){
 	
 					$i = array_search($bookId, $currentBookSelectionIds);
+					$this->logger->info("Et l'ouvrage est dedans ...");
 					$splice = array_splice($currentBookSelectionIds, $i, 1 );
 	
 					$session->set('currentBookSelectionIds', $currentBookSelectionIds);
@@ -669,6 +672,7 @@ class BookController extends AbstractController
         }
 
         // return $this->redirectToRoute('book_index');
+		$this->logger->info("Retour au front !-z");
         return $this->redirectToRoute('front'); /// ???
 	}
 
