@@ -121,7 +121,6 @@ class BookController extends AbstractController
 			'sentenceSearchForm'	=> $sentenceSearchForm->createView(),
 			'bookSelectForm'		=> $bookSelectForm->createView(),
 			// 'hideContact'			=> true,
-
 			]);
 	}
 	
@@ -152,6 +151,7 @@ class BookController extends AbstractController
 		passthru('mkdir -v ' . $dirName . ' > /dev/null 2>&1', $errCode );
 		if ($errCode){
 			$this->logger->debug('Erreur de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
+			$this->addFlash('error', 'Erreur de création du répertoire : ' . $dirName );
 			return null;
 		}
 		//
@@ -174,30 +174,26 @@ class BookController extends AbstractController
 			$this->logger->info( '$xmlFileName : ' . $xmlFileName . ' does not exist !!!');
 			return null;
 		}
-		//
-		// append styles.xml
-		//
 		if (!file_exists($styleFileName)){
 			// internal error !!
 			$this->logger->info( '$styleFileName : ' . $styleFileName . ' does not exist !!!');
 			return null;
 		}
 
-		// $balise1 = '<bibnphi>';
-		// $balise2 = '</bibnphi>';
-
 		$b1 = $this->projectDir . '/public/balise-bibnphi-1.xml';
 		$b2 = $this->projectDir . '/public/balise-bibnphi-2.xml';
 
-		// remove xml prolog in files
-		// sed -i".bak" "1d" content.xml
+		// remove xml prolog in files $styleFileName and $xmlFileName
+		//
+		// supprime la 1ère ligne du fichier fileName avec backup dans fileName.bak
+		// sed -i".bak" "1d" fileName
 
-		passthru('sed -i".bak" "1d" ' . $styleFileName, $errCode);
+		passthru('sed -i "1d" ' . $styleFileName, $errCode); // sans back up ..
 		if ($errCode){
 			$this->logger->debug('Err: ' . $errCode . ', sed "1d" sur ' . $styleFileName);
 			return null;
 		}
-		passthru('sed -i".bak" "1d" ' . $xmlFileName, $errCode);
+		passthru('sed -i "1d" ' . $xmlFileName, $errCode); // sans back up ..
 		if ($errCode){
 			$this->logger->debug('Err: ' . $errCode . ', sed "1d" sur ' . $xmlFileName);
 			return null;
@@ -330,7 +326,7 @@ class BookController extends AbstractController
 		else {
 			// flash message
 			$this->addFlash(
-				'warning',
+				'error',
 				'Le document odt : ' . $book->getOdtBookName() . ' est invalide ou absent (cf bibnphi.log) !-\\'
 			);
 		}
@@ -377,12 +373,9 @@ class BookController extends AbstractController
 					]);
 			}
 			else {
-
-			// dd($slug);
-
-			$this->addFlash(
-				'danger',
-				'Ajout impossible !! Un ouvrage du même nom existe déjà dans la bibliothèque.');
+				$this->addFlash(
+					'error',
+					'Ajout impossible !! Un ouvrage du même nom existe déjà dans la bibliothèque.');
 			}
 
 
@@ -411,7 +404,7 @@ class BookController extends AbstractController
 	/**
 	 * @Route("/{slug}/jumpTo/{whereToJump}", name="book_show_with_jump", methods={"GET"})
 	 */
-	public function showAndJump( Request $request,
+	public function __no_more_used__showAndJump( Request $request,
 								 Book $book, 
 								 $whereToJump, 
 								 BookParagraphRepository $pRepo, 
@@ -618,48 +611,67 @@ class BookController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->request->get('_token'))) {
 			
+			// $this->removeBook($book);
+
 			foreach( $book->getBookParagraphs() as $paragraph ){
 				$book->removeBookParagraph($paragraph);
 			}
-			
+			//
+			//
+			$parsingTime = $book->getParsingTime();
+			$title = $book->getTitle();
+			$odtFileName = $book->getOdtBookName();
 
+			$this->em->remove($book);
+			$this->em->flush();
+	
 			//
 			// unix cmd
 			// remove odt file
-			$dirName = $book->getOdtBookName();
-			passthru('rm -v books/'. $dirName . ' > /dev/null 2>&1', $errCode );
+			passthru('rm -v books/'. $odtFileName . ' > /dev/null 2>&1', $errCode );
+	
+			$this->logger->info('Remove odt file : books/' . $odtFileName . ' (with title : ' . $title . ')[$errCode:' . $errCode . ']');
+			$this->logger->info('Was parsed in : ' . $parsingTime . 'sec.');
 
-			$this->logger->info('Remove odt file : books/' . $dirName . ' (with title : ' . $book->getTitle() . ')' );
-			$this->logger->info('Was parsed in : ' . $book->getParsingTime() . 'sec.');
-
-			// remove .whatever to get directory name from odt file name << buggy !-(
-			$dirName = substr($dirName, 0, strpos($dirName, '.'));
+			if ($errCode){
+				$this->logger->info('Erreur de suppression du fichier : ' . $odtFileName );
+				$this->addFlash('error', 'Erreur de suppression du fichier : ' . $odtFileName . '[$errCode:' . $errCode . ']' );
+			}
+	
+			// remove .whatever to get directory name from odt file name << maybe buggy !-(
+			$dirName = substr($odtFileName, 0, strpos($odtFileName, '.'));
+			
 			// then delete associated directory recursive
 			passthru('rm -v -r books/' . $dirName . ' > /dev/null 2>&1', $errCode );
-
+			if ($errCode){
+				$this->logger->info('Erreur de suppression du répertoire : ' . $dirName );
+				$this->addFlash('error', 'Erreur de suppression du Répertoire : ' . $dirName . '[$errCode:' . $errCode . ']' );
+			}
+	
 			//
 			// clear the array 'currentBookSelectionIds' in the session if any, and if deleted book is part of it
 			$session = $request->getSession();
 			$currentBookSelectionIds = $session->get('currentBookSelectionIds');
 			if ($currentBookSelectionIds){
-
+	
 				if (in_array( $book->getId(), $currentBookSelectionIds)){
 	
 					$i = array_search($book->getId(), $currentBookSelectionIds);
 					$splice = array_splice($currentBookSelectionIds, $i, 1 );
-
+	
 					$session->set('currentBookSelectionIds', $currentBookSelectionIds);
 				}
 			}
-
-			//
-			//
-            $this->em->remove($book);
-            $this->em->flush();
+	
+	
         }
 
         // return $this->redirectToRoute('book_index');
-        return $this->redirectToRoute('front');
+        return $this->redirectToRoute('front'); /// ???
+	}
+
+	public function removeBook( Book $book )
+	{
 	}
 
 }

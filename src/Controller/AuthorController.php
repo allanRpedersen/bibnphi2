@@ -128,6 +128,9 @@ class AuthorController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$author->getId(), $request->request->get('_token'))) {
 
+            // remove books
+
+
             $this->em->remove($author);
             $this->em->flush();
         }
