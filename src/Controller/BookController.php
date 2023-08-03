@@ -618,6 +618,7 @@ class BookController extends AbstractController
 			}
 			//
 			//
+			$bookId = $book->getId();
 			$parsingTime = $book->getParsingTime();
 			$title = $book->getTitle();
 			$odtFileName = $book->getOdtBookName();
@@ -630,12 +631,13 @@ class BookController extends AbstractController
 			// remove odt file
 			passthru('rm -v books/'. $odtFileName . ' > /dev/null 2>&1', $errCode );
 	
-			$this->logger->info('Remove odt file : books/' . $odtFileName . ' (with title : ' . $title . ')[$errCode:' . $errCode . ']');
-			$this->logger->info('Was parsed in : ' . $parsingTime . 'sec.');
-
 			if ($errCode){
 				$this->logger->info('Erreur de suppression du fichier : ' . $odtFileName );
 				$this->addFlash('error', 'Erreur de suppression du fichier : ' . $odtFileName . '[$errCode:' . $errCode . ']' );
+			}
+			else {
+				$this->logger->info('Remove odt file : books/' . $odtFileName . ' (with title : ' . $title . ')');
+				$this->logger->info('Was parsed in : ' . $parsingTime . 'sec.');
 			}
 	
 			// remove .whatever to get directory name from odt file name << maybe buggy !-(
@@ -654,9 +656,9 @@ class BookController extends AbstractController
 			$currentBookSelectionIds = $session->get('currentBookSelectionIds');
 			if ($currentBookSelectionIds){
 	
-				if (in_array( $book->getId(), $currentBookSelectionIds)){
+				if (in_array( $bookId, $currentBookSelectionIds)){
 	
-					$i = array_search($book->getId(), $currentBookSelectionIds);
+					$i = array_search($bookId, $currentBookSelectionIds);
 					$splice = array_splice($currentBookSelectionIds, $i, 1 );
 	
 					$session->set('currentBookSelectionIds', $currentBookSelectionIds);
