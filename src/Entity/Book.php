@@ -359,16 +359,17 @@ class Book
 
     public function removeBookParagraph(BookParagraph $bookParagraph): self
     {
-		// foreach( $bookParagraph->getSentences() as $sentence ){
-		// 	$bookParagraph->removeSentence($sentence);
-		// }
-        //
-        // to be replaced by getNotes & remove Notes
+        foreach ($bookParagraph->getAlterations() as $alteration ){
+            $bookParagraph->removeAlteration($alteration);
+        }
+
+        foreach ($bookParagraph->getIllustrations() as $illustration ){
+            $bookParagraph->removeIllustration($illustration);
+        }
+
 		foreach( $bookParagraph->getNotes() as $note ){
 			$bookParagraph->removeNote($note);
 		}
-
-
 
         if ($this->bookParagraphs->contains($bookParagraph)) {
             $this->bookParagraphs->removeElement($bookParagraph);

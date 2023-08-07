@@ -2,16 +2,19 @@
 
 namespace App\Controller;
 
+use Monolog\Logger;
 use App\Entity\Author;
 use App\Form\AuthorType;
 use App\Entity\BookSelect;
 use App\Form\BookSelectType;
 use App\Service\SelectAndSearch;
+use Monolog\Handler\StreamHandler;
 use App\Repository\AuthorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -24,16 +27,20 @@ class AuthorController extends AbstractController
     private $em; // Entity manager
     private $ar; // Author repository
 
+    private $logger;
+    private $projectDir;
+
     /**
      * 
      */
-    public function __construct(AuthorRepository $ar, EntityManagerInterface $em ){
+    public function __construct(KernelInterface $kernel, AuthorRepository $ar, EntityManagerInterface $em ){
 
         $this->em = $em;
         $this->ar = $ar;
 
-		// $this->authors = $this->ar->findByLastName();
-		// $this->nbAuthors = count($this->authors);
+        $this->projectDir = $kernel->getProjectDir();
+		$this->logger = new Logger('bibnphi');
+		$this->logger->pushHandler( new StreamHandler($this->projectDir . '/public/bibnphi.log', Logger::DEBUG) );
     }	
 
     /**
@@ -67,7 +74,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/new", name="author_new", methods={"GET","POST"})
-	 * @IsGranted("ROLE_USER")
+	 * @IsGranted("ROLE_LIBRARIAN")
 	 */
     public function new(Request $request): Response
     {
@@ -101,7 +108,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/{slug}/edit", name="author_edit", methods={"GET","POST"})
-	 * @IsGranted("ROLE_USER")
+	 * @IsGranted("ROLE_LIBRARIAN")
      */
     public function edit(Request $request, Author $author): Response
     {
@@ -122,7 +129,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/{slug}", name="author_delete", methods={"DELETE", "POST"})
-	 * @IsGranted("ROLE_USER")
+	 * @IsGranted("ROLE_LIBRARIAN")
      */
     public function delete(Request $request, Author $author): Response
     {
@@ -130,9 +137,12 @@ class AuthorController extends AbstractController
 
             // remove books
 
+            $this->logger->info("Suppression de l'auteur : " . $author->getLastName() );
 
             $this->em->remove($author);
             $this->em->flush();
+
+
         }
 
         return $this->redirectToRoute('author_index');

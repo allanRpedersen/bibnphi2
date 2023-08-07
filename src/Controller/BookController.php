@@ -151,7 +151,7 @@ class BookController extends AbstractController
 		passthru('mkdir -v ' . $dirName . ' > /dev/null 2>&1', $errCode );
 		if ($errCode){
 			$this->logger->debug('Erreur de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
-			$this->addFlash('error', 'Erreur de création du répertoire : ' . $dirName );
+			$this->addFlash('error', 'Erreur de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
 			return null;
 		}
 		//
@@ -159,6 +159,7 @@ class BookController extends AbstractController
 		passthru('unzip '. $odtFilePath . ' -d ' . $dirName . ' > /dev/null 2>&1', $errCode);
 		if ($errCode){
 			$this->logger->debug('Erreur de décompression : ' . $odtFilePath . ', errCode : ' . $errCode );
+			$this->addFlash('danger', 'Erreur de décompression du fichier : ' . $odtFilePath);
 			return null;
 		}
 		//
@@ -611,17 +612,16 @@ class BookController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->request->get('_token'))) {
 			
-			// $this->removeBook($book);
-
-			foreach( $book->getBookParagraphs() as $paragraph ){
-				$book->removeBookParagraph($paragraph);
-			}
 			//
 			//
 			$bookId			= $book->getId();
 			$odtFileName	= $book->getOdtBookName();
 			$parsingTime 	= $book->getParsingTime();
 			$title			= $book->getTitle();
+
+			foreach( $book->getBookParagraphs() as $paragraph ){
+				$book->removeBookParagraph($paragraph);
+			}
 
 			$this->em->remove($book);
 			$this->em->flush();
@@ -631,8 +631,8 @@ class BookController extends AbstractController
 			// remove odt file
 			passthru('rm -v books/'. $odtFileName . ' > /dev/null 2>&1', $errCode );
 			if ($errCode){
-				$this->logger->info('Erreur de suppression du fichier : ' . $odtFileName );
-				$this->addFlash('error', 'Erreur de suppression du fichier : ' . $odtFileName . '[$errCode:' . $errCode . ']' );
+				$this->logger->info('Erreur de suppression du fichier : ' . $odtFileName . ' [$errCode:' . $errCode . ']');
+				// $this->addFlash('danger', 'Erreur de suppression du fichier : ' . $odtFileName . ' [$errCode:' . $errCode . ']' );
 			}
 			else {
 				$this->logger->info('Suppression du fichier : books/' . $odtFileName . ' (with title : ' . $title . '),');
