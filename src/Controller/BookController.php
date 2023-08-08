@@ -626,9 +626,13 @@ class BookController extends AbstractController
 				'parsingtime'	=> $book->getParsingTime()
 			];
 
+			foreach( $book->getBookmarks() as $bookmark ){
+				$book->removeBookmark($bookmark);
+				$this->em->remove($bookmark);
+			}
+
 			foreach( $book->getBookParagraphs() as $paragraph ){
 				$book->removeBookParagraph($paragraph);
-
 				$this->em->remove($paragraph);
 			}
 
@@ -641,9 +645,4 @@ class BookController extends AbstractController
         // return $this->redirectToRoute('book_index');
         return $this->redirectToRoute('front'); /// ???
 	}
-
-	public function removeBook( Book $book )
-	{
-	}
-
 }
