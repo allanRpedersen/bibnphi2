@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Model\TraitContentMgr;
+use App\Traits\TraitContentMgr;
 use App\Repository\CellParagraphRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

@@ -1,5 +1,5 @@
 <?php
-namespace App\Model;
+namespace App\Traits;
 
 trait TraitContentMgr
 {

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookParagraphRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Model\TraitContentMgr;
+use App\Traits\TraitContentMgr;
 // use ApiPlatform\Metadata\ApiResource;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -54,7 +54,7 @@ class BookParagraph
 
      /**
      * @ORM\OneToOne(targetEntity=BookTable::class, mappedBy="anchorParagraph", cascade={"persist", "remove"})
-     */
+     */ 
     private $bookTable; // si positionné, ce paragraphe sert d'ancre à un tableau
 
 

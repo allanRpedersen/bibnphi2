@@ -17,6 +17,7 @@ use App\Repository\BookParagraphRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -48,7 +49,7 @@ class SelectAndSearch extends AbstractController
                                     BookRepository $br,
                                     BookParagraphRepository $pr,
                                     BookNoteRepository $nr,
-                                    SessionInterface $session )
+                                    RequestStack $requestStack )
 	{
 
 		$this->ar = $ar;
@@ -62,7 +63,7 @@ class SelectAndSearch extends AbstractController
 		$this->pr = $pr;
 		$this->nr = $nr;
 
-        $this->session = $session;
+        $this->session = $requestStack->getCurrentRequest()->getSession();
 
 	}
 

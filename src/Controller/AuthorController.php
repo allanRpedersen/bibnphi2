@@ -10,6 +10,7 @@ use App\Form\BookSelectType;
 use App\Service\SelectAndSearch;
 use Monolog\Handler\StreamHandler;
 use App\Repository\AuthorRepository;
+use App\Traits\TraitFileMgr;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +30,10 @@ class AuthorController extends AbstractController
 
     private $logger;
     private $projectDir;
+
+    //
+    //
+    use TraitFileMgr;
 
     /**
      * 
@@ -135,16 +140,28 @@ class AuthorController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$author->getId(), $request->request->get('_token'))) {
 
-            // remove books
+            $authorName = $author->getLastName();
 
-            $this->logger->info("Suppression de l'auteur : " . $author->getLastName() );
+            // store books info
+            $booksInfo = [];
+
+            foreach( $author->getBooks() as $book ){
+                $booksInfo[] = [
+                    'id'			=> $book->getId(),
+                    'title'			=> $book->getTitle(),
+                    'filename'		=> $book->getOdtBookName(),
+                    'parsingtime'	=> $book->getParsingTime()    
+                ];
+            }
 
             $this->em->remove($author);
             $this->em->flush();
 
-
+            $this->RemoveOdtAndDirectory($booksInfo, $request->getSession());
+            
+            $this->logger->info("Suppression de l'auteur : " . $authorName );
+            $this->addFlash('success', "L'auteur : " . $authorName . " a été supprimé.");
         }
-
         return $this->redirectToRoute('author_index');
     }
 }

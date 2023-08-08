@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookNoteRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Model\TraitContentMgr;
+use App\Traits\TraitContentMgr;
 
 // use ApiPlatform\Metadata\ApiResource;
 
@@ -69,6 +69,8 @@ class BookNote
     /**
      * la propriété $notes n'est ici que pour satisfaire 
      * TraitContentMgr::getFormattedContent() !!!
+     * 
+     * no notes in notes !!!
      */
     private $notes = [];
 

@@ -20,6 +20,7 @@ use App\Repository\BookNoteRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\BookParagraphRepository;
+use App\Traits\TraitFileMgr;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,11 +48,14 @@ class BookController extends AbstractController
 	private $logger;
 	private $projectDir;
 	private $em;
+
+	//
 	// 
 	private $fDev; 
-	//
-	//
 
+	//
+	//
+	use TraitFileMgr;
 
 	public function __construct(KernelInterface $kernel,
 								EntityManagerInterface $em,
@@ -614,65 +618,27 @@ class BookController extends AbstractController
 			
 			//
 			//
-			$bookId			= $book->getId();
-			$odtFileName	= $book->getOdtBookName();
-			$parsingTime 	= $book->getParsingTime();
-			$title			= $book->getTitle();
+			$booksInfo = [];
+			$booksInfo[] = [
+				'id'			=> $book->getId(),
+				'title'			=> $book->getTitle(),
+				'filename'		=> $book->getOdtBookName(),
+				'parsingtime'	=> $book->getParsingTime()
+			];
 
 			foreach( $book->getBookParagraphs() as $paragraph ){
 				$book->removeBookParagraph($paragraph);
+
+				$this->em->remove($paragraph);
 			}
 
 			$this->em->remove($book);
 			$this->em->flush();
 	
-			//
-			// unix cmd
-			// remove odt file
-			passthru('rm -v books/'. $odtFileName . ' > /dev/null 2>&1', $errCode );
-			if ($errCode){
-				$this->logger->info('Erreur de suppression du fichier : ' . $odtFileName . ' [$errCode:' . $errCode . ']');
-				// $this->addFlash('danger', 'Erreur de suppression du fichier : ' . $odtFileName . ' [$errCode:' . $errCode . ']' );
-			}
-			else {
-				$this->logger->info('Suppression du fichier : books/' . $odtFileName . ' (with title : ' . $title . '),');
-				$this->logger->info('qui avait été analysé en : ' . $parsingTime . 'secondes !!!');
-			}
-	
-			// remove .whatever to get directory name from odt file name << maybe buggy !-(
-			$dirName = substr($odtFileName, 0, strpos($odtFileName, '.'));
-			
-			// then delete associated directory recursive
-			passthru('rm -v -r books/' . $dirName . ' > /dev/null 2>&1', $errCode );
-			if ($errCode){
-				$this->logger->info('Erreur de suppression du répertoire : ' . $dirName );
-				$this->addFlash('error', 'Erreur de suppression du Répertoire : ' . $dirName . '[$errCode:' . $errCode . ']' );
-			}
-			else {
-				$this->logger->info('Suppression du répertoire : books/' . $dirName . ' ET de son arborescence !' );
-			}
-	
-			//
-			// clear the array 'currentBookSelectionIds' in the session if any, and if deleted book is part of it
-			$session = $request->getSession();
-			$currentBookSelectionIds = $session->get('currentBookSelectionIds');
-			if ($currentBookSelectionIds){
-				$this->logger->info('Ya une liste sélectionnée !!!' );
-				if (in_array( $bookId, $currentBookSelectionIds)){
-	
-					$i = array_search($bookId, $currentBookSelectionIds);
-					$this->logger->info("Et l'ouvrage est dedans ...");
-					$splice = array_splice($currentBookSelectionIds, $i, 1 );
-	
-					$session->set('currentBookSelectionIds', $currentBookSelectionIds);
-				}
-			}
-	
-	
+			$this->RemoveOdtAndDirectory($booksInfo, $request->getSession());
         }
 
         // return $this->redirectToRoute('book_index');
-		$this->logger->info("Retour au front !-z");
         return $this->redirectToRoute('front'); /// ???
 	}
 
