@@ -863,14 +863,14 @@ class XmlParser {
 
 					// handle paragraph content, notes, alterations, illustrations
 					// either BookParagraph or TableCellParagraph
-					$this->handleParagraph($this->text, $this->noteCollection);
+					$this->handleParagraph($this->text);
 
 					// reset
-					$this->text = '';
-					$this->noteCollection = [];
-					$this->spans = [];
-					$this->illustrations = [];
-					$this->bookmarkName = '';
+					$this->text 			= '';
+					$this->noteCollection 	= [];
+					$this->spans 			= [];
+					$this->illustrations 	= [];
+					$this->bookmarkName 	= '';
 					$this->isHorizontalLine = false;
 				}
 				break;
@@ -936,12 +936,13 @@ class XmlParser {
 	 * 
 	 * 
 	 */
-	private function handleParagraph($rawParagraph, $noteCollection)
+	private function handleParagraph($rawParagraph)
 	{
 		$paragraph = NULL;
 		$illustrations = $this->illustrations;
 		$isBookmark = ($this->bookmarkName != '');
 		$isLine = $this->isHorizontalLine;
+		$noteCollection = $this->noteCollection;
 
 		// strip beginning white spaces.
 		$rawParagraph = ltrim($rawParagraph);
@@ -980,6 +981,14 @@ class XmlParser {
 				$paragraph->setBook($this->book);
 			} 
 
+			//
+			// the following is required in order to flush each bookNote one by one
+			// to be sure of the sequence of creation of entities in the table book_note
+			$paragraph->setContent('');
+			$this->em->persist($paragraph);
+			$this->em->flush();
+
+
 			// handle content alteration, text style attributes
 			//
 			foreach($this->spans as $span){
@@ -999,11 +1008,12 @@ class XmlParser {
 			//
 			// handle notes if any for the paragraph
 			if (!empty($noteCollection)){
+
 				foreach($noteCollection as $note){
 					
 					$bookNote = new BookNote();
 					
-					$bookNote->setBook($this->book)
+					$bookNote
 							->setContent($note['content'])
 							->setParagraphStyles('')
 							->setCitation($note['citation'])
@@ -1025,16 +1035,7 @@ class XmlParser {
 							$this->em->persist($alt);
 							$bookNote->addAlteration($alt);
 	
-							//
-							//
-							// printf("note citation: %s, alt.name: %s, pos.:%d, len.:%d \r\n",
-							// $note['citation'],
-							// $alt->getName(),
-							// $alt->getPosition(),
-							// $alt->getLength() );
-
-							}
-						
+							}						
 						}
 					}
 				
@@ -1069,7 +1070,14 @@ class XmlParser {
 					}
 
 					$this->em->persist($bookNote);
+
+					$this->book->addBookNote($bookNote);
 					$paragraph->addNote($bookNote); //
+
+					// to force respect of the sequence on notes creation in the table book_note 
+					$this->em->flush();
+					// without  that ... doctrine creates note entities
+					// in the reverse order from the one in the paragraph content ??
 				}
 			}
 			//
