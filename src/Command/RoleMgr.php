@@ -82,8 +82,12 @@ class RoleMgr extends Command
         // $role->setTitle('ROLE_ADMIN');
         // $this->em->persist($role);
 
-        $adminMail = "elisee.reclus@webcoop.fr";
+        $adminMail = $_ENV['ADMIN_MAIL'];
+        $io->text($_ENV['ADMIN_MAIL']);
         $adminUser = $this->ur->findOneByEmail($adminMail);
+        
+        //
+        return Command::SUCCESS;
 
 
         $adminUser->addUserRole($role);

@@ -109,6 +109,24 @@ class BookRepository extends ServiceEntityRepository
     }
 
     /**
+	 * findByOdtFileName
+	 * 
+	 * @param string $orderBy
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByOdtFileName($orderBy='ASC') : array
+    {
+        return $this->createQueryBuilder('t')
+            //->andWhere('t.title = :val')
+            //->setParameter('val', $value)
+            ->orderBy('t.OdtFileName', $orderBy)
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
 	 * findByAuthor
 	 * 
 	 * @param Author $author
@@ -148,6 +166,16 @@ class BookRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('b')
             ->andWhere('b.slug = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function findOneByOdtBookName($value): ?Book
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.odtBookName = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

@@ -1056,7 +1056,7 @@ class XmlParser {
 								->setName($illustration['name'])
 								->setSvgWidth($pxWidth)
 								->setSvgHeight($pxHeight)
-								->setFileName('/' . $this->workingDir . '/' . $illustration['fileName'])
+								->setFileName('/books/' . $this->book->getSlug() . '/' . $illustration['fileName'])
 								->setMimeType(($illustration['mimeType']))
 								->setSvgTitle($illustration['svgTitle'])
 								->setBookNote($bookNote)
@@ -1098,7 +1098,7 @@ class XmlParser {
 					->setName($illustration['name'])
 					->setSvgWidth($pxWidth)
 					->setSvgHeight($pxHeight)
-					->setFileName('/' . $this->workingDir . '/' . $illustration['fileName'])
+					->setFileName('/books/' . $this->book->getSlug() . '/' . $illustration['fileName'])
 					->setMimeType(($illustration['mimeType']))
 					->setSvgTitle($illustration['svgTitle'])
 					;
@@ -1159,7 +1159,6 @@ class XmlParser {
 		}
 				
 	}
-
 
 	/**
 	 * Check if the text style name is managed, if true return associated alteration object

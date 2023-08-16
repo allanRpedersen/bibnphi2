@@ -103,6 +103,8 @@ class XmlParserCommand extends Command
                         $mode
         );
 
+        $title = $book->getTitle();
+        $io->text($title);
         $parser->parse();
 
         //

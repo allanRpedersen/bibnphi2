@@ -129,108 +129,24 @@ class BookController extends AbstractController
 	}
 	
 	/**
-	 * Return dirName where is located the xml file to parse or false
-	 */
-	public function isOdtDocValid(Book $book): ? string
-	{
-		//
-		// get the xml files out of odt file
-
-		// uploaded odt file, $odtFilePath, is set once the entity has been persisted ..
-		$odtFilePath = $this->uploaderHelper->asset($book, 'odtBookFile');
-
-		// to rip the leading slash ..
-		$odtFilePath = substr($odtFilePath, 1);
-
-		if (!file_exists($odtFilePath)){
-			$this->logger->info( '$odtFilePath : ' . $odtFilePath . ' does not exist !!!');
-			// internal error !!
-			return null;
-		}
-
-		$dirName = \pathinfo($odtFilePath, PATHINFO_DIRNAME) . '/' . \pathinfo($odtFilePath, PATHINFO_FILENAME);
-
-		//
-		// unix cmd
-		passthru('mkdir -v ' . $dirName . ' > /dev/null 2>&1', $errCode );
-		if ($errCode){
-			$this->logger->debug('Erreur de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
-			$this->addFlash('error', 'Erreur de création du répertoire : ' . $dirName . ', errCode : ' . $errCode );
-			return null;
-		}
-		//
-		//
-		passthru('unzip '. $odtFilePath . ' -d ' . $dirName . ' > /dev/null 2>&1', $errCode);
-		if ($errCode){
-			$this->logger->debug('Erreur de décompression : ' . $odtFilePath . ', errCode : ' . $errCode );
-			$this->addFlash('danger', 'Erreur de décompression du fichier : ' . $odtFilePath);
-			return null;
-		}
-		//
-		//
-		//
-		//
-		$xmlFileName	= $dirName . '/content.xml';
-		$styleFileName 	= $dirName . '/styles.xml';
-		$docFileName	= $dirName . '/document.xml';
-
-		if (!file_exists($xmlFileName)){
-			// internal error !!
-			$this->logger->info( '$xmlFileName : ' . $xmlFileName . ' does not exist !!!');
-			return null;
-		}
-		if (!file_exists($styleFileName)){
-			// internal error !!
-			$this->logger->info( '$styleFileName : ' . $styleFileName . ' does not exist !!!');
-			return null;
-		}
-
-		$b1 = $this->projectDir . '/public/balise-bibnphi-1.xml';
-		$b2 = $this->projectDir . '/public/balise-bibnphi-2.xml';
-
-		// remove xml prolog in files $styleFileName and $xmlFileName
-		//
-		// supprime la 1ère ligne du fichier fileName avec backup dans fileName.bak
-		// sed -i".bak" "1d" fileName
-
-		passthru('sed -i "1d" ' . $styleFileName, $errCode); // sans back up ..
-		if ($errCode){
-			$this->logger->debug('Err: ' . $errCode . ', sed "1d" sur ' . $styleFileName);
-			return null;
-		}
-		passthru('sed -i "1d" ' . $xmlFileName, $errCode); // sans back up ..
-		if ($errCode){
-			$this->logger->debug('Err: ' . $errCode . ', sed "1d" sur ' . $xmlFileName);
-			return null;
-		}
-
-		// then build bibnphi document.xml ..
-
-		passthru('cat '. $b1 . ' ' . $styleFileName . ' ' . $xmlFileName . ' ' . $b2 . ' > ' . $docFileName, $errCode);
-		if ($errCode){
-			$this->logger->debug('Err: ' . $errCode . ', lors de la concatenation de : ' . $xmlFileName . ' avec ' . $styleFileName);
-			return null;
-		}
-
-		// success ..
-		// un fichier document.xml est présent dans le répertoire de travail
-		return $dirName;
-	}
-
-	/**
 	 * @Route("/{slug}/processing", name="book_processing")
 	 */
 	public function bookProcessing(Request $request, Book $book)
 	{
-		$xmlFileName = '';
+		//
+		// uploaded odt file, $odtFilePath, is set once the entity has been persisted ..
+		$odtFilePath = $this->uploaderHelper->asset($book, 'odtBookFile');
+		// to rip the leading slash 
+		// as \Vich\UploaderBundle\Templating\Helper\UploaderHelper::asset returns web site public path whhich begins with '/' ...
+		$odtFilePath = substr($odtFilePath, 1);
+		// file system current path is already website public path
 
-		// check if odt file is well-founded and get the dir name of the xml file content.xml
-		$workingDir = $this->isOdtDocValid($book);
+		// check if odt file is well-founded and get the dir name of the xml file document.xml
+		$workingDir = $this->isOdtDocValid($odtFilePath);
 
 		if ($workingDir){
  
-			$xmlFileName = $workingDir . '/document.xml';
-			$xmlFileSize = filesize($xmlFileName);
+			$xmlFileSize = filesize($workingDir . '/document.xml');
 			$book->setXmlFileSize($xmlFileSize);
 
 			// for the big xml files, use an external command =======
@@ -281,19 +197,6 @@ class BookController extends AbstractController
 
 				// setting no execution time out .. bbrrrr !! 
 				// if ($xmlParser->getRatio() > 1) ini_set('max_execution_time', '0');
-
-				//
-				// xml parsing !
-				// while( !$xmlParser->isParsingCompleted() ){
-				// 		$xmlParser->parse();
-				// }
-
-				// try async ..
-				// $this->get('krlove.async.factory')
-				// 		->call('app.service.parse', 'parse');
-
-				//  $container
-				// ContainerInterface $container->get('krlove.service')->call('app.service.parse', 'parse');
 
 				// could be a long time process ..
 				$xmlParser->parse();
@@ -363,7 +266,7 @@ class BookController extends AbstractController
 				->setXmlFileSize(0)
 				;
 
-            $this->em->persist($book);
+            $this->em->persist($book); // to set the slug
 
 			$slug = $book->getSlug();
 			if (!$this->br->findOneBySlug($slug)){
@@ -379,7 +282,7 @@ class BookController extends AbstractController
 			}
 			else {
 				$this->addFlash(
-					'error',
+					'danger',
 					'Ajout impossible !! Un ouvrage du même nom existe déjà dans la bibliothèque.');
 			}
 

@@ -28,6 +28,7 @@ class BookType extends GenericType
 					return $er->createQueryBuilder('u')
 							->orderBy('u.lastName', 'ASC');
 				},
+				'label' => false,
 			])
 			->add('odtBookFile', VichFileType::class, [
 				'label' => 'Document au format odt',

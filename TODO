@@ -36,18 +36,18 @@ Je t'enverrai des textes pour ces pages à l'occasion.
 10. bandeau de navigation, ça va pas.
         - dissocier un bandeau générique et un bandeau session / utilisateur connecté.
         - 
-11. si utilisateur connecté (ROLE_USER), bouton de sauvegarde de la sélection
+11. si utilisateur connecté (ROLE_USER), bouton de sauvegarde de la sélection <<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>
 
 12. affichage bibliothéque
         - scroller les livres, pas le titre de la page
         
-13. appliquer la recherche de chaîne de caractères aux contenus des tableaux.. i.e. inclure les cellParagraph..
+13. appliquer la recherche de chaîne de caractères aux contenus des tableaux.. i.e. inclure les cellParagraph.. <<<<<<<<<<>>>>>>>>>>
 
 14. Partage de code, utilisation de TraitContent.php dans toutes les entités de contenu. <DONE:>
 
 15. Formulaire de contact. <DONE:>
 
-16. Parcours du résultat d'une recherche de chaîne de car.
+16. Parcours du résultat d'une recherche de chaîne de car. <<<<<<<<<<<>>>>>>>>>>>
 
 17. Les formules de LibreOffice Math !!
         Qd ya pas d'image associée à la formule.. (bergson-l'évolution créatrice)
@@ -70,5 +70,11 @@ Par exemple, pour les livres de Platon, je vais mettre comme année de rédactio
 D'où ma question : est-ce que ça pourra être pris en compte comme paramètre pour le tri des titres ?
 Dans cet exemple, il suffirait que la date soit considéré comme -399.
 
-19.
+19. Une autre suggestion : il m'est arrivé au moins deux ou trois fois d'attribuer à tort un texte à Alain parce que c'est le premier de la liste, j'avais juste oublié de mettre le bon auteur. Si tu peux juste ajouter une ligne en haut de la liste du genre "Sélectionner un auteur", avec message d'erreur si aucun n'est sélectionné, c'est cool.
+
+20. Peux-tu augmenter encore le nombre de caractères possibles pour le champ "Année/période de publication/rédaction" d'une œuvre ?
+Il faudrait que je puisse mettre "Dates de composition et de publication inconnues", soit 48 caractères. C'est par exemple le cas pour les œuvres d'Épicure.
+
+21. Bon je viens de remettre en ligne le dernier Platon, Timée... et il y a des problèmes avec les quatre images dans les notes.
+Elles devraient apparaître chacune sur une ligne à part, mais elles sont au milieu du texte. J'ai ajouté des sauts de lignes avant et après avec des espaces insécables, mais ça ne change rien...
 

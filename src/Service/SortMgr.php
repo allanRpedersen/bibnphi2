@@ -61,8 +61,8 @@ class SortMgr
         $books = [];
         foreach( $originalList as $book ){
             $books[]= [
-                "author"    => strtr($book->getAuthor()->getLastName(), $this->table),
-                "title"     => strtr($book->getTitle(), $this->table),
+                "author"    => strtoupper(strtr($book->getAuthor()->getLastName(), $this->table)),
+                "title"     => strtoupper(strtr($book->getTitle(), $this->table)),
             ];
         }
 

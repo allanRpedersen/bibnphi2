@@ -282,7 +282,7 @@ class Book
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile | File | null $odtBookFile
      */
-    public function setOdtBookFile(?File $odtBookFile = null): void
+    public function setOdtBookFile(?File $odtBookFile = null): self
     {
         $this->odtBookFile = $odtBookFile;
 
@@ -291,6 +291,8 @@ class Book
             // otherwise the event listeners won't be called and the file is lost
             $this->updatedAt = new \DateTimeImmutable();
         }
+
+        return $this;
     }
 
     
@@ -299,9 +301,10 @@ class Book
         return $this->odtBookFile;
     }
 
-    public function setOdtBookName(?string $odtBookName): void
+    public function setOdtBookName(?string $odtBookName): self
     {
         $this->odtBookName = $odtBookName;
+        return $this;
     }
 
     public function getOdtBookName(): ?string
@@ -309,9 +312,10 @@ class Book
         return $this->odtBookName;
     }
     
-    public function setOdtBookSize(?int $odtBookSize): void
+    public function setOdtBookSize(?int $odtBookSize): self
     {
         $this->odtBookSize = $odtBookSize;
+        return $this;
     }
 
     public function getOdtBookSize(): ?int
@@ -319,9 +323,10 @@ class Book
         return $this->odtBookSize;
     }
 
-	public function setBookMimeType(?string $bookMimeType): void
+	public function setBookMimeType(?string $bookMimeType): self
     {
         $this->bookMimeType = $bookMimeType;
+        return $this;
     }
 
     public function getBookMimeType(): ?string
@@ -329,9 +334,10 @@ class Book
         return $this->bookMimeType;
     }
 
-	public function setOdtOriginalName(?string $odtOriginalName): void
+	public function setOdtOriginalName(?string $odtOriginalName): self
     {
         $this->odtOriginalName = $odtOriginalName;
+        return $this;
     }
 
     public function getOdtOriginalName(): ?string
@@ -605,4 +611,28 @@ class Book
         return $this;
     }
 
+
+    /**
+     * Get the value of updatedAt
+     *
+     * @return  \DateTimeInterface|null
+     */ 
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set the value of updatedAt
+     *
+     * @param  \DateTimeInterface|null  $updatedAt
+     *
+     * @return  self
+     */ 
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
 }
