@@ -43,7 +43,7 @@ class AdminBookController extends AbstractController
     /**
      * @Route("/book/{sortBy}", name="admin_book_index")
      */
-    public function index($sortBy = 'Title', AuthorRepository $authorRepo, BookRepository $bookRepo): Response
+    public function index(AuthorRepository $authorRepo, BookRepository $bookRepo, $sortBy = 'Title'): Response
     {
         switch($sortBy){
             case 'Id':

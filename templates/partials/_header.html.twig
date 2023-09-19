@@ -31,7 +31,7 @@
 			</li>
 			{% endif %}
 			{% if is_granted('ROLE_LIBRARIAN') %}
-			<a class=" btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
+			<a class=" btn btn-outline-warning mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 			{% else %}
 			{% endif %}
 		</ul>
@@ -60,15 +60,15 @@
 			{% endif %}
 			{% if is_granted('ROLE_ADMIN') %}
 			<li class="nav-item">
-				<a class="" href="{{ path('admin_book_index',{sortBy: 'Title'}) }}">
+				<a class="btn btn-outline-danger mx-1" href="{{ path('admin_book_index',{sortBy: 'Title'}) }}">
 					<i class="fas fa-wrench"></i>
 					Admin
 				</a>
 			</li>
 			{% endif %}
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-			<li class="nav-item dropdown active" {# style="float:right;"  #}>
-				<a class=" dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<li class="nav-link nav-item dropdown active" {# style="float:right;"  #}>
+				<a class="dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					{{ app.user.email }}
 					{# <img src="{{ vich_uploader_asset(app.user, 'imageFile')}}" alt="avatar" style="width: 30px; height:auto;"> #}
 				</a>
