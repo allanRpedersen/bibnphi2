@@ -3,17 +3,17 @@
 
 // using template https://bootswatch.com/lumen/
 // @import 'variables';
-@import 'bootstrap.min.css';
-// @import '~bootstrap/dist/css/bootstrap.min.css';
+// @import 'bootstrap.min.css';
+@import '~bootstrap/dist/css/bootstrap.min.css';
 // @import 'bootswatch';
 
 $bibnphi-background: rgb(162, 247, 162);
 $bibnphi-text-color: #212529;
 
 body {
-    background-image: url('/public/fondecrannuages.jpeg');
+    // background-image: url('/public/fondecrannuages.jpeg');
     background-size: cover;
-    background-color: lightgray;
+    background-color: lightsteelblue;
 }
 
 #liste-titres {
@@ -301,3 +301,6 @@ a {
     }
 }
 
+.bibnphi-button {
+    color: $bibnphi-text-color;
+}

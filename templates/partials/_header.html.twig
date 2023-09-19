@@ -14,24 +14,24 @@
 	<div class="collapse navbar-collapse" id="navbarColor02">
 		<ul class="navbar-nav mr-auto" style="align-items:center;">
 			<li class="nav-item">
-				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('author_index') }}">Nos philosophes</a>
+				<a class=" btn btn-outline-primary mx-1" href="{{ path('author_index') }}">Nos philosophes</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('book_index') }}">Nos titres</a>
+				<a class=" btn btn-outline-primary mx-1" href="{{ path('book_index') }}">Nos titres</a>
 			</li>
 			{% if hideAbout is not defined %}
 			<li class="nav-item">
-				<a class="nav-link btn btn-outline-primary mx-1" href="{{ path('about') }}">À propos</a>
+				<a class=" btn btn-outline-primary mx-1" href="{{ path('about') }}">À propos</a>
 			</li>
 			{% endif %}
 			{% if hideContact is not defined %}
 			<li class="nav-item">
 				{# <button data-toggle="modal" href="#" data-target="#contact-new" class="nav-link btn btn-outline-primary mx-1">Contact</button> #}
-				<a class="nav-link btn btn-outline-primary mx-1" href="/about#contactTitle">Contact</a>
+				<a class=" btn btn-outline-primary mx-1" href="/about#contactTitle">Contact</a>
 			</li>
 			{% endif %}
 			{% if is_granted('ROLE_LIBRARIAN') %}
-			<a class="nav-link btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
+			<a class=" btn btn-outline-info mx-1" href="{{ path('book_new') }}" title="Ajouter une oeuvre"><i class="fa fa-plus" aria-hidden="true"></i></a>
 			{% else %}
 			{% endif %}
 		</ul>
@@ -39,7 +39,7 @@
 		<ul class="navbar-nav ml-auto">
 			{% if sentenceSearchForm is defined %}
 			<li class="nav-item">
-				<button class="nav-link btn btn-outline-primary mx-1"
+				<button class=" btn btn-outline-primary mx-1"
 				id="sentence-search-button" title="Recherche dans les oeuvres sélectionnées ou la bibliothèque"><i class="fa fa-search"></i></button>
 			</li>
 			<li class="nav-item">
@@ -48,19 +48,19 @@
 			{% endif %}
 			{% if bookSelectForm is defined %}
 			<li class="nav-item">
-				<button class="nav-link btn btn-outline-primary mx-1"
+				<button class=" btn btn-outline-primary mx-1"
 				id="book-search-button" title="dans la bibliothèque">Sélectionner un ou plusieurs ouvrages</button>
 			</li>
 			{% endif %}
 			{% if showCancelSelection is defined %}
 			<li class="nav-item">
-				<a class="nav-link btn btn-outline-primary mx-1"
+				<a class=" btn btn-outline-primary mx-1"
 				id="cancel-selection-button" title="Annuler la sélection courante" href="{{ path('reset_selection') }}">Annuler</a>
 			</li>
 			{% endif %}
 			{% if is_granted('ROLE_ADMIN') %}
 			<li class="nav-item">
-				<a class="nav-link" href="{{ path('admin_book_index',{sortBy: 'Title'}) }}">
+				<a class="" href="{{ path('admin_book_index',{sortBy: 'Title'}) }}">
 					<i class="fas fa-wrench"></i>
 					Admin
 				</a>
@@ -68,7 +68,7 @@
 			{% endif %}
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 			<li class="nav-item dropdown active" {# style="float:right;"  #}>
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<a class=" dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					{{ app.user.email }}
 					{# <img src="{{ vich_uploader_asset(app.user, 'imageFile')}}" alt="avatar" style="width: 30px; height:auto;"> #}
 				</a>
@@ -81,7 +81,7 @@
 			</li>
 			{% else %}
 			<li class="nav-item">
-				<a href="{{ path('app_login') }}" title="connexion.." class="nav-link btn btn-outline-primary" role="button" aria-haspopup="true" aria-expanded="false">
+				<a href="{{ path('app_login') }}" title="connexion.." class=" btn btn-outline-primary" role="button" aria-haspopup="true" aria-expanded="false">
 					<i class="fas fa-sign-in-alt"></i></a>
 						<!--
 							<i class="fas fa-sign-in-alt"></i></a>

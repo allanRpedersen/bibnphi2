@@ -640,10 +640,18 @@ class XmlParser {
 				// index from the beginning of the paragraph !!
 				$this->indexNoteCitation = iconv_strlen($this->text);
 				$this->insideNote = true;
+
+
+				// create entity BookNote
+				// $this->bookNote = new BookNote();
+				//
 				break;
 				
 			case "TEXT:NOTE-BODY":
 				$this->isNoteBody = true;
+
+				//
+				// create entity container 
 				break;
 			
 			case "TEXT:NOTE-CITATION":

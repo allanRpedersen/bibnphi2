@@ -13,9 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class CellParagraph
 {
-    /**
-     * 
-     */
     use TraitContentMgr;
 
     /**
@@ -47,6 +44,8 @@ class CellParagraph
      */
     private $notes;
 
+
+    // 
     private $bookTable;
 
     public function __construct()

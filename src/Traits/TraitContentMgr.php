@@ -1,6 +1,25 @@
 <?php
 namespace App\Traits;
 
+/**
+ * TraitContentMgr defines the following methods :
+ * 
+ *  - isContentMatching()
+ *  - getContent()
+ *  - getFormattedContent()
+ *  - getFirstOccurrenceInParagraph()
+ *  - getFoundStringIndexes()
+ *  - getNbOccurrencesInBook()
+ *  - getParagraphStyles()
+ *  - getSearchedString()
+ *  - setContent()
+ *  - setFirstOccurrenceInParagraph()
+ *  - setFoundStringIndexes()
+ *  - setNbOccurrencesInBook()
+ *  - setParagraphStyles()
+ *  - setSearchedString()
+ * 
+ */
 trait TraitContentMgr
 {
     /**
@@ -70,7 +89,6 @@ trait TraitContentMgr
         // false if empty !!
         return ($this->foundStringIndexes);
     }
-
     /**
      * Construit et retourne le contenu mise en forme pour l'affichage.
      *
@@ -233,7 +251,6 @@ trait TraitContentMgr
         // sinon, on retourne le contenu "cru"
         return $this->content;
     }
-
     /**
      * Get the value of content
      */ 
@@ -290,17 +307,6 @@ trait TraitContentMgr
         return $this;
     }
     /**
-     * Set the value of nextOccurence
-     *
-     * @return  self
-     */ 
-    public function setNextOccurence($nextOccurence): self
-    {
-        $this->nextOccurence = $nextOccurence;
-
-        return $this;
-    }
-    /**
      * Set the value of firstOccurrenceInParagraph
      *
      * @return  self
@@ -330,6 +336,17 @@ trait TraitContentMgr
     public function setNbOccurrencesInBook($nbOccurrencesInBook): self
     {
         $this->nbOccurrencesInBook = $nbOccurrencesInBook;
+
+        return $this;
+    }
+    /**
+     * Set the value of nextOccurence
+     *
+     * @return  self
+     */ 
+    public function setNextOccurence($nextOccurence): self
+    {
+        $this->nextOccurence = $nextOccurence;
 
         return $this;
     }
